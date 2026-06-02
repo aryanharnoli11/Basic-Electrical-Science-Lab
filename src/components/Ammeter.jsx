@@ -1,0 +1,80 @@
+import a1Img from '../assets/A1.png'
+import a2Img from '../assets/A2.png'
+import a3Img from '../assets/A3.png'
+import needleImg from '../assets/needle.png'
+
+const METER_MAX_CURRENT = 10
+const DIAL_START_ANGLE = 180
+const DIAL_SWEEP_ANGLE = 180
+
+const ammeterImages = {
+  A1: a1Img,
+  A2: a2Img,
+  A3: a3Img,
+}
+
+const terminalNumbers = {
+  A1: { positive: 3, negative: 4 },
+  A2: { positive: 5, negative: 6 },
+  A3: { positive: 7, negative: 8 },
+}
+
+const Ammeter = ({ label, value = 0 }) => {
+  const terminals = terminalNumbers[label]
+  const current = Number.isFinite(value) ? value : 0
+  const ratio = Math.min(Math.max(current / METER_MAX_CURRENT, 0), 1)
+  const angle = DIAL_START_ANGLE + ratio * DIAL_SWEEP_ANGLE
+
+  return (
+    <article className={`ammeter ammeter--${label}`} id={`ammeter-${label.toLowerCase()}`} aria-label={`${label} ammeter`}>
+      <img
+        src={ammeterImages[label]}
+        alt={`${label} ammeter`}
+        className="ammeter__image"
+      />
+
+      <span
+        id={`${terminals.positive}-endpoint`}
+        className={`connection-terminal connection-terminal--meter connection-terminal--meter-plus connection-terminal--endpoint-${terminals.positive}`}
+        data-polarity="plus"
+        aria-label={`${label} positive terminal ${terminals.positive}`}
+        title={`${label} positive (${terminals.positive}-endpoint)`}
+      />
+      <span
+        className={`terminal-number-label terminal-number-label--meter-plus terminal-number-label--endpoint-${terminals.positive}`}
+        data-terminal-id={`${terminals.positive}-endpoint`}
+        title={`${label} positive (${terminals.positive}-endpoint)`}
+      >
+        {terminals.positive}
+      </span>
+
+      <span
+        id={`${terminals.negative}-endpoint`}
+        className={`connection-terminal connection-terminal--meter connection-terminal--meter-minus connection-terminal--endpoint-${terminals.negative}`}
+        data-polarity="minus"
+        aria-label={`${label} negative terminal ${terminals.negative}`}
+        title={`${label} negative (${terminals.negative}-endpoint)`}
+      />
+      <span
+        className={`terminal-number-label terminal-number-label--meter-minus terminal-number-label--endpoint-${terminals.negative}`}
+        data-terminal-id={`${terminals.negative}-endpoint`}
+        title={`${label} negative (${terminals.negative}-endpoint)`}
+      >
+        {terminals.negative}
+      </span>
+
+      <div
+        className="ammeter__needle"
+        style={{ transform: `rotate(${angle}deg)` }}
+      >
+        <img
+          src={needleImg}
+          alt="Needle"
+          className="ammeter__needle-image"
+        />
+      </div>
+    </article>
+  )
+}
+
+export default Ammeter
