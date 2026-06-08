@@ -68,9 +68,9 @@ const CircuitDiagram = ({ className = '', r1, r2, r3 }) => (
         </Fragment>
       ))}
 
-      <span className="resistor-value left-[336px] top-[160px]">{r1} &Omega;</span>
-      <span className="resistor-value left-[515px] top-[334px]">{r2} &Omega;</span>
-      <span className="resistor-value left-[600px] top-[160px]">{r3} &Omega;</span>
+      <span className="resistor-value left-[166px] top-[80px]">{r1} &Omega;</span>
+      <span className="resistor-value left-[300px] top-[134px]">{r2} &Omega;</span>
+      <span className="resistor-value left-[615px] top-[80px]">{r3} &Omega;</span>
     </div>
   </section>
 )

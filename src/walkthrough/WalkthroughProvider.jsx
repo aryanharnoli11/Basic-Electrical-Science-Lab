@@ -4,7 +4,6 @@ import defaultWalkthroughConfig from './walkthroughConfig.json'
 import { WalkthroughContext } from './WalkthroughContext.js'
 import { loadWalkthroughConfig } from './walkthroughConfigLoader.js'
 import WalkthroughOverlay from './components/WalkthroughOverlay.jsx'
-import WalkthroughStartButton from './components/WalkthroughStartButton.jsx'
 import './walkthrough.css'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
@@ -249,7 +248,6 @@ const WalkthroughProvider = ({
   return (
     <WalkthroughContext.Provider value={contextValue}>
       {children}
-      <WalkthroughStartButton />
       <WalkthroughOverlay />
     </WalkthroughContext.Provider>
   )

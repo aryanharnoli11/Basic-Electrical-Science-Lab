@@ -1,7 +1,7 @@
-import { ButtonIcon, SlidersIcon, TableIcon } from './Icons.jsx'
+import { ActionButtonsIcon, SlidersIcon, TableIcon } from './Icons.jsx'
 
 const icons = {
-  buttons: ButtonIcon,
+  buttons: ActionButtonsIcon,
   sliders: SlidersIcon,
   table: TableIcon,
 }

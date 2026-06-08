@@ -6,12 +6,15 @@ import ActionButtons from './components/ActionButtons.jsx'
 import ControlPanel from './components/ControlPanel.jsx'
 import GraphPanel from './components/GraphPanel.jsx'
 import HeaderBoard from './components/HeaderBoard.jsx'
-import InstructionsTab from './components/InstructionsTab.jsx'
+import ReportControls from './components/ReportControls.jsx'
+import WalkthroughStartButton from './walkthrough/components/WalkthroughStartButton.jsx'
 import { EXPERIMENT_ALERTS } from './alerts/experimentStepAlerts.js'
 import { useLabAlerts } from './alerts/useLabAlerts.js'
+import { useAiGuideNarration } from './aiGuide/useAiGuideNarration.js'
 // import StatusBar from './components/StatusBar.jsx'
  
 import { calculateReadings } from './utils/circuitMath.js'
+import { generateKclReport } from './utils/reportGenerator.js'
  
 const BASE_WIDTH = 1440
 const BASE_HEIGHT = 960
@@ -25,6 +28,15 @@ const MAX_OBSERVATIONS = 10
 const VOLTAGE_SAFETY_LIMIT = 8.5
 const VOLTAGE_SAFETY_RESET = 7.5
 
+const getObservationSignature = ({ i1, i2, i3, voltage }) => (
+  [
+    Number(voltage).toFixed(1),
+    Number(i1).toFixed(3),
+    Number(i2).toFixed(3),
+    Number(i3).toFixed(3),
+  ].join('|')
+)
+
 const getScale = () => {
   if (typeof window === 'undefined') {
     return 1
@@ -37,7 +49,7 @@ const getScale = () => {
 }
 
 const App = () => {
-  const { confirmAlert, showStepAlert } = useLabAlerts()
+  const { clearAlerts, showStepAlert } = useLabAlerts()
   const [scale, setScale] = useState(getScale)
   const [r1, setR1] = useState(0)
   const [r2, setR2] = useState(0)
@@ -45,13 +57,15 @@ const App = () => {
   const [voltage, setVoltage] = useState(0)
   const [powerOn, setPowerOn] = useState(false)
   const [observations, setObservations] = useState([])
-  const [showGraph, setShowGraph] = useState(false)
-  const [status, setStatus] = useState('Make the connections, click CHECK, then set the resistance values.')
+  const [graphGenerated, setGraphGenerated] = useState(false)
+  const [reportGenerated, setReportGenerated] = useState(false)
+  const [status, setStatus] = useState('Apparatus cleared. Add the new images before continuing the experiment flow.')
 
   const [autoConnectRequest, setAutoConnectRequest] = useState(0)
   const [checkRequest, setCheckRequest] = useState(0)
   const [resetRequest, setResetRequest] = useState(0)
   const [connectionsVerified, setConnectionsVerified] = useState(false)
+  const [sessionStart, setSessionStart] = useState(() => Date.now())
   const voltageLimitWarningShownRef = useRef(false)
 
   useEffect(() => {
@@ -69,8 +83,50 @@ const App = () => {
   )
 
   const normalizedVoltage = Number(voltage.toFixed(1))
-  const hasRecordedVoltage = observations.some((row) => row.voltage === normalizedVoltage)
-  const canPlotGraph = observations.length >= MIN_GRAPH_READINGS
+  const currentReadingSignature = getObservationSignature({
+    i1: readings.i1,
+    i2: readings.i2,
+    i3: readings.i3,
+    voltage: normalizedVoltage,
+  })
+  const hasDuplicateReading = observations.some((row) => (
+    row.voltage === normalizedVoltage
+      || getObservationSignature(row) === currentReadingSignature
+  ))
+  const readingCount = observations.length
+  const canPlotGraph = readingCount >= MIN_GRAPH_READINGS
+
+  const handleAiGuideStart = useCallback(() => {
+    setStatus('AI Guide narration started.')
+  }, [])
+
+  const handleAiGuideFinish = useCallback(() => {
+    setStatus('AI Guide narration completed.')
+  }, [])
+
+  const handleAiGuideError = useCallback(() => {
+    setStatus('AI Guide narration could not start. Add audio files or use a browser with speech synthesis.')
+  }, [])
+
+  const {
+    isPlaying: aiGuidePlaying,
+    start: startAiGuide,
+    stop: stopAiGuide,
+  } = useAiGuideNarration({
+    onError: handleAiGuideError,
+    onFinish: handleAiGuideFinish,
+    onStart: handleAiGuideStart,
+  })
+
+  const handleAiGuide = useCallback(() => {
+    if (aiGuidePlaying) {
+      stopAiGuide()
+      setStatus('AI Guide narration stopped.')
+      return
+    }
+
+    startAiGuide()
+  }, [aiGuidePlaying, startAiGuide, stopAiGuide])
 
   const recordObservation = () => {
     if (!connectionsVerified) {
@@ -105,7 +161,7 @@ const App = () => {
       return
     }
 
-    if (observations.length >= MAX_OBSERVATIONS) {
+    if (readingCount >= MAX_OBSERVATIONS) {
       setStatus('Ten readings are already recorded. Plot the graph or reset for a new run.')
       showStepAlert(EXPERIMENT_ALERTS.minimumReadingsRequired, {
         description: 'The observation table already contains the maximum 10 readings.',
@@ -114,9 +170,12 @@ const App = () => {
       return
     }
 
-    if (hasRecordedVoltage) {
-      setStatus('Change the power supply voltage before adding another reading.')
-      showStepAlert(EXPERIMENT_ALERTS.readingAlreadyExists)
+    if (hasDuplicateReading) {
+      setStatus('Duplicate reading cannot be added to the observation table.')
+      showStepAlert(EXPERIMENT_ALERTS.readingAlreadyExists, {
+        description: 'This reading already exists in the observation table. Change the voltage before adding another reading.',
+        title: 'Duplicate Reading Not Allowed',
+      })
       return
     }
 
@@ -131,9 +190,11 @@ const App = () => {
       i2: readings.i2,
       i3: readings.i3,
     }
-    const nextObservationCount = observations.length + 1
+    const nextObservationCount = readingCount + 1
 
     setObservations([...observations, nextObservation])
+    setGraphGenerated(false)
+    setReportGenerated(false)
     setStatus('Reading added to the observation table.')
 
     if (nextObservationCount === MIN_GRAPH_READINGS) {
@@ -142,35 +203,36 @@ const App = () => {
   }
 
   const resetSimulation = useCallback(() => {
+    stopAiGuide()
     setPowerOn(false)
     setVoltage(0)
     setR1(0)
     setR2(0)
     setR3(0)
     setObservations([])
-    setShowGraph(false)
+    setGraphGenerated(false)
+    setReportGenerated(false)
     setAutoConnectRequest(0)
     setCheckRequest(0)
     setConnectionsVerified(false)
     setResetRequest((current) => current + 1)
+    setSessionStart(Date.now())
     voltageLimitWarningShownRef.current = false
-    setStatus('Simulation reset. Make the circuit connections again.')
+    setStatus('Simulation reset. Apparatus area is clear for the next setup.')
     showStepAlert(EXPERIMENT_ALERTS.resetSuccess)
-  }, [showStepAlert])
+  }, [showStepAlert, stopAiGuide])
 
-  const handleReset = async () => {
-    const confirmed = await confirmAlert(EXPERIMENT_ALERTS.resetWarning)
-
-    if (confirmed) {
-      resetSimulation()
-    }
+  const handleReset = () => {
+    clearAlerts()
+    resetSimulation()
   }
 
   const handlePlot = () => {
     if (!canPlotGraph) {
-      const remainingReadings = MIN_GRAPH_READINGS - observations.length
+      const remainingReadings = MIN_GRAPH_READINGS - readingCount
 
-      setShowGraph(false)
+      setGraphGenerated(false)
+      setReportGenerated(false)
       setStatus(`Add ${remainingReadings} more reading(s) before plotting the graph.`)
       showStepAlert(EXPERIMENT_ALERTS.insufficientGraphReadings, {
         description: `Add ${remainingReadings} more reading(s) before plotting.`,
@@ -178,7 +240,8 @@ const App = () => {
       return
     }
 
-    setShowGraph(true)
+    setGraphGenerated(true)
+    setReportGenerated(false)
     setStatus('Observation graph plotted from the table readings.')
     showStepAlert(EXPERIMENT_ALERTS.graphPlotted)
   }
@@ -191,7 +254,65 @@ const App = () => {
       return
     }
 
+    if (!graphGenerated) {
+      setStatus('Please generate the graph first.')
+      showStepAlert(EXPERIMENT_ALERTS.insufficientGraphReadings, {
+        description: 'Please generate the graph first.',
+        target: '#plot-button',
+        title: 'Generate Graph First',
+        type: 'warning',
+      })
+      window.alert('Please generate the graph first.')
+      return
+    }
+
     window.print()
+  }
+
+  const handleGenerateReport = () => {
+    if (readingCount < MIN_GRAPH_READINGS) {
+      const remainingReadings = MIN_GRAPH_READINGS - readingCount
+
+      setStatus(`Add ${remainingReadings} more reading(s) before generating the report.`)
+      showStepAlert(EXPERIMENT_ALERTS.minimumReadingsRequired, {
+        description: `Add ${remainingReadings} more reading(s), then plot the graph before generating a report.`,
+        target: '#generate-report-button',
+        title: 'Report Requires 6 Readings',
+      })
+      return
+    }
+
+    if (!graphGenerated) {
+      setStatus('Please generate the graph first.')
+      showStepAlert(EXPERIMENT_ALERTS.insufficientGraphReadings, {
+        description: 'Please generate the graph first.',
+        target: '#plot-button',
+        title: 'Generate Graph First',
+        type: 'warning',
+      })
+      window.alert('Please generate the graph first.')
+      return
+    }
+
+    const generated = generateKclReport({
+      observations,
+      resistances: { r1, r2, r3 },
+      sessionStart,
+    })
+
+    if (!generated) {
+      setStatus('Unable to open the report window.')
+      window.alert('Unable to open the report window. Please allow pop-ups and try again.')
+      return
+    }
+
+    setReportGenerated(true)
+    setStatus('Experiment report generated from the plotted graph and current observations.')
+    showStepAlert(EXPERIMENT_ALERTS.printLayoutGenerated, {
+      description: 'The KCL report was generated from the plotted graph and current observations.',
+      target: '#generate-report-button',
+      title: 'Report Generated Successfully',
+    })
   }
 
   const scaledWidth = Math.ceil(BASE_WIDTH * scale)
@@ -254,7 +375,7 @@ const App = () => {
     setConnectionsVerified(false)
 
     setStatus(
-      'Default connections added using jsPlumb. Click CHECK to validate and lock the circuit.',
+      'Auto connection is unavailable until the replacement apparatus is added.',
     )
     showStepAlert(EXPERIMENT_ALERTS.circuitConnectionsCompleted)
   }
@@ -295,20 +416,24 @@ const App = () => {
         <div
           id="app-scale"
           style={{
+            height: `${CONTENT_HEIGHT}px`,
             transform: `scale(${scale})`,
           }}
         >
           <main className="simulation-shell" id="walkthrough-demo-experiment">
             <HeaderBoard />
-            <InstructionsTab />
+            <WalkthroughStartButton variant="side-tab" />
             {/* <StatusBar status={status} /> */}
             <span className="sr-only" role="status" aria-live="polite">{status}</span>
 
             <section className="workspace-grid">
               <aside className="left-panel">
                 <ActionButtons
+                  activeButtons={{
+                    onAiGuide: aiGuidePlaying,
+                  }}
                   disabledButtons={{
-                    onAdd: false,
+                    onAdd: true,
                     onAutoConnect: connectionsVerified || powerOn,
                     onCheck: connectionsVerified,
                     onPlot: false,
@@ -320,6 +445,7 @@ const App = () => {
                   onPrint={handlePrint}
                   onReset={handleReset}
                   onAutoConnect={handleAutoConnect}
+                  onAiGuide={handleAiGuide}
                 />
 
                 <ControlPanel
@@ -336,6 +462,7 @@ const App = () => {
 
               <section className="right-panel">
                 <ConnectionLab
+                  key={`connection-lab-${resetRequest}`}
                   autoConnectRequest={autoConnectRequest}
                   checkRequest={checkRequest}
                   onCheckConnections={handleCheckConnections}
@@ -353,13 +480,21 @@ const App = () => {
               </section>
             </section>
 
+            <ReportControls
+              graphGenerated={graphGenerated}
+              minReadings={MIN_GRAPH_READINGS}
+              onGenerateReport={handleGenerateReport}
+              readingCount={readingCount}
+              reportGenerated={reportGenerated}
+            />
+
           </main>
 
           <GraphPanel
             className="graph-panel--separate"
             id="graph-panel"
             observations={observations}
-            plotted={showGraph}
+            plotted={graphGenerated}
           />
         </div>
       </div>

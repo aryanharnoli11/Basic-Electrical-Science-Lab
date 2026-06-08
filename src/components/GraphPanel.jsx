@@ -12,11 +12,17 @@ const CHART = {
 }
 const X_TICKS = [0, 2, 4, 6, 8, 10]
 const Y_TICK_COUNT = 5
+// Tune labelLeft and labelTop to manually adjust graph labels in SVG units.
 const SERIES = [
-  { className: 'i1', key: 'i1', label: 'I1', labelOffset: -10, pointRadius: 1.9 },
-  { className: 'i3', key: 'i3', label: 'I3', labelOffset: 10, pointRadius: 2 },
-  { className: 'i2', key: 'i2', label: 'I2', labelOffset: -10, pointRadius: 1.8 },
+  { className: 'i1', key: 'i1', labelIndex: '1', labelLeft: 0, labelOffset: -1, labelTop: 0, pointRadius: 1.9 },
+  { className: 'i2', key: 'i2', labelIndex: '2', labelLeft: 0, labelOffset: 0, labelTop: 0, pointRadius: 1.8 },
+  { className: 'i3', key: 'i3', labelIndex: '3', labelLeft: 0, labelOffset: -3, labelTop: 0, pointRadius: 2 },
 ]
+const SERIES_LABEL = {
+  height: 10,
+  width: 18,
+}
+const SERIES_LABEL_GAP = 5
 
 const getMaxCurrent = (observations) => {
   const maxCurrent = observations.reduce(
@@ -82,16 +88,75 @@ const getLinePath = (observations, currentKey, maxCurrent) => (
     .join(' ')
 )
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+
 const getSeriesLabelPoint = (observations, currentKey, maxCurrent, offset) => {
   const row = observations.at(-1)
   const point = getPoint(row, row[currentKey], maxCurrent)
-  const y = Math.min(Math.max(point.y + offset, CHART.top + 9), CHART.top + CHART.height - 9)
+  const minY = CHART.top + SERIES_LABEL.height / 2 + 2
+  const maxY = CHART.top + CHART.height - SERIES_LABEL.height / 2 - 2
 
   return {
-    x: Math.min(point.x + 13, CHART_VIEWBOX.width - 44),
-    y,
+    point,
+    x: Math.min(point.x + 14, CHART_VIEWBOX.width - SERIES_LABEL.width - 8),
+    y: clamp(point.y + offset, minY, maxY),
   }
 }
+
+const getSeriesLabelPoints = (observations, maxCurrent) => {
+  const minY = CHART.top + SERIES_LABEL.height / 2 + 2
+  const maxY = CHART.top + CHART.height - SERIES_LABEL.height / 2 - 2
+  const minGap = SERIES_LABEL.height + SERIES_LABEL_GAP
+  const labels = SERIES
+    .map((series) => ({
+      ...getSeriesLabelPoint(observations, series.key, maxCurrent, series.labelOffset),
+      series,
+    }))
+    .sort((current, next) => current.y - next.y)
+
+  labels.forEach((label, index) => {
+    if (index === 0) {
+      label.y = Math.max(label.y, minY)
+      return
+    }
+
+    label.y = Math.max(label.y, labels[index - 1].y + minGap)
+  })
+
+  if (labels.at(-1)?.y > maxY) {
+    labels[labels.length - 1].y = maxY
+
+    for (let index = labels.length - 2; index >= 0; index -= 1) {
+      labels[index].y = Math.min(labels[index].y, labels[index + 1].y - minGap)
+    }
+  }
+
+  if (labels[0]?.y < minY) {
+    const shift = minY - labels[0].y
+
+    labels.forEach((label) => {
+      label.y += shift
+    })
+  }
+
+  return labels.map((label) => ({
+    ...label,
+    x: label.x + (label.series.labelLeft ?? 0),
+    y: label.y + (label.series.labelTop ?? 0),
+  }))
+}
+
+const CurrentLabel = ({ index }) => (
+  <>
+    I<sub>{index}</sub>
+  </>
+)
+
+const SvgCurrentLabel = ({ index }) => (
+  <>
+    I<tspan className="graph-panel__series-label-sub" dx="1">{index}</tspan>
+  </>
+)
 
 const GraphPanel = ({ className = '', id, observations = [], plotted = false }) => {
   const shouldPlot = plotted && observations.length >= MIN_GRAPH_READINGS
@@ -102,19 +167,20 @@ const GraphPanel = ({ className = '', id, observations = [], plotted = false }) 
   const chartRight = CHART.left + CHART.width
   const yAxisTitleX = 27
   const yAxisTitleY = CHART.top + CHART.height / 2
+  const seriesLabelPoints = shouldPlot ? getSeriesLabelPoints(plottedObservations, maxCurrent) : []
 
   return (
     <section className={`graph-panel ${shouldPlot ? 'graph-panel--plotted' : ''} ${className}`} id={id} aria-label="Observation graph">
       <div className="graph-panel__heading">
         <div>
-          <p className="graph-panel__eyebrow">TABLE READINGS</p>
-          <h2>OBSERVATION GRAPH</h2>
+          
+          <h2>GRAPH</h2>
         </div>
 
         <div className="graph-panel__legend" aria-label="Current lines">
-          <span><i className="graph-panel__dot graph-panel__dot--i1" />I1</span>
-          <span><i className="graph-panel__dot graph-panel__dot--i2" />I2</span>
-          <span><i className="graph-panel__dot graph-panel__dot--i3" />I3</span>
+          <span><i className="graph-panel__dot graph-panel__dot--i1" /><CurrentLabel index="1" /></span>
+          <span><i className="graph-panel__dot graph-panel__dot--i2" /><CurrentLabel index="2" /></span>
+          <span><i className="graph-panel__dot graph-panel__dot--i3" /><CurrentLabel index="3" /></span>
         </div>
       </div>
 
@@ -218,18 +284,29 @@ const GraphPanel = ({ className = '', id, observations = [], plotted = false }) 
                 </g>
               ))}
 
-              {SERIES.map((series) => {
-                const labelPoint = getSeriesLabelPoint(plottedObservations, series.key, maxCurrent, series.labelOffset)
-
+              {seriesLabelPoints.map(({ point, series, x, y }) => {
                 return (
-                  <text
-                    className={`graph-panel__series-label graph-panel__series-label--${series.className}`}
-                    key={`${series.key}-label`}
-                    x={labelPoint.x}
-                    y={labelPoint.y}
-                  >
-                    {series.label}
-                  </text>
+                  <g className="graph-panel__series-label-group" key={`${series.key}-label`}>
+                    <path
+                      className={`graph-panel__series-label-leader graph-panel__series-label-leader--${series.className}`}
+                      d={`M${point.x + 5} ${point.y}L${x - 8} ${y}`}
+                    />
+                    <rect
+                      className={`graph-panel__series-label-bg graph-panel__series-label-bg--${series.className}`}
+                      height={SERIES_LABEL.height}
+                      rx="5"
+                      width={SERIES_LABEL.width}
+                      x={x - 6}
+                      y={y - SERIES_LABEL.height / 2}
+                    />
+                    <text
+                      className={`graph-panel__series-label graph-panel__series-label--${series.className}`}
+                      x={x}
+                      y={y}
+                    >
+                      <SvgCurrentLabel index={series.labelIndex} />
+                    </text>
+                  </g>
                 )
               })}
             </g>

@@ -25,85 +25,13 @@
         "en": "Lab Actions"
       },
       "description": {
-        "en": "Use these controls to check wiring, record readings, plot the graph, reset the setup, print results, or auto-connect the circuit."
+        "en": "Use these controls to record readings, plot the graph, reset the setup, print results, or open the guide."
       },
       "audio": "#",
       "placement": "right"
     },
     {
       "id": 3,
-      "target": "#auto-connect-button",
-      "title": {
-        "en": "Auto Connect"
-      },
-      "description": {
-        "en": "For a guided run, add the default circuit wires first, then press CHECK to validate and lock the connections."
-      },
-      "audio": "#",
-      "placement": "right"
-    },
-    {
-      "id": 4,
-      "target": "#resistance-controls",
-      "title": {
-        "en": "Resistance Controls"
-      },
-      "description": {
-        "en": "After the connections are verified, set R1, R2, and R3 with these sliders. The controls lock while the supply is on or readings exist."
-      },
-      "audio": "#",
-      "placement": "right"
-    },
-    {
-      "id": 5,
-      "target": "#power-supply",
-      "title": {
-        "en": "Power Supply"
-      },
-      "description": {
-        "en": "Switch the supply on after the circuit passes CHECK. The display shows the active voltage supplied to the experiment."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 6,
-      "target": "#voltage-control",
-      "title": {
-        "en": "Voltage Controller"
-      },
-      "description": {
-        "en": "Use this slider to adjust the input voltage. Record a new observation after each unique voltage setting."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 7,
-      "target": "#ammeter-a1",
-      "title": {
-        "en": "Ammeter Readings"
-      },
-      "description": {
-        "en": "A1 measures the main current. A2 and A3 show the branch currents used to confirm that I1 equals I2 plus I3."
-      },
-      "audio": "#",
-      "placement": "bottom"
-    },
-    {
-      "id": 8,
-      "target": "#circuit-panel",
-      "title": {
-        "en": "Circuit Wiring Area"
-      },
-      "description": {
-        "en": "Create or inspect terminal connections here. Before the circuit is locked, terminal labels can be used to remove a wire."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 9,
       "target": "#observation-table-panel",
       "title": {
         "en": "Observation Table"
@@ -115,25 +43,13 @@
       "placement": "right"
     },
     {
-      "id": 10,
+      "id": 4,
       "target": "#graph-panel",
       "title": {
         "en": "Observation Graph"
       },
       "description": {
         "en": "Once enough readings are available, PLOT displays current-versus-voltage traces for I1, I2, and I3."
-      },
-      "audio": "#",
-      "placement": "top"
-    },
-    {
-      "id": 11,
-      "target": "#status-bar",
-      "title": {
-        "en": "Status Feedback"
-      },
-      "description": {
-        "en": "Lab messages appear here after each action so students can see what to do next."
       },
       "audio": "#",
       "placement": "top"

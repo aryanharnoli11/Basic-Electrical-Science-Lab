@@ -1,23 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
-import CircuitDiagram from './CircuitDiagram.jsx'
 import EquipmentPanel from './EquipmentPanel.jsx'
-
 import {
   addAllEndpoints,
-  autoConnectDefaultCircuit,
-  DEFAULT_AMMETER_CURRENT_KEYS,
-  deleteConnectionsForTerminal,
-  getAmmeterCurrentKeys,
-  lockJsPlumbCircuit,
   resolveJsPlumb,
-  validateOldExperimentConnections,
   wireHoverPaintStyles,
   wirePaintStyles,
 } from '../utils/jsPlumbWiring.js'
 
-const getJsPlumbZoom = (scale) => (
-  Number.isFinite(scale) && scale > 0 ? scale : 1
+const getTerminalPolarity = (terminalId) => (
+  document.getElementById(terminalId)?.dataset.polarity
 )
 
 const ConnectionLab = ({
@@ -25,197 +17,142 @@ const ConnectionLab = ({
   checkRequest,
   onCheckConnections,
   powerOn,
-  r1,
-  r2,
-  r3,
   readings,
   resetRequest,
-  scale = 1,
+  scale,
   onTogglePower,
   setVoltage,
   voltage,
 }) => {
-  const containerRef = useRef(null)
+  const labRef = useRef(null)
   const instanceRef = useRef(null)
-  const onCheckConnectionsRef = useRef(onCheckConnections)
-  const scaleRef = useRef(getJsPlumbZoom(scale))
-
-  const [isLocked, setIsLocked] = useState(false)
-  const [ammeterCurrentKeys, setAmmeterCurrentKeys] = useState(DEFAULT_AMMETER_CURRENT_KEYS)
 
   useEffect(() => {
-    onCheckConnectionsRef.current = onCheckConnections
-  }, [onCheckConnections])
+    let disposed = false
+    let activeInstance = null
 
-  useEffect(() => {
-    let cancelled = false
-
-    const initJsPlumb = async () => {
-      const jsPlumbModule = await import('jsplumb')
-      const jsPlumb = resolveJsPlumb(jsPlumbModule)
-
-      if (cancelled || !containerRef.current || !jsPlumb?.getInstance) {
+    const setupJsPlumb = (jsPlumb) => {
+      if (disposed || !labRef.current) {
         return
       }
 
-      instanceRef.current?.reset()
-
-      containerRef.current.classList.remove('connection-lab--locked')
-      setIsLocked(false)
-      setAmmeterCurrentKeys(DEFAULT_AMMETER_CURRENT_KEYS)
-
-      const instance = jsPlumb.getInstance({
-        Container: containerRef.current,
+      activeInstance = jsPlumb.getInstance({
         ConnectionsDetachable: true,
-        ReattachConnections: true,
-        Connector: ['Bezier', { curviness: 72 }],
-        PaintStyle: {
-          ...wirePaintStyles.positive,
-        },
-        HoverPaintStyle: {
-          ...wireHoverPaintStyles.positive,
-        },
+        Connector: ['Bezier', { curviness: 48 }],
+        Container: labRef.current,
         Endpoint: ['Dot', { radius: 5 }],
       })
 
-      instanceRef.current = instance
-      instance.setZoom?.(scaleRef.current)
-
-      instance.registerConnectionTypes({
-        positive: {
-          paintStyle: {
-            ...wirePaintStyles.positive,
-          },
-          hoverPaintStyle: {
-            ...wireHoverPaintStyles.positive,
-          },
-        },
-        negative: {
-          paintStyle: {
-            ...wirePaintStyles.negative,
-          },
-          hoverPaintStyle: {
-            ...wireHoverPaintStyles.negative,
-          },
-        },
+      activeInstance.setContainer?.(labRef.current)
+      activeInstance.registerConnectionType?.('positive', {
+        connectorHoverStyle: wireHoverPaintStyles.positive,
+        connectorStyle: wirePaintStyles.positive,
+        paintStyle: wirePaintStyles.positive,
+        hoverPaintStyle: wireHoverPaintStyles.positive,
+      })
+      activeInstance.registerConnectionType?.('negative', {
+        connectorHoverStyle: wireHoverPaintStyles.negative,
+        connectorStyle: wirePaintStyles.negative,
+        paintStyle: wirePaintStyles.negative,
+        hoverPaintStyle: wireHoverPaintStyles.negative,
       })
 
-      instance.setSuspendDrawing(true)
+      activeInstance.bind('beforeDrop', ({ sourceId, targetId }) => {
+        if (sourceId === targetId) {
+          return false
+        }
 
-      addAllEndpoints(instance)
+        const sourcePolarity = getTerminalPolarity(sourceId)
+        const targetPolarity = getTerminalPolarity(targetId)
 
-      instance.setSuspendDrawing(false, true)
+        return Boolean(sourcePolarity && targetPolarity && sourcePolarity === targetPolarity)
+      })
 
-      window.setTimeout(() => {
-        instance.repaintEverything()
-      }, 100)
+      addAllEndpoints(activeInstance)
+      instanceRef.current = activeInstance
+
+      window.requestAnimationFrame(() => {
+        activeInstance?.repaintEverything?.()
+      })
     }
 
-    initJsPlumb()
+    import('jsplumb').then((module) => {
+      const jsPlumb = resolveJsPlumb(module)
 
-    const handleResize = () => {
-      window.setTimeout(() => {
-        instanceRef.current?.repaintEverything()
-      }, 100)
-    }
+      if (!jsPlumb?.getInstance) {
+        return
+      }
 
-    window.addEventListener('resize', handleResize)
+      if (typeof jsPlumb.ready === 'function') {
+        jsPlumb.ready(() => setupJsPlumb(jsPlumb))
+        return
+      }
+
+      setupJsPlumb(jsPlumb)
+    })
 
     return () => {
-      cancelled = true
-      window.removeEventListener('resize', handleResize)
+      disposed = true
 
-      instanceRef.current?.reset()
-      instanceRef.current = null
+      if (instanceRef.current === activeInstance) {
+        instanceRef.current = null
+      }
+
+      activeInstance?.deleteEveryConnection?.()
+      activeInstance?.deleteEveryEndpoint?.()
+      activeInstance?.reset?.()
     }
   }, [resetRequest])
 
   useEffect(() => {
     const instance = instanceRef.current
-    const zoom = getJsPlumbZoom(scale)
 
-    scaleRef.current = zoom
-
-    if (!instance?.setZoom) {
+    if (!instance || autoConnectRequest === 0) {
       return
     }
 
-    instance.setZoom(zoom, true)
+    instance.repaintEverything?.()
+  }, [autoConnectRequest])
 
-    window.setTimeout(() => {
+  useEffect(() => {
+    const instance = instanceRef.current
+
+    if (!instance || checkRequest === 0) {
+      return
+    }
+
+    const connections = typeof instance.getAllConnections === 'function'
+      ? instance.getAllConnections()
+      : instance.getConnections?.() ?? []
+
+    onCheckConnections({
+      isCorrect: false,
+      matchedCount: 0,
+      totalConnections: connections.length,
+    })
+  }, [checkRequest, onCheckConnections])
+
+  useEffect(() => {
+    const instance = instanceRef.current
+
+    if (!instance) {
+      return
+    }
+
+    window.requestAnimationFrame(() => {
       instance.repaintEverything?.()
-    }, 0)
+    })
   }, [scale])
 
-  useEffect(() => {
-    if (autoConnectRequest === 0 || !instanceRef.current || isLocked) {
-      return
-    }
-
-    autoConnectDefaultCircuit(instanceRef.current)
-
-    window.setTimeout(() => {
-      instanceRef.current?.repaintEverything()
-    }, 80)
-  }, [autoConnectRequest, isLocked])
-
-  useEffect(() => {
-    if (checkRequest === 0 || !instanceRef.current) {
-      return
-    }
-
-    const result = validateOldExperimentConnections(instanceRef.current)
-
-    if (result.isCorrect) {
-      setAmmeterCurrentKeys(getAmmeterCurrentKeys(instanceRef.current))
-      lockJsPlumbCircuit(instanceRef.current, containerRef.current)
-      setIsLocked(true)
-    }
-
-    onCheckConnectionsRef.current?.(result)
-  }, [checkRequest])
-
-  const handleLabelClick = (event) => {
-    const label = event.target.closest('.terminal-number-label')
-
-    if (!label || !containerRef.current?.contains(label)) {
-      return
-    }
-
-    event.preventDefault()
-    event.stopPropagation()
-
-    if (isLocked) {
-      return
-    }
-
-    const terminalId = label.dataset.terminalId
-
-    if (!terminalId || !instanceRef.current) {
-      return
-    }
-
-    deleteConnectionsForTerminal(instanceRef.current, terminalId)
-    instanceRef.current.repaintEverything?.()
-  }
-
-  const ammeterReadings = {
-    A1: readings[ammeterCurrentKeys.A1] ?? 0,
-    A2: readings[ammeterCurrentKeys.A2] ?? 0,
-    A3: readings[ammeterCurrentKeys.A3] ?? 0,
-  }
-
   return (
-    <div className="connection-lab" onClick={handleLabelClick} ref={containerRef}>
+    <div className="connection-lab" id="connection-lab" ref={labRef} aria-label="Experiment apparatus area">
       <EquipmentPanel
         onTogglePower={onTogglePower}
         powerOn={powerOn}
-        readings={ammeterReadings}
+        readings={readings}
         setVoltage={setVoltage}
         voltage={voltage}
       />
-
-      <CircuitDiagram r1={r1} r2={r2} r3={r3} />
     </div>
   )
 }

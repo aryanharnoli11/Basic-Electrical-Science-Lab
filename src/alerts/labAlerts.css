@@ -307,14 +307,14 @@
 }
 
 .lab-alert-active-target {
-  animation: lab-alert-target-glow 1350ms ease-in-out infinite alternate;
-  outline: 2px solid rgba(255, 213, 132, 0.9);
-  outline-offset: 4px;
+  animation: none;
+  outline: none;
 }
 
 .lab-alert-spotlight {
   position: fixed;
   z-index: 955;
+  display: none;
   border: 2px solid var(--alert-spotlight-color, #4db8ff);
   border-radius: 18px;
   box-shadow:

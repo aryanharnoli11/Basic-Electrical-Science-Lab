@@ -108,6 +108,8 @@ const WalkthroughPopup = ({
   const titleId = `walkthrough-title-${activeStep.id}`
   const descriptionId = `walkthrough-description-${activeStep.id}`
   const progressPercent = (currentStep / totalSteps) * 100
+  const primaryActionLabel = canGoNext ? 'Next' : 'Finish'
+  const handlePrimaryAction = canGoNext ? onNext : onClose
 
   useFocusTrap(popupRef, true)
 
@@ -258,11 +260,10 @@ const WalkthroughPopup = ({
         <button
           className="walkthrough-popup__button walkthrough-popup__button--primary"
           data-autofocus
-          disabled={!canGoNext}
-          onClick={onNext}
+          onClick={handlePrimaryAction}
           type="button"
         >
-          Next
+          {primaryActionLabel}
         </button>
       </div>
     </motion.aside>

@@ -34,6 +34,25 @@ export const PrintIcon = () => (
     <path d="M21 16h2" stroke="currentColor" strokeLinecap="round" strokeWidth="2.8" />
   </svg>
 )
+
+export const PdfIcon = () => (
+  <svg aria-hidden="true" viewBox="0 0 32 32">
+    <path d="M9 4h10l5 5v19H9z" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2.5" />
+    <path d="M19 4v6h6" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2.5" />
+    <path d="M8 17h16v8H8z" fill="currentColor" />
+    <text
+      fill="#fff"
+      fontFamily="Arial, Helvetica, sans-serif"
+      fontSize="6"
+      fontWeight="900"
+      x="10"
+      y="23"
+    >
+      PDF
+    </text>
+  </svg>
+)
+
 export const AutoConnectIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 32 32">
     <path d="M8 10h6M18 22h6M14 10c5.5 0 4.5 12 10 12M18 22c-5.5 0-4.5-12-10-12" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.6" />
@@ -69,10 +88,30 @@ export const TableIcon = () => (
   </svg>
 )
 
+export const ActionButtonsIcon = () => (
+  <svg aria-hidden="true" viewBox="0 0 32 32">
+    <circle cx="14.7" cy="8.7" fill="currentColor" r="6.7" />
+    <path
+      d="M12.4 8.4c0-1.3 1-2.4 2.3-2.4s2.3 1.1 2.3 2.4v8.1c.5-.6 1.2-1 2.1-1 .9 0 1.6.5 2 1.2.5-.5 1.1-.8 1.9-.8 1.3 0 2.4 1.1 2.4 2.5v8.2c0 .8-.2 1.5-.7 2.1l-1.1 1.5H12.2v-3.9l-3.1-3.4c-.6-.7-1-1.6-1-2.6v-3.7c0-.8.6-1.4 1.4-1.4.4 0 .8.2 1.1.5l1.8 2.2Z"
+      fill="currentColor"
+      stroke="#f4eadc"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.7"
+    />
+  </svg>
+)
+
 export const ButtonIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 32 32">
     <rect fill="none" height="22" rx="3" stroke="currentColor" strokeWidth="2.4" width="18" x="7" y="5" />
     <path d="M11 11h10M11 16h10M11 21h6" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
+  </svg>
+)
+
+export const CloseIcon = () => (
+  <svg aria-hidden="true" viewBox="0 0 32 32">
+    <path d="M9 9l14 14M23 9 9 23" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="3" />
   </svg>
 )
 
