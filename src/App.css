@@ -61,7 +61,7 @@
   z-index: 1;
   display: grid;
   width: 1332px;
-  grid-template-columns: 466px 845px;
+  grid-template-columns: 466px 945px;
   gap: 21px;
 }
 
@@ -637,7 +637,7 @@
   z-index: auto;
   left: 15px;
   width: 280px;
-  height: 205px;
+  height: 200px;
   flex: 0 0 auto;
   overflow: hidden;
   border-radius: 13px;
@@ -662,16 +662,16 @@
 
 .power-supply__image {
   position: absolute;
-  top: -1px;
+  top: 5px;
   left: 1px;
   z-index: 1;
   width: 300px;
   height: 230px;
-  object-fit: fill;
+  object-fit: cover;
   filter: none;
 }
 
-.power-supply__display {
+/* .power-supply__display {
   position: absolute;
   top: 50px;
   left: 40px;
@@ -707,7 +707,7 @@
   border-radius: 999px;
   background: transparent;
   cursor: pointer;
-}
+} */
 
 .power-supply__control {
   position: absolute;
@@ -715,7 +715,7 @@
   bottom: 30px;
   z-index: 4;
   width: 116px;
-  height: 26px;
+  height: 36px;
 }
 
 .voltage-range {
@@ -826,7 +826,7 @@
   z-index: 1;
   width: 204px;
   height: 224px;
-  object-fit: fill;
+  object-fit: cover;
   transform-origin: center top;
   transform: scale(var(--ammeter-image-scale));
   filter: none;
@@ -1345,9 +1345,12 @@ input:focus-visible {
 }
 
 .equipment-panel {
-  height: 390px;
+  --lab-meter-gap: 42px;
+  --lab-meter-height: 205px;
+  --lab-meter-width: 158px;
+  height: 750px;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 0;
   padding: 22px 36px 18px;
 }
@@ -1363,6 +1366,16 @@ input:focus-visible {
   gap: 18px;
 }
 
+.equipment-panel__meter-row {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, var(--lab-meter-width));
+  gap: var(--lab-meter-gap);
+  align-items: start;
+  margin-left: auto;
+}
+
 .mcb-device,
 .lab-meter {
   position: relative;
@@ -1373,7 +1386,8 @@ input:focus-visible {
 }
 
 .mcb-device {
-  width: 94px;
+  top: 25px;
+  width: 120px;
   height: 158px;
 }
 
@@ -1386,10 +1400,10 @@ input:focus-visible {
   object-fit: fill;
   pointer-events: none;
 }
-
+/* 
 .mcb-device__button {
   position: absolute;
-  top: 47px;
+  top: 7px;
   left: 31px;
   z-index: 4;
   width: 33px;
@@ -1418,7 +1432,7 @@ input:focus-visible {
     inset 0 -4px 6px rgba(0, 0, 0, 0.2),
     0 5px 8px rgba(34, 24, 18, 0.26);
   pointer-events: none;
-}
+} */
 
 .mcb-device__switch::before {
   position: absolute;
@@ -1459,10 +1473,14 @@ input:focus-visible {
 .variac-device {
   position: relative;
   z-index: 1;
-  width: 190px;
+  top: 58px;
+  left: -40px;
+  width: 195px;
   height: 127px;
   flex: 0 0 auto;
   overflow: visible;
+  transform: translate(12px, 10px) scale(1.55);
+  transform-origin: top left;
   filter: drop-shadow(5px 6px 0 rgba(72, 46, 25, 0.18));
 }
 
@@ -1478,11 +1496,11 @@ input:focus-visible {
 
 .variac-device__knob {
   position: absolute;
-  top: 34px;
-  left: 26px;
+  top: 48px;
+  left: 50px;
   z-index: 2;
-  width: 70px;
-  height: 70px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   pointer-events: none;
   transform-origin: center center;
@@ -1491,11 +1509,11 @@ input:focus-visible {
 
 .variac-device__control {
   position: absolute;
-  top: 29px;
-  left: 21px;
+  top: 70px;
+  left: 41px;
   z-index: 4;
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 999px;
 }
 
@@ -1511,9 +1529,50 @@ input:focus-visible {
   cursor: not-allowed;
 }
 
+.transformer-device {
+  position: relative;
+  top: -78px;
+  left: 289px;
+  z-index: 1;
+  width: 195px;
+  max-width: none;
+  height: auto;
+  flex: 0 0 auto;
+  pointer-events: none;
+  filter: drop-shadow(5px 6px 0 rgba(72, 46, 25, 0.18));
+}
+
+.under-variac-meter {
+  position: absolute;
+  display: block;
+  z-index: 2;
+  max-width: none;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(5px 6px 0 rgba(72, 46, 25, 0.18));
+}
+
+#A2 {
+  top: 460px;
+  left: -10px;
+  width: 155px;
+  height: 155px;
+  transform: scale(1.37);
+  transform-origin: top left;
+}
+
+#V2 {
+  top: 460px;
+  left: 165px;
+  width: 155px;
+  height: 155px;
+  transform: scale(1.35);
+  transform-origin: top left;
+}
+
 .lab-meter {
-  width: 158px;
-  height: 210px;
+  width: var(--lab-meter-width);
+  height: var(--lab-meter-height);
   border: 3px solid #272522;
   border-radius: 13px;
   background:
@@ -1636,7 +1695,7 @@ input:focus-visible {
 }
 
 .lab-meter--ammeter .lab-meter__image {
-  transform: scale(1.15);
+  transform: scale(1.12);
   transform-origin: center center;
 }
 
@@ -1674,6 +1733,19 @@ input:focus-visible {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24);
   pointer-events: none;
   transform-origin: 0 50%;
+}
+
+.lamp-load-image {
+  position: absolute;
+  top: 230px;
+  left: -100px;
+  z-index: 2;
+  width: 200px;
+  max-width: none;
+  height: auto;
+  transform: scale(1.45);
+  transform-origin: top left;
+  pointer-events: none;
 }
 
 .mcb-device .connection-terminal--endpoint-1 {

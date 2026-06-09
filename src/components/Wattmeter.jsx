@@ -1,3 +1,4 @@
+import lampLoadImg from '../assets/lampload.png'
 import wattmeterImg from '../assets/ac_wattmeter.png'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 
@@ -10,6 +11,7 @@ const Wattmeter = ({ value = 0 }) => {
   return (
     <article className="lab-meter lab-meter--wattmeter" id="wattmeter-meter" aria-label="AC wattmeter">
       <img alt="AC wattmeter" className="lab-meter__image" src={wattmeterImg} />
+      <img alt="Lamp load" className="lamp-load-image" src={lampLoadImg} />
 
       <span
         className="wattmeter-needle"

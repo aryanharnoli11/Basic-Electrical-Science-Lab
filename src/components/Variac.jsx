@@ -6,7 +6,7 @@ const Variac = ({ powerOn, setVoltage, voltage }) => {
     setVoltage(Number(Number(event.target.value).toFixed(1)))
   }
 
-  const rotation = -120 + (voltage / 10) * 240
+  const rotation = -70 + (voltage / 10) * 240
 
   return (
     <article className="variac-device" aria-label="Variac voltage controller">

@@ -16,13 +16,13 @@ import { useAiGuideNarration } from './aiGuide/useAiGuideNarration.js'
 import { calculateReadings } from './utils/circuitMath.js'
 import { generateKclReport } from './utils/reportGenerator.js'
  
-const BASE_WIDTH = 1440
+const BASE_WIDTH = 1435
 const BASE_HEIGHT = 960
 const GRAPH_SECTION_GAP = 28
 const GRAPH_SECTION_HEIGHT = 430
 const CONTENT_HEIGHT = BASE_HEIGHT + GRAPH_SECTION_GAP + GRAPH_SECTION_HEIGHT
-const PANEL_MAX_SCALE = 0.9
-const PANEL_VIEWPORT_MARGIN = 24
+const PANEL_MAX_SCALE = 0.95
+const PANEL_VIEWPORT_MARGIN = 32
 const MIN_GRAPH_READINGS = 6
 const MAX_OBSERVATIONS = 10
 const VOLTAGE_SAFETY_LIMIT = 8.5
@@ -43,9 +43,8 @@ const getScale = () => {
   }
 
   const widthScale = (window.innerWidth - PANEL_VIEWPORT_MARGIN) / BASE_WIDTH
-  const heightScale = (window.innerHeight - PANEL_VIEWPORT_MARGIN) / BASE_HEIGHT
 
-  return Math.max(Math.min(widthScale, heightScale, PANEL_MAX_SCALE), 0.1)
+  return Math.max(Math.min(widthScale, PANEL_MAX_SCALE), 0.1)
 }
 
 const App = () => {
