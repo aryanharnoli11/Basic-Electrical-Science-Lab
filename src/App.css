@@ -101,9 +101,10 @@
 
 .header-board h1 {
   margin: 0;
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 900;
   line-height: 1;
+  white-space: nowrap;
   text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
 }
 
@@ -1735,17 +1736,58 @@ input:focus-visible {
   transform-origin: 0 50%;
 }
 
-.lamp-load-image {
+.lamp-load {
+  --lamp-load-width: 200px;
+  --lamp-load-scale: 1.55;
+  --lamp-bulb-width: 8.6%;
   position: absolute;
   top: 230px;
-  left: -100px;
+  left: -110px;
   z-index: 2;
-  width: 200px;
+  width: var(--lamp-load-width);
   max-width: none;
-  height: auto;
-  transform: scale(1.45);
+  aspect-ratio: 2 / 3;
+  transform: scale(var(--lamp-load-scale));
   transform-origin: top left;
   pointer-events: none;
+}
+
+.lamp-load__image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+.lamp-load__bulb {
+  position: absolute;
+  top: var(--bulb-y);
+  left: var(--bulb-x);
+  z-index: 2;
+  display: block;
+  width: var(--bulb-width, var(--lamp-bulb-width));
+  aspect-ratio: 472 / 980;
+  overflow: hidden;
+  pointer-events: none;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--bulb-rotation, 0deg))
+    scale(var(--bulb-scale, 1));
+  transform-origin: center;
+}
+
+.lamp-load__bulb-image {
+  position: absolute;
+  top: -23.7%;
+  left: -58.5%;
+  width: 216.95%;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
 }
 
 .mcb-device .connection-terminal--endpoint-1 {

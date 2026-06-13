@@ -1,8 +1,53 @@
+import bulbOffImg from '../assets/bulboff.png'
 import lampLoadImg from '../assets/lampload.png'
 import wattmeterImg from '../assets/ac_wattmeter.png'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+
+const LAMP_LOAD_BULBS = [
+  { id: 'r1-c1', x: 23.5, y: 30.5 },
+  { id: 'r1-c2', x: 36.5, y: 30.5 },
+  { id: 'r1-c3', x: 49.5, y: 30.5 },
+  { id: 'r1-c4', x: 62.5, y: 30.5 },
+  { id: 'r2-c1', x: 23.5, y: 44.2 },
+  { id: 'r2-c2', x: 36.5, y: 44.2 },
+  { id: 'r2-c3', x: 49.5, y: 44.2 },
+  { id: 'r2-c4', x: 62.5, y: 44.2 },
+  { id: 'r3-c1', x: 23.5, y: 57.9 },
+  { id: 'r3-c2', x: 36.5, y: 57.9 },
+  { id: 'r3-c3', x: 49.5, y: 57.9 },
+  { id: 'r3-c4', x: 62.5, y: 57.9 },
+  { id: 'r4-c1', x: 23.5, y: 71.6 },
+  { id: 'r4-c2', x: 36.5, y: 71.6 },
+  { id: 'r4-c3', x: 49.5, y: 71.6 },
+  { id: 'r4-c4', x: 62.5, y: 71.6 },
+]
+
+const formatCssLength = (value, unit) => (
+  typeof value === 'number' ? `${value}${unit}` : value
+)
+
+const getBulbStyle = ({ rotation, scale, width, x, y }) => {
+  const style = {
+    '--bulb-x': `${x}%`,
+    '--bulb-y': `${y}%`,
+  }
+
+  if (width) {
+    style['--bulb-width'] = formatCssLength(width, '%')
+  }
+
+  if (rotation) {
+    style['--bulb-rotation'] = formatCssLength(rotation, 'deg')
+  }
+
+  if (scale) {
+    style['--bulb-scale'] = scale
+  }
+
+  return style
+}
 
 const Wattmeter = ({ value = 0 }) => {
   const ratio = clamp((Number.isFinite(value) ? value : 0) / 600, 0, 1)
@@ -11,7 +56,18 @@ const Wattmeter = ({ value = 0 }) => {
   return (
     <article className="lab-meter lab-meter--wattmeter" id="wattmeter-meter" aria-label="AC wattmeter">
       <img alt="AC wattmeter" className="lab-meter__image" src={wattmeterImg} />
-      <img alt="Lamp load" className="lamp-load-image" src={lampLoadImg} />
+      <div className="lamp-load" role="img" aria-label="Lamp load with 16 bulbs">
+        <img alt="" className="lamp-load__image" src={lampLoadImg} aria-hidden="true" />
+        {LAMP_LOAD_BULBS.map((bulb) => (
+          <span
+            className="lamp-load__bulb"
+            key={bulb.id}
+            style={getBulbStyle(bulb)}
+          >
+            <img alt="" className="lamp-load__bulb-image" src={bulbOffImg} aria-hidden="true" />
+          </span>
+        ))}
+      </div>
 
       <span
         className="wattmeter-needle"
