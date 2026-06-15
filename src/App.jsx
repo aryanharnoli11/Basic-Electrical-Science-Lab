@@ -343,7 +343,7 @@ const App = () => {
       `Invalid connections. Correct matched points: ${result.matchedCount}; total wires: ${result.totalConnections}.`,
     )
     showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
-      description: `Matched ${result.matchedCount} of 8 required wire pairs from ${result.totalConnections} total wires.`,
+      description: `Matched ${result.matchedCount} of 15 required wire pairs from ${result.totalConnections} total wires.`,
     })
   }, [showStepAlert])
 
@@ -373,9 +373,7 @@ const App = () => {
     setAutoConnectRequest((current) => current + 1)
     setConnectionsVerified(false)
 
-    setStatus(
-      'Auto connection is unavailable until the replacement apparatus is added.',
-    )
+    setStatus('Auto connecting the circuit with the correct wire pairs.')
     showStepAlert(EXPERIMENT_ALERTS.circuitConnectionsCompleted)
   }
 

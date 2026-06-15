@@ -3,14 +3,15 @@ import { useEffect, useRef } from 'react'
 import EquipmentPanel from './EquipmentPanel.jsx'
 import {
   addAllEndpoints,
+  autoConnectDefaultCircuit,
+  deleteConnectionsForTerminal,
   resolveJsPlumb,
+  syncWireAnchors,
+  updateTerminalConnectionStates,
+  validateOldExperimentConnections,
   wireHoverPaintStyles,
   wirePaintStyles,
 } from '../utils/jsPlumbWiring.js'
-
-const getTerminalPolarity = (terminalId) => (
-  document.getElementById(terminalId)?.dataset.polarity
-)
 
 const ConnectionLab = ({
   autoConnectRequest,
@@ -30,6 +31,7 @@ const ConnectionLab = ({
   useEffect(() => {
     let disposed = false
     let activeInstance = null
+    let cleanupLayoutListeners = () => {}
 
     const setupJsPlumb = (jsPlumb) => {
       if (disposed || !labRef.current) {
@@ -57,22 +59,46 @@ const ConnectionLab = ({
         hoverPaintStyle: wireHoverPaintStyles.negative,
       })
 
-      activeInstance.bind('beforeDrop', ({ sourceId, targetId }) => {
-        if (sourceId === targetId) {
-          return false
+      const refreshWiring = () => {
+        if (!activeInstance || !labRef.current) {
+          return
         }
 
-        const sourcePolarity = getTerminalPolarity(sourceId)
-        const targetPolarity = getTerminalPolarity(targetId)
+        syncWireAnchors(labRef.current, activeInstance)
+        activeInstance.repaintEverything?.()
+        updateTerminalConnectionStates(activeInstance)
+      }
 
-        return Boolean(sourcePolarity && targetPolarity && sourcePolarity === targetPolarity)
+      activeInstance.bind('beforeDrop', ({ sourceId, targetId }) => {
+        return sourceId !== targetId
       })
+      activeInstance.bind('connection', refreshWiring)
+      activeInstance.bind('connectionDetached', refreshWiring)
+      activeInstance.bind('connectionMoved', refreshWiring)
 
+      syncWireAnchors(labRef.current)
       addAllEndpoints(activeInstance)
       instanceRef.current = activeInstance
 
+      const scheduleRefresh = () => {
+        window.requestAnimationFrame(refreshWiring)
+      }
+
+      const imageElements = Array.from(labRef.current.querySelectorAll('img'))
+
+      imageElements.forEach((imageElement) => {
+        imageElement.addEventListener('load', scheduleRefresh)
+      })
+
+      cleanupLayoutListeners = () => {
+        imageElements.forEach((imageElement) => {
+          imageElement.removeEventListener('load', scheduleRefresh)
+        })
+      }
+
       window.requestAnimationFrame(() => {
-        activeInstance?.repaintEverything?.()
+        refreshWiring()
+        window.requestAnimationFrame(refreshWiring)
       })
     }
 
@@ -98,6 +124,7 @@ const ConnectionLab = ({
         instanceRef.current = null
       }
 
+      cleanupLayoutListeners()
       activeInstance?.deleteEveryConnection?.()
       activeInstance?.deleteEveryEndpoint?.()
       activeInstance?.reset?.()
@@ -111,8 +138,14 @@ const ConnectionLab = ({
       return
     }
 
-    instance.repaintEverything?.()
-  }, [autoConnectRequest])
+    window.requestAnimationFrame(() => {
+      syncWireAnchors(labRef.current, instance)
+      autoConnectDefaultCircuit(instance)
+      instance.repaintEverything?.()
+      updateTerminalConnectionStates(instance)
+      onCheckConnections(validateOldExperimentConnections(instance))
+    })
+  }, [autoConnectRequest, onCheckConnections])
 
   useEffect(() => {
     const instance = instanceRef.current
@@ -121,15 +154,7 @@ const ConnectionLab = ({
       return
     }
 
-    const connections = typeof instance.getAllConnections === 'function'
-      ? instance.getAllConnections()
-      : instance.getConnections?.() ?? []
-
-    onCheckConnections({
-      isCorrect: false,
-      matchedCount: 0,
-      totalConnections: connections.length,
-    })
+    onCheckConnections(validateOldExperimentConnections(instance))
   }, [checkRequest, onCheckConnections])
 
   useEffect(() => {
@@ -140,9 +165,88 @@ const ConnectionLab = ({
     }
 
     window.requestAnimationFrame(() => {
+      syncWireAnchors(labRef.current, instance)
       instance.repaintEverything?.()
+      updateTerminalConnectionStates(instance)
     })
   }, [scale])
+
+  useEffect(() => {
+    const labElement = labRef.current
+
+    if (!labElement) {
+      return undefined
+    }
+
+    const removeTerminalConnection = (terminalId) => {
+      const instance = instanceRef.current
+
+      if (!instance || !terminalId) {
+        return
+      }
+
+      const deletedCount = deleteConnectionsForTerminal(instance, terminalId)
+
+      if (deletedCount > 0) {
+        syncWireAnchors(labRef.current, instance)
+        instance.repaintEverything?.()
+        updateTerminalConnectionStates(instance)
+      }
+    }
+
+    const getTerminalLabel = (event) => {
+      const directLabel = event.target.closest?.('.terminal-number-label[data-terminal-id]')
+
+      if (directLabel) {
+        return directLabel
+      }
+
+      return Array.from(labElement.querySelectorAll('.terminal-number-label[data-terminal-id]'))
+        .find((label) => {
+          const rect = label.getBoundingClientRect()
+
+          return (
+            event.clientX >= rect.left
+            && event.clientX <= rect.right
+            && event.clientY >= rect.top
+            && event.clientY <= rect.bottom
+          )
+        })
+    }
+
+    const handleLabelClick = (event) => {
+      const label = getTerminalLabel(event)
+
+      if (!label || !labElement.contains(label)) {
+        return
+      }
+
+      removeTerminalConnection(label.dataset.terminalId)
+    }
+
+    const handleLabelKeyDown = (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return
+      }
+
+      const label = getTerminalLabel(event)
+
+      if (!label || !labElement.contains(label)) {
+        return
+      }
+
+      event.preventDefault()
+      removeTerminalConnection(label.dataset.terminalId)
+    }
+
+    labElement.addEventListener('click', handleLabelClick)
+    labElement.addEventListener('keydown', handleLabelKeyDown)
+
+    return () => {
+      labElement.removeEventListener('click', handleLabelClick)
+      labElement.removeEventListener('keydown', handleLabelKeyDown)
+    }
+  }, [])
 
   return (
     <div className="connection-lab" id="connection-lab" ref={labRef} aria-label="Experiment apparatus area">

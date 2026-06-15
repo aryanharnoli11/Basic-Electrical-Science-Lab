@@ -9,10 +9,6 @@ const PowerSupply = ({ onTogglePower, powerOn }) => (
         src={mcbImg}
       />
 
-      <span className="mcb-device__switch" aria-hidden="true">
-        <span />
-      </span>
-
       <ApparatusTerminal number={1} owner="MCB" polarity="plus" variant="mcb" />
       <ApparatusTerminal number={2} owner="MCB" polarity="minus" variant="mcb" />
 

@@ -3,6 +3,7 @@ import SectionCard from './SectionCard.jsx'
 import {
   AddIcon,
   AiGuide,
+  AutoConnectIcon,
   ButtonIcon,
   CloseIcon,
   PlotIcon,
@@ -45,6 +46,13 @@ const buttons = [
     tone: 'action-button--red',
     Icon: ResetIcon,
     handlerName: 'onReset',
+  },
+  {
+    id: 'auto-connect-button',
+    label: 'AUTO CONNECT',
+    tone: 'action-button--teal',
+    Icon: AutoConnectIcon,
+    handlerName: 'onAutoConnect',
   },
   {
     id: 'print-button',

@@ -11,26 +11,33 @@ const ApparatusTerminal = ({ number, owner, polarity, variant }) => {
   return (
     <>
       <span
-        id={terminalId}
         className={[
           'connection-terminal',
           'connection-terminal--apparatus',
+          'endpoint',
+          `endpoint-${number}`,
           `connection-terminal--${variant}`,
           `connection-terminal--${variant}-${polarity}`,
           `connection-terminal--endpoint-${number}`,
         ].join(' ')}
         data-polarity={polarity}
+        data-terminal-id={terminalId}
         aria-label={`${owner} ${terminalPolarity} terminal ${number}`}
         title={title}
       />
       <span
+        id={`label-${number}`}
         className={[
           'terminal-number-label',
           'terminal-number-label--apparatus',
+          'endpoint-label',
+          `endpoint-label-${number}`,
           `terminal-number-label--${variant}-${polarity}`,
           `terminal-number-label--endpoint-${number}`,
         ].join(' ')}
         data-terminal-id={terminalId}
+        role="button"
+        tabIndex={0}
         title={title}
       >
         {number}

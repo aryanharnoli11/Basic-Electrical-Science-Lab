@@ -1401,74 +1401,19 @@ input:focus-visible {
   object-fit: fill;
   pointer-events: none;
 }
-/* 
+
 .mcb-device__button {
   position: absolute;
-  top: 7px;
-  left: 31px;
+  top: 8px;
+  left: 27px;
   z-index: 4;
-  width: 33px;
-  height: 54px;
+  width: 66px;
+  height: 96px;
   border: 0;
-  border-radius: 8px;
+  padding: 0;
+  border-radius: 12px;
   background: transparent;
   cursor: pointer;
-}
-
-.mcb-device__switch {
-  position: absolute;
-  top: 48px;
-  left: 34px;
-  z-index: 3;
-  display: block;
-  width: 27px;
-  height: 49px;
-  border: 2px solid rgba(24, 24, 24, 0.82);
-  border-radius: 4px;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.86), transparent 18% 82%, rgba(0, 0, 0, 0.18)),
-    linear-gradient(180deg, #f6f4ec 0 10px, #a8a8a3 10px 28px, #eceae3 28px 34px, #7c7f7c 34px 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.68),
-    inset 0 -4px 6px rgba(0, 0, 0, 0.2),
-    0 5px 8px rgba(34, 24, 18, 0.26);
-  pointer-events: none;
-} */
-
-.mcb-device__switch::before {
-  position: absolute;
-  left: 3px;
-  right: 3px;
-  height: 6px;
-  content: "";
-  background: #d71912;
-  box-shadow: 0 0 5px rgba(215, 25, 18, 0.38);
-}
-
-.mcb-device--off .mcb-device__switch::before {
-  top: 18px;
-}
-
-.mcb-device--on .mcb-device__switch::before {
-  top: 29px;
-  background: #0fba30;
-  box-shadow: 0 0 5px rgba(15, 186, 48, 0.38);
-}
-
-.mcb-device__switch span {
-  position: absolute;
-  left: -5px;
-  right: -5px;
-  bottom: -3px;
-  height: 17px;
-  border: 1px solid rgba(30, 30, 30, 0.38);
-  border-radius: 5px;
-  background:
-    linear-gradient(180deg, #dbdad5, #878984 72%, #5d625f),
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.36) 0 2px, transparent 2px 5px);
-  box-shadow:
-    inset 0 2px 2px rgba(255, 255, 255, 0.44),
-    0 3px 6px rgba(0, 0, 0, 0.28);
 }
 
 .variac-device {
@@ -1539,8 +1484,16 @@ input:focus-visible {
   max-width: none;
   height: auto;
   flex: 0 0 auto;
-  pointer-events: none;
+  pointer-events: auto;
   filter: drop-shadow(5px 6px 0 rgba(72, 46, 25, 0.18));
+}
+
+.transformer-device__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
 }
 
 .under-variac-meter {
@@ -1548,14 +1501,21 @@ input:focus-visible {
   display: block;
   z-index: 2;
   max-width: none;
+  pointer-events: auto;
+  filter: drop-shadow(5px 6px 0 rgba(72, 46, 25, 0.18));
+}
+
+.under-variac-meter__image {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   pointer-events: none;
-  filter: drop-shadow(5px 6px 0 rgba(72, 46, 25, 0.18));
 }
 
 #A2 {
   top: 460px;
-  left: -10px;
+  left: 215px;
   width: 155px;
   height: 155px;
   transform: scale(1.37);
@@ -1564,7 +1524,7 @@ input:focus-visible {
 
 #V2 {
   top: 460px;
-  left: 165px;
+  left: -20px;
   width: 155px;
   height: 155px;
   transform: scale(1.35);
@@ -1752,6 +1712,11 @@ input:focus-visible {
   pointer-events: none;
 }
 
+.lamp-load .connection-terminal,
+.lamp-load .terminal-number-label {
+  pointer-events: auto;
+}
+
 .lamp-load__image {
   position: absolute;
   inset: 0;
@@ -1779,6 +1744,7 @@ input:focus-visible {
   transform-origin: center;
 }
 
+
 .lamp-load__bulb-image {
   position: absolute;
   top: -23.7%;
@@ -1788,100 +1754,4 @@ input:focus-visible {
   max-width: none;
   pointer-events: none;
   user-select: none;
-}
-
-.mcb-device .connection-terminal--endpoint-1 {
-  --terminal-base-top: 123px;
-  --terminal-base-left: 23px;
-  --jtk-endpoint-offset-x: 0px;
-  --jtk-endpoint-offset-y: 0px;
-}
-
-.mcb-device .connection-terminal--endpoint-2 {
-  --terminal-base-top: 123px;
-  --terminal-base-left: 62px;
-  --jtk-endpoint-offset-x: 0px;
-  --jtk-endpoint-offset-y: 0px;
-}
-
-.lab-meter--voltmeter .connection-terminal--endpoint-3 {
-  --terminal-base-top: 164px;
-  --terminal-base-left: 38px;
-  --jtk-endpoint-offset-x: 0px;
-  --jtk-endpoint-offset-y: 0px;
-}
-
-.lab-meter--voltmeter .connection-terminal--endpoint-4 {
-  --terminal-base-top: 164px;
-  --terminal-base-left: 109px;
-  --jtk-endpoint-offset-x: 0px;
-  --jtk-endpoint-offset-y: 0px;
-}
-
-.lab-meter--ammeter .connection-terminal--endpoint-5 {
-  --terminal-base-top: 159px;
-  --terminal-base-left: 43px;
-  --jtk-endpoint-offset-x: 0px;
-  --jtk-endpoint-offset-y: 0px;
-}
-
-.lab-meter--ammeter .connection-terminal--endpoint-6 {
-  --terminal-base-top: 159px;
-  --terminal-base-left: 91px;
-  --jtk-endpoint-offset-x: 0px;
-  --jtk-endpoint-offset-y: 0px;
-}
-
-.lab-meter--wattmeter .connection-terminal--endpoint-7 {
-  --terminal-base-top: 166px;
-  --terminal-base-left: 34px;
-  --jtk-endpoint-offset-x: 0px;
-  --jtk-endpoint-offset-y: 0px;
-}
-
-.lab-meter--wattmeter .connection-terminal--endpoint-8 {
-  --terminal-base-top: 166px;
-  --terminal-base-left: 103px;
-  --jtk-endpoint-offset-x: 0px;
-  --jtk-endpoint-offset-y: 0px;
-}
-
-.mcb-device .terminal-number-label--endpoint-1 {
-  top: 139px;
-  left: 33px;
-}
-
-.mcb-device .terminal-number-label--endpoint-2 {
-  top: 139px;
-  left: 72px;
-}
-
-.lab-meter--voltmeter .terminal-number-label--endpoint-3 {
-  top: 184px;
-  left: 48px;
-}
-
-.lab-meter--voltmeter .terminal-number-label--endpoint-4 {
-  top: 184px;
-  left: 119px;
-}
-
-.lab-meter--ammeter .terminal-number-label--endpoint-5 {
-  top: 181px;
-  left: 53px;
-}
-
-.lab-meter--ammeter .terminal-number-label--endpoint-6 {
-  top: 181px;
-  left: 101px;
-}
-
-.lab-meter--wattmeter .terminal-number-label--endpoint-7 {
-  top: 190px;
-  left: 44px;
-}
-
-.lab-meter--wattmeter .terminal-number-label--endpoint-8 {
-  top: 190px;
-  left: 113px;
 }

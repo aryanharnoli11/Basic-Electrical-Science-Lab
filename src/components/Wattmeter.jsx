@@ -67,6 +67,8 @@ const Wattmeter = ({ value = 0 }) => {
             <img alt="" className="lamp-load__bulb-image" src={bulbOffImg} aria-hidden="true" />
           </span>
         ))}
+        <ApparatusTerminal number={23} owner="Lamp load" polarity="plus" variant="lamp-load" />
+        <ApparatusTerminal number={24} owner="Lamp load" polarity="minus" variant="lamp-load" />
       </div>
 
       <span
@@ -77,6 +79,8 @@ const Wattmeter = ({ value = 0 }) => {
 
       <ApparatusTerminal number={7} owner="AC wattmeter" polarity="plus" variant="wattmeter" />
       <ApparatusTerminal number={8} owner="AC wattmeter" polarity="minus" variant="wattmeter" />
+      <ApparatusTerminal number={9} owner="AC wattmeter" polarity="plus" variant="wattmeter" />
+      <ApparatusTerminal number={10} owner="AC wattmeter" polarity="minus" variant="wattmeter" />
     </article>
   )
 }

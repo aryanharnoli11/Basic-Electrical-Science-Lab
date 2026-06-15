@@ -52,9 +52,9 @@ const CircuitDiagram = ({ className = '', r1, r2, r3 }) => (
       {terminalLabels.map(({ id, label, polarity }) => (
         <Fragment key={id}>
           <span
-            id={id}
             className={`connection-terminal connection-terminal--circuit connection-terminal--endpoint-${label}`}
             data-polarity={polarity}
+            data-terminal-id={id}
             aria-label={`Circuit terminal ${label}`}
             title={`Circuit terminal ${label} (${id})`}
           />

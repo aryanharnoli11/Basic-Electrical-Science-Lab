@@ -1,5 +1,6 @@
 import knobImg from '../assets/knob.png'
 import variacImg from '../assets/Variacoff.png'
+import ApparatusTerminal from './ApparatusTerminal.jsx'
 
 const Variac = ({ powerOn, setVoltage, voltage }) => {
   const handleVoltageChange = (event) => {
@@ -18,6 +19,11 @@ const Variac = ({ powerOn, setVoltage, voltage }) => {
         src={knobImg}
         style={{ transform: `rotate(${rotation}deg)` }}
       />
+
+      <ApparatusTerminal number={11} owner="Variac input" polarity="plus" variant="variac-input" />
+      <ApparatusTerminal number={12} owner="Variac input" polarity="minus" variant="variac-input" />
+      <ApparatusTerminal number={13} owner="Variac output" polarity="plus" variant="variac-output" />
+      <ApparatusTerminal number={14} owner="Variac output" polarity="minus" variant="variac-output" />
 
       <label className="variac-device__control" id="voltage-control">
         <span className="sr-only">Voltage</span>

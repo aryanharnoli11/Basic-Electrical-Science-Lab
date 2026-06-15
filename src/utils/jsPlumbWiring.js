@@ -1,144 +1,83 @@
-export const POSITIVE_TERMINALS = ['1-endpoint', '3-endpoint', '5-endpoint', '7-endpoint']
-
-export const NEGATIVE_TERMINALS = ['2-endpoint', '4-endpoint', '6-endpoint', '8-endpoint']
-
-export const CIRCUIT_POSITIVE_TERMINALS = [
+export const POSITIVE_TERMINALS = [
+  '1-endpoint',
+  '3-endpoint',
+  '5-endpoint',
+  '7-endpoint',
   '9-endpoint',
   '11-endpoint',
   '13-endpoint',
   '15-endpoint',
+  '16-endpoint',
+  '19-endpoint',
+  '21-endpoint',
+  '23-endpoint',
 ]
 
-export const CIRCUIT_NEGATIVE_TERMINALS = [
+export const NEGATIVE_TERMINALS = [
+  '2-endpoint',
+  '4-endpoint',
+  '6-endpoint',
+  '8-endpoint',
   '10-endpoint',
   '12-endpoint',
   '14-endpoint',
-  '16-endpoint',
+  '17-endpoint',
+  '18-endpoint',
+  '20-endpoint',
+  '22-endpoint',
+  '24-endpoint',
 ]
 
-export const VALID_CONNECTION_SEQUENCE = [
-  '1-endpoint', '9-endpoint',
-  '2-endpoint', '10-endpoint',
+export const CIRCUIT_POSITIVE_TERMINALS = []
 
-  '3-endpoint', '11-endpoint',
-  '4-endpoint', '12-endpoint',
+export const CIRCUIT_NEGATIVE_TERMINALS = []
 
-  '5-endpoint', '13-endpoint',
-  '6-endpoint', '14-endpoint',
+const WIRE_ANCHOR_SIZE = 28
 
-  '7-endpoint', '15-endpoint',
-  '8-endpoint', '16-endpoint',
-
-  // These extra combinations allow A1, A2, A3 to be connected
-  // to different valid branches, same as your old JavaScript file.
-
-  '3-endpoint', '13-endpoint',
-  '4-endpoint', '14-endpoint',
-
-  '3-endpoint', '15-endpoint',
-  '4-endpoint', '16-endpoint',
-
-  '5-endpoint', '11-endpoint',
-  '6-endpoint', '12-endpoint',
-
-  '5-endpoint', '15-endpoint',
-  '6-endpoint', '16-endpoint',
-
-  '7-endpoint', '11-endpoint',
-  '8-endpoint', '12-endpoint',
-
-  '7-endpoint', '13-endpoint',
-  '8-endpoint', '14-endpoint',
+export const REQUIRED_CONNECTIONS = [
+  ['1-endpoint', '11-endpoint'],
+  ['2-endpoint', '12-endpoint'],
+  ['3-endpoint', '13-endpoint'],
+  ['4-endpoint', '14-endpoint'],
+  ['3-endpoint', '5-endpoint'],
+  ['6-endpoint', '7-endpoint'],
+  ['7-endpoint', '9-endpoint'],
+  ['8-endpoint', '15-endpoint'],
+  ['10-endpoint', '17-endpoint'],
+  ['14-endpoint', '17-endpoint'],
+  ['16-endpoint', '19-endpoint'],
+  ['18-endpoint', '20-endpoint'],
+  ['19-endpoint', '21-endpoint'],
+  ['22-endpoint', '23-endpoint'],
+  ['20-endpoint', '24-endpoint'],
 ]
 
-export const DEFAULT_AUTO_CONNECTIONS = [
-  ['1-endpoint', '9-endpoint'],
-  ['2-endpoint', '10-endpoint'],
+export const VALID_CONNECTION_SEQUENCE = REQUIRED_CONNECTIONS.flat()
 
-  ['3-endpoint', '11-endpoint'],
-  ['4-endpoint', '12-endpoint'],
-
-  ['5-endpoint', '13-endpoint'],
-  ['6-endpoint', '14-endpoint'],
-
-  ['7-endpoint', '15-endpoint'],
-  ['8-endpoint', '16-endpoint'],
-]
+export const DEFAULT_AUTO_CONNECTIONS = REQUIRED_CONNECTIONS
 
 export const DEFAULT_AMMETER_CURRENT_KEYS = {
   A1: 'i1',
   A2: 'i2',
-  A3: 'i3',
 }
 
 const AMMETER_BRANCH_CONNECTIONS = {
   A1: [
     {
       currentKey: 'i1',
-      negativeTerminal: '4-endpoint',
-      positiveTerminal: '3-endpoint',
-      circuitNegativeTerminal: '12-endpoint',
-      circuitPositiveTerminal: '11-endpoint',
-    },
-    {
-      currentKey: 'i2',
-      negativeTerminal: '4-endpoint',
-      positiveTerminal: '3-endpoint',
-      circuitNegativeTerminal: '14-endpoint',
-      circuitPositiveTerminal: '13-endpoint',
-    },
-    {
-      currentKey: 'i3',
-      negativeTerminal: '4-endpoint',
-      positiveTerminal: '3-endpoint',
-      circuitNegativeTerminal: '16-endpoint',
-      circuitPositiveTerminal: '15-endpoint',
+      negativeTerminal: '6-endpoint',
+      positiveTerminal: '5-endpoint',
+      circuitNegativeTerminal: '18-endpoint',
+      circuitPositiveTerminal: '16-endpoint',
     },
   ],
   A2: [
     {
-      currentKey: 'i1',
-      negativeTerminal: '6-endpoint',
-      positiveTerminal: '5-endpoint',
-      circuitNegativeTerminal: '12-endpoint',
-      circuitPositiveTerminal: '11-endpoint',
-    },
-    {
       currentKey: 'i2',
-      negativeTerminal: '6-endpoint',
-      positiveTerminal: '5-endpoint',
-      circuitNegativeTerminal: '14-endpoint',
-      circuitPositiveTerminal: '13-endpoint',
-    },
-    {
-      currentKey: 'i3',
-      negativeTerminal: '6-endpoint',
-      positiveTerminal: '5-endpoint',
-      circuitNegativeTerminal: '16-endpoint',
-      circuitPositiveTerminal: '15-endpoint',
-    },
-  ],
-  A3: [
-    {
-      currentKey: 'i1',
-      negativeTerminal: '8-endpoint',
-      positiveTerminal: '7-endpoint',
-      circuitNegativeTerminal: '12-endpoint',
-      circuitPositiveTerminal: '11-endpoint',
-    },
-    {
-      currentKey: 'i2',
-      negativeTerminal: '8-endpoint',
-      positiveTerminal: '7-endpoint',
-      circuitNegativeTerminal: '14-endpoint',
-      circuitPositiveTerminal: '13-endpoint',
-    },
-    {
-      currentKey: 'i3',
-      negativeTerminal: '8-endpoint',
-      positiveTerminal: '7-endpoint',
-      circuitNegativeTerminal: '16-endpoint',
-      circuitPositiveTerminal: '15-endpoint',
+      negativeTerminal: '22-endpoint',
+      positiveTerminal: '21-endpoint',
+      circuitNegativeTerminal: '18-endpoint',
+      circuitPositiveTerminal: '16-endpoint',
     },
   ],
 }
@@ -162,6 +101,110 @@ const getAllConnections = (instance) => {
   }
 
   return []
+}
+
+const getAllTerminalIds = () => [
+  ...POSITIVE_TERMINALS,
+  ...NEGATIVE_TERMINALS,
+  ...CIRCUIT_POSITIVE_TERMINALS,
+  ...CIRCUIT_NEGATIVE_TERMINALS,
+]
+
+const getVisualTerminalElement = (terminalId) => (
+  document.querySelector(`.connection-terminal[data-terminal-id="${terminalId}"]`)
+)
+
+const getWireAnchorLayer = (containerElement) => {
+  let layer = containerElement.querySelector('.wire-anchor-layer')
+
+  if (!layer) {
+    layer = document.createElement('div')
+    layer.className = 'wire-anchor-layer'
+    layer.setAttribute('aria-hidden', 'true')
+    containerElement.appendChild(layer)
+  }
+
+  return layer
+}
+
+export const syncWireAnchors = (
+  containerElement = document.getElementById('connection-lab'),
+  instance,
+) => {
+  if (!containerElement) {
+    return []
+  }
+
+  const layer = getWireAnchorLayer(containerElement)
+  const containerRect = containerElement.getBoundingClientRect()
+  const scaleX = containerElement.offsetWidth && containerRect.width
+    ? containerRect.width / containerElement.offsetWidth
+    : 1
+  const scaleY = containerElement.offsetHeight && containerRect.height
+    ? containerRect.height / containerElement.offsetHeight
+    : 1
+
+  return getAllTerminalIds().map((terminalId) => {
+    const visualElement = getVisualTerminalElement(terminalId)
+
+    if (!visualElement) {
+      return null
+    }
+
+    let anchorElement = document.getElementById(terminalId)
+
+    if (!anchorElement || anchorElement.parentElement !== layer) {
+      anchorElement = document.createElement('span')
+      anchorElement.id = terminalId
+      anchorElement.className = [
+        'wire-anchor',
+        `wire-anchor-${getTerminalNumber(terminalId)}`,
+      ].join(' ')
+      anchorElement.dataset.terminalId = terminalId
+      layer.appendChild(anchorElement)
+    }
+
+    anchorElement.dataset.polarity = visualElement.dataset.polarity ?? ''
+    anchorElement.title = visualElement.title
+
+    const visualRect = visualElement.getBoundingClientRect()
+    const centerX = (
+      visualRect.left
+      + visualRect.width / 2
+      - containerRect.left
+    ) / scaleX
+    const centerY = (
+      visualRect.top
+      + visualRect.height / 2
+      - containerRect.top
+    ) / scaleY
+
+    anchorElement.style.left = `${centerX - WIRE_ANCHOR_SIZE / 2}px`
+    anchorElement.style.top = `${centerY - WIRE_ANCHOR_SIZE / 2}px`
+
+    instance?.revalidate?.(anchorElement)
+
+    return anchorElement
+  }).filter(Boolean)
+}
+
+export const updateTerminalConnectionStates = (instance) => {
+  const connectedTerminalIds = new Set()
+
+  getAllConnections(instance).forEach((connection) => {
+    const sourceId = connection.sourceId || connection.source?.id
+    const targetId = connection.targetId || connection.target?.id
+
+    if (sourceId) connectedTerminalIds.add(sourceId)
+    if (targetId) connectedTerminalIds.add(targetId)
+  })
+
+  getAllTerminalIds().forEach((terminalId) => {
+    getVisualTerminalElement(terminalId)?.classList.toggle(
+      'jtk-connected',
+      connectedTerminalIds.has(terminalId),
+    )
+  })
 }
 
 export const deleteConnectionsForTerminal = (instance, terminalId) => {
@@ -191,34 +234,34 @@ const isNegativeTerminal = (terminalId) => (
 
 const terminalPaintStyles = {
   positive: {
-    fill: '#0969e8',
+    fill: '#0047b8',
     outlineStroke: '#f8fbff',
     outlineWidth: 2,
-    stroke: '#062b77',
+    stroke: '#05215f',
     strokeWidth: 1.4,
   },
   negative: {
-    fill: '#e33024',
+    fill: '#b91c1c',
     outlineStroke: '#fff8f6',
     outlineWidth: 2,
-    stroke: '#8f140e',
+    stroke: '#65100e',
     strokeWidth: 1.4,
   },
 }
 
 const terminalHoverPaintStyles = {
   positive: {
-    fill: '#2a7cff',
+    fill: '#075bd8',
     outlineStroke: '#ffffff',
     outlineWidth: 2.4,
-    stroke: '#082767',
+    stroke: '#04194e',
     strokeWidth: 1.6,
   },
   negative: {
-    fill: '#ff4a3d',
+    fill: '#d42020',
     outlineStroke: '#ffffff',
     outlineWidth: 2.4,
-    stroke: '#81130f',
+    stroke: '#560b0a',
     strokeWidth: 1.6,
   },
 }
@@ -275,6 +318,8 @@ const getEndpointCssClass = (terminalId, type) => {
   return [
     'jtk-endpoint--terminal',
     `jtk-endpoint--terminal-${terminalNumber}`,
+    'wire-endpoint',
+    `wire-endpoint-${terminalNumber}`,
     `jtk-endpoint--${terminalId}`,
     `jtk-endpoint--${type}`,
   ].join(' ')
@@ -357,6 +402,7 @@ export const getAmmeterCurrentKeys = (instance) => {
 
 export const addTerminalEndpoint = (instance, terminalId, type) => {
   const element = document.getElementById(terminalId)
+  const visualElement = getVisualTerminalElement(terminalId) ?? element
 
   if (!element) {
     return
@@ -373,9 +419,9 @@ export const addTerminalEndpoint = (instance, terminalId, type) => {
     connectionsDetachable: true,
     connectorStyle: wirePaintStyles[type],
     connectorHoverStyle: wireHoverPaintStyles[type],
-    maxConnections: 1,
-    paintStyle: getEndpointPaintStyle(element, type),
-    hoverPaintStyle: getEndpointPaintStyle(element, type, 'hover'),
+    maxConnections: -1,
+    paintStyle: getEndpointPaintStyle(visualElement, type),
+    hoverPaintStyle: getEndpointPaintStyle(visualElement, type, 'hover'),
   })
 }
 
@@ -398,6 +444,14 @@ export const addAllEndpoints = (instance) => {
 }
 
 export const autoConnectDefaultCircuit = (instance) => {
+  if (typeof instance.deleteEveryConnection === 'function') {
+    instance.deleteEveryConnection()
+  } else {
+    getAllConnections(instance).forEach((connection) => {
+      instance.deleteConnection?.(connection)
+    })
+  }
+
   DEFAULT_AUTO_CONNECTIONS.forEach(([source, target]) => {
     if (hasConnectionBetween(instance, source, target)) {
       return
@@ -411,44 +465,17 @@ export const autoConnectDefaultCircuit = (instance) => {
 }
 
 export const validateOldExperimentConnections = (instance) => {
-  const matchedConnections = []
-
-  for (let i = 0; i < VALID_CONNECTION_SEQUENCE.length - 1; i += 1) {
-    const firstTerminal = VALID_CONNECTION_SEQUENCE[i]
-    const secondTerminal = VALID_CONNECTION_SEQUENCE[i + 1]
-
-    const matchedConnection = getConnectionBetween(
-      instance,
-      firstTerminal,
-      secondTerminal,
-    )
-
-    if (!matchedConnection || i % 2 !== 0) {
-      continue
-    }
-
-    matchedConnections.push(matchedConnection)
-
-    try {
-      const nextPairIsMissing = !hasConnectionBetween(
-        instance,
-        VALID_CONNECTION_SEQUENCE[i + 2],
-        VALID_CONNECTION_SEQUENCE[i + 3],
-      )
-
-      if (nextPairIsMissing && i % 4 === 0) {
-        matchedConnections.pop()
-      }
-    } catch {
-      // Same idea as old JS:
-      // if the next pair does not exist, just continue.
-    }
-  }
+  const matchedConnections = REQUIRED_CONNECTIONS
+    .map(([firstTerminal, secondTerminal]) => (
+      getConnectionBetween(instance, firstTerminal, secondTerminal)
+    ))
+    .filter(Boolean)
 
   const totalConnections = getAllConnections(instance).length
 
   return {
-    isCorrect: matchedConnections.length === 8 && totalConnections === 8,
+    isCorrect: matchedConnections.length === REQUIRED_CONNECTIONS.length
+      && totalConnections === REQUIRED_CONNECTIONS.length,
     matchedCount: matchedConnections.length,
     totalConnections,
   }

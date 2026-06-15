@@ -1,5 +1,6 @@
 
 import Ammeter from './Ammeter.jsx'
+import ApparatusTerminal from './ApparatusTerminal.jsx'
 import PowerSupply from './PowerSupply.jsx'
 import Variac from './Variac.jsx'
 import Voltmeter from './Voltmeter.jsx'
@@ -25,23 +26,35 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
           setVoltage={setVoltage}
           voltage={voltage}
         />
-        <img
-          alt="A2 meter"
-          className="under-variac-meter"
-          id="A2"
-          src={a2MeterImg}
-        />
-        <img
-          alt="AC voltmeter"
-          className="under-variac-meter"
-          id="V2"
-          src={acVoltmeterImg}
-        />
-        <img
-          alt="Transformer"
-          className="transformer-device"
-          src={transformerImg}
-        />
+        <article className="under-variac-meter under-variac-meter--voltmeter" id="V2" aria-label="AC voltmeter under variac">
+          <img
+            alt="AC voltmeter"
+            className="under-variac-meter__image"
+            src={acVoltmeterImg}
+          />
+          <ApparatusTerminal number={19} owner="Lower AC voltmeter" polarity="plus" variant="under-voltmeter" />
+          <ApparatusTerminal number={20} owner="Lower AC voltmeter" polarity="minus" variant="under-voltmeter" />
+        </article>
+        <article className="under-variac-meter under-variac-meter--ammeter" id="A2" aria-label="A2 ammeter">
+          <img
+            alt="A2 meter"
+            className="under-variac-meter__image"
+            src={a2MeterImg}
+          />
+          <ApparatusTerminal number={21} owner="Ammeter A2" polarity="plus" variant="ammeter-a2" />
+          <ApparatusTerminal number={22} owner="Ammeter A2" polarity="minus" variant="ammeter-a2" />
+        </article>
+        <article className="transformer-device" id="transformer-device" aria-label="Transformer">
+          <img
+            alt="Transformer"
+            className="transformer-device__image"
+            src={transformerImg}
+          />
+          <ApparatusTerminal number={15} owner="Transformer input" polarity="plus" variant="transformer-input" />
+          <ApparatusTerminal number={17} owner="Transformer input" polarity="minus" variant="transformer-input" />
+          <ApparatusTerminal number={16} owner="Transformer output" polarity="plus" variant="transformer-output" />
+          <ApparatusTerminal number={18} owner="Transformer output" polarity="minus" variant="transformer-output" />
+        </article>
       </div>
 
       <div className="equipment-panel__meter-row">
