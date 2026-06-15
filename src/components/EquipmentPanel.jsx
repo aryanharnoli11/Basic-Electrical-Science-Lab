@@ -1,18 +1,25 @@
 
 import Ammeter from './Ammeter.jsx'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
+import MeterNeedle from './MeterNeedle.jsx'
 import PowerSupply from './PowerSupply.jsx'
 import Variac from './Variac.jsx'
 import Voltmeter from './Voltmeter.jsx'
 import Wattmeter from './Wattmeter.jsx'
+import { getMeterNeedleRotation } from '../utils/meterNeedle.js'
 import a2MeterImg from '../assets/A2.png'
 import acVoltmeterImg from '../assets/AC_voltmeter_equal.png'
 import transformerImg from '../assets/transformer.png'
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+
 const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage }) => {
   const activeVoltage = powerOn ? voltage : 0
   const ammeterCurrent = readings?.i1 ?? 0
+  const branchCurrent = readings?.i2 ?? 0
   const wattmeterPower = activeVoltage * ammeterCurrent
+  const lowerVoltmeterRotation = getMeterNeedleRotation(clamp(activeVoltage / 10, 0, 1))
+  const lowerAmmeterRotation = getMeterNeedleRotation(clamp(branchCurrent / 10, 0, 1))
 
   return (
     <section className="equipment-panel" id="equipment-panel">
@@ -32,6 +39,7 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
             className="under-variac-meter__image"
             src={acVoltmeterImg}
           />
+          <MeterNeedle className="meter-needle--under-voltmeter" rotation={lowerVoltmeterRotation} />
           <ApparatusTerminal number={19} owner="Lower AC voltmeter" polarity="plus" variant="under-voltmeter" />
           <ApparatusTerminal number={20} owner="Lower AC voltmeter" polarity="minus" variant="under-voltmeter" />
         </article>
@@ -41,6 +49,7 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
             className="under-variac-meter__image"
             src={a2MeterImg}
           />
+          <MeterNeedle className="meter-needle--under-ammeter" rotation={lowerAmmeterRotation} />
           <ApparatusTerminal number={21} owner="Ammeter A2" polarity="plus" variant="ammeter-a2" />
           <ApparatusTerminal number={22} owner="Ammeter A2" polarity="minus" variant="ammeter-a2" />
         </article>

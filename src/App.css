@@ -1660,40 +1660,67 @@ input:focus-visible {
   transform-origin: center center;
 }
 
-.image-meter-needle {
+.meter-needle {
   position: absolute;
+  top: var(--meter-needle-top);
+  left: var(--meter-needle-left);
   z-index: 3;
-  height: 2px;
-  border-radius: 999px;
-  background: #d71912;
+  width: 0;
+  height: 0;
   pointer-events: none;
-  transform-origin: 0 50%;
+  transform-origin: 0 0;
+  transition: transform 280ms ease;
 }
 
-.image-meter-needle--voltmeter {
-  top: 85px;
-  left: 77px;
-  width: 44px;
-}
-
-.image-meter-needle--ammeter {
-  top: 96px;
-  left: 78px;
-  width: 43px;
-}
-
-.wattmeter-needle {
+.meter-needle__image {
   position: absolute;
-  top: 83px;
-  left: 79px;
-  z-index: 3;
-  width: 45px;
-  height: 2px;
-  border-radius: 999px;
-  background: #d71912;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24);
-  pointer-events: none;
-  transform-origin: 0 50%;
+  top: var(--meter-needle-image-top);
+  left: var(--meter-needle-image-left);
+  display: block;
+  width: var(--meter-needle-size);
+  max-width: none;
+  height: auto;
+  user-select: none;
+}
+
+.meter-needle--voltmeter {
+  --meter-needle-top: 115px;
+  --meter-needle-left: 74px;
+  --meter-needle-size: 85px;
+  --meter-needle-image-top: -51px;
+  --meter-needle-image-left: -40px;
+}
+
+.meter-needle--ammeter {
+  --meter-needle-top: 93px;
+  --meter-needle-left: 79px;
+  --meter-needle-size: 70px;
+  --meter-needle-image-top: -50px;
+  --meter-needle-image-left: -39px;
+}
+
+.meter-needle--wattmeter {
+  --meter-needle-top: 110px;
+  --meter-needle-left: 79px;
+  --meter-needle-size: 80px;
+  --meter-needle-image-top: -51px;
+  --meter-needle-image-left: -40px;
+}
+
+.meter-needle--under-voltmeter {
+  --meter-needle-top: 68px;
+  --meter-needle-left: 98px;
+  --meter-needle-size: 70px;
+  --meter-needle-image-top: -66px;
+  --meter-needle-image-left: -52px;
+}
+
+.meter-needle--under-ammeter {
+  --meter-needle-top: 64px;
+  --meter-needle-left: 95px;
+  --meter-needle-size: 60px;
+  --meter-needle-image-top: -55px;
+  --meter-needle-image-left: -43px;
 }
 
 .lamp-load {

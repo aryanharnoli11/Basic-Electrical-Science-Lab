@@ -1,7 +1,9 @@
 import bulbOffImg from '../assets/bulboff.png'
 import lampLoadImg from '../assets/lampload.png'
 import wattmeterImg from '../assets/ac_wattmeter.png'
+import { getMeterNeedleRotation } from '../utils/meterNeedle.js'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
+import MeterNeedle from './MeterNeedle.jsx'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 
@@ -51,7 +53,7 @@ const getBulbStyle = ({ rotation, scale, width, x, y }) => {
 
 const Wattmeter = ({ value = 0 }) => {
   const ratio = clamp((Number.isFinite(value) ? value : 0) / 600, 0, 1)
-  const angle = 180 - ratio * 180
+  const rotation = getMeterNeedleRotation(ratio)
 
   return (
     <article className="lab-meter lab-meter--wattmeter" id="wattmeter-meter" aria-label="AC wattmeter">
@@ -71,11 +73,7 @@ const Wattmeter = ({ value = 0 }) => {
         <ApparatusTerminal number={24} owner="Lamp load" polarity="minus" variant="lamp-load" />
       </div>
 
-      <span
-        className="wattmeter-needle"
-        style={{ transform: `rotate(${angle}deg)` }}
-        aria-hidden="true"
-      />
+      <MeterNeedle className="meter-needle--wattmeter" rotation={rotation} />
 
       <ApparatusTerminal number={7} owner="AC wattmeter" polarity="plus" variant="wattmeter" />
       <ApparatusTerminal number={8} owner="AC wattmeter" polarity="minus" variant="wattmeter" />

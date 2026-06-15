@@ -5,6 +5,7 @@ import {
   AiGuide,
   AutoConnectIcon,
   ButtonIcon,
+  CheckIcon,
   CloseIcon,
   PlotIcon,
   PrintIcon,
@@ -27,6 +28,20 @@ const buttons = [
     handlerName: 'onAiGuide',
   },
   {
+    id: 'check-button',
+    label: 'CHECK',
+    tone: 'action-button--green',
+    Icon: CheckIcon,
+    handlerName: 'onCheck',
+  },
+  {
+    id: 'auto-connect-button',
+    label: 'AUTO CONNECT',
+    tone: 'action-button--teal',
+    Icon: AutoConnectIcon,
+    handlerName: 'onAutoConnect',
+  },
+  {
     id: 'add-reading-button',
     label: 'ADD',
     tone: 'action-button--blue',
@@ -46,13 +61,6 @@ const buttons = [
     tone: 'action-button--red',
     Icon: ResetIcon,
     handlerName: 'onReset',
-  },
-  {
-    id: 'auto-connect-button',
-    label: 'AUTO CONNECT',
-    tone: 'action-button--teal',
-    Icon: AutoConnectIcon,
-    handlerName: 'onAutoConnect',
   },
   {
     id: 'print-button',
