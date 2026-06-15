@@ -268,6 +268,14 @@ const terminalHoverPaintStyles = {
 
 const getTerminalNumber = (terminalId) => terminalId.replace('-endpoint', '')
 
+const getConnectionKey = (firstTerminal, secondTerminal) => (
+  [firstTerminal, secondTerminal].sort().join('|')
+)
+
+const getTerminalPairLabel = (firstTerminal, secondTerminal) => (
+  `${getTerminalNumber(firstTerminal)}-${getTerminalNumber(secondTerminal)}`
+)
+
 const getCssValue = (styles, propertyName, fallback) => {
   const value = styles.getPropertyValue(propertyName).trim()
 
@@ -465,19 +473,65 @@ export const autoConnectDefaultCircuit = (instance) => {
 }
 
 export const validateOldExperimentConnections = (instance) => {
-  const matchedConnections = REQUIRED_CONNECTIONS
-    .map(([firstTerminal, secondTerminal]) => (
-      getConnectionBetween(instance, firstTerminal, secondTerminal)
-    ))
-    .filter(Boolean)
+  const requiredConnectionKeys = new Set(
+    REQUIRED_CONNECTIONS.map(([firstTerminal, secondTerminal]) => (
+      getConnectionKey(firstTerminal, secondTerminal)
+    )),
+  )
+  const matchedConnectionKeys = new Set()
+  const wrongConnections = []
+  const connections = getAllConnections(instance)
 
-  const totalConnections = getAllConnections(instance).length
+  connections.forEach((connection) => {
+    const sourceId = connection.sourceId || connection.source?.id
+    const targetId = connection.targetId || connection.target?.id
+
+    if (!sourceId || !targetId) {
+      return
+    }
+
+    const connectionKey = getConnectionKey(sourceId, targetId)
+    const connectionDetail = {
+      firstTerminal: sourceId,
+      label: getTerminalPairLabel(sourceId, targetId),
+      secondTerminal: targetId,
+    }
+
+    if (!requiredConnectionKeys.has(connectionKey)) {
+      wrongConnections.push(connectionDetail)
+      return
+    }
+
+    if (matchedConnectionKeys.has(connectionKey)) {
+      wrongConnections.push({
+        ...connectionDetail,
+        duplicate: true,
+      })
+      return
+    }
+
+    matchedConnectionKeys.add(connectionKey)
+  })
+
+  const missingConnections = REQUIRED_CONNECTIONS
+    .filter(([firstTerminal, secondTerminal]) => (
+      !matchedConnectionKeys.has(getConnectionKey(firstTerminal, secondTerminal))
+    ))
+    .map(([firstTerminal, secondTerminal]) => ({
+      firstTerminal,
+      label: getTerminalPairLabel(firstTerminal, secondTerminal),
+      secondTerminal,
+    }))
+
+  const totalConnections = connections.length
 
   return {
-    isCorrect: matchedConnections.length === REQUIRED_CONNECTIONS.length
+    isCorrect: matchedConnectionKeys.size === REQUIRED_CONNECTIONS.length
       && totalConnections === REQUIRED_CONNECTIONS.length,
-    matchedCount: matchedConnections.length,
+    matchedCount: matchedConnectionKeys.size,
+    missingConnections,
     totalConnections,
+    wrongConnections,
   }
 }
 

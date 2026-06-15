@@ -4,9 +4,10 @@ import ApparatusTerminal from './ApparatusTerminal.jsx'
 import MeterNeedle from './MeterNeedle.jsx'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+const VOLTMETER_MAX = 240
 
 const Voltmeter = ({ value = 0 }) => {
-  const ratio = clamp((Number.isFinite(value) ? value : 0) / 10, 0, 1)
+  const ratio = clamp((Number.isFinite(value) ? value : 0) / VOLTMETER_MAX, 0, 1)
   const rotation = getMeterNeedleRotation(ratio)
 
   return (

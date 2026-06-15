@@ -1,10 +1,14 @@
-import mcbImg from '../assets/PowerSupply_Off.png'
+import mcbOffImg from '../assets/PowerSupply_Off.png'
+import mcbOnImg from '../assets/PowerSupply_ON.png'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 
-const PowerSupply = ({ onTogglePower, powerOn }) => (
+const PowerSupply = ({ onTogglePower, powerOn }) => {
+  const mcbImg = powerOn ? mcbOnImg : mcbOffImg
+
+  return (
     <article className={`mcb-device mcb-device--${powerOn ? 'on' : 'off'}`} id="power-supply" aria-label="MCB">
       <img
-        alt="MCB"
+        alt={powerOn ? 'MCB on' : 'MCB off'}
         className="mcb-device__image"
         src={mcbImg}
       />
@@ -21,6 +25,7 @@ const PowerSupply = ({ onTogglePower, powerOn }) => (
         type="button"
       />
     </article>
-)
+  )
+}
 
 export default PowerSupply

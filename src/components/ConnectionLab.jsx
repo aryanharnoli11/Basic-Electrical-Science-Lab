@@ -143,9 +143,8 @@ const ConnectionLab = ({
       autoConnectDefaultCircuit(instance)
       instance.repaintEverything?.()
       updateTerminalConnectionStates(instance)
-      onCheckConnections(validateOldExperimentConnections(instance))
     })
-  }, [autoConnectRequest, onCheckConnections])
+  }, [autoConnectRequest])
 
   useEffect(() => {
     const instance = instanceRef.current

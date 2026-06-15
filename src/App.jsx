@@ -25,8 +25,8 @@ const PANEL_MAX_SCALE = 0.95
 const PANEL_VIEWPORT_MARGIN = 32
 const MIN_GRAPH_READINGS = 6
 const MAX_OBSERVATIONS = 10
-const VOLTAGE_SAFETY_LIMIT = 8.5
-const VOLTAGE_SAFETY_RESET = 7.5
+const VOLTAGE_SAFETY_LIMIT = 240
+const VOLTAGE_SAFETY_RESET = 220
 
 const getObservationSignature = ({ i1, i2, i3, voltage }) => (
   [
@@ -35,6 +35,25 @@ const getObservationSignature = ({ i1, i2, i3, voltage }) => (
     Number(i2).toFixed(3),
     Number(i3).toFixed(3),
   ].join('|')
+)
+
+const formatConnectionList = (connections) => (
+  connections.map((connection) => connection.label).join(', ')
+)
+
+const getWrongConnectionDescription = ({ missingConnections = [], wrongConnections = [] }) => {
+  const wrongLabel = wrongConnections.length === 1 ? 'Wrong connection' : 'Wrong connections'
+  const alertParts = [`${wrongLabel}: ${formatConnectionList(wrongConnections)}.`]
+
+  if (missingConnections.length > 0) {
+    alertParts.push(`Missing connections: ${formatConnectionList(missingConnections)}.`)
+  }
+
+  return alertParts.join(' ')
+}
+
+const getMissingConnectionDescription = ({ missingConnections = [] }) => (
+  `Missing connections: ${formatConnectionList(missingConnections)}.`
 )
 
 const getScale = () => {
@@ -320,10 +339,12 @@ const App = () => {
     if (result.isCorrect) {
       setConnectionsVerified(true)
 
-      setStatus(
-        'Right connections! Please choose resistance values and switch on the power supply.',
-      )
-      showStepAlert(EXPERIMENT_ALERTS.connectionsVerified)
+      setStatus('Connections are correct, click on the MCB to turn it ON.')
+      showStepAlert(EXPERIMENT_ALERTS.connectionsVerified, {
+        description: null,
+        target: '#power-toggle-button',
+        title: 'Connections are correct, click on the MCB to turn it ON',
+      })
 
       return
     }
@@ -334,6 +355,34 @@ const App = () => {
       setStatus('Please make the connections first.')
       showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
         description: 'No circuit wires were found. Drag node connections before checking.',
+        type: 'warning',
+      })
+      return
+    }
+
+    if (result.wrongConnections?.length > 0) {
+      const description = getWrongConnectionDescription(result)
+      const title = result.wrongConnections.length === 1
+        ? 'Wrong connection'
+        : 'Wrong connections'
+
+      setStatus(description)
+      showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
+        description,
+        target: '#connection-lab',
+        title,
+      })
+      return
+    }
+
+    if (result.missingConnections?.length > 0) {
+      const description = getMissingConnectionDescription(result)
+
+      setStatus(description)
+      showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
+        description,
+        target: '#connection-lab',
+        title: 'Missing connections',
         type: 'warning',
       })
       return
@@ -366,15 +415,23 @@ const App = () => {
     }
 
     setPowerOn(true)
-    setStatus('Power supply switched on. Adjust voltage and add the reading.')
-    showStepAlert(EXPERIMENT_ALERTS.powerOn)
+    setStatus('MCB has been turned ON. Now click on the autotransformer knob.')
+    showStepAlert(EXPERIMENT_ALERTS.powerOn, {
+      description: null,
+      target: '#voltage-control',
+      title: 'MCB has been turned ON. Now click on the autotransformer knob',
+    })
   }
   const handleAutoConnect = () => {
     setAutoConnectRequest((current) => current + 1)
     setConnectionsVerified(false)
 
-    setStatus('Auto connecting the circuit with the correct wire pairs.')
-    showStepAlert(EXPERIMENT_ALERTS.circuitConnectionsCompleted)
+    setStatus('Autoconnect Completed. Click on the check button to verify the connections.')
+    showStepAlert(EXPERIMENT_ALERTS.circuitConnectionsCompleted, {
+      description: 'Click on the check button to verify the connections.',
+      target: '#check-button',
+      title: 'Autoconnect Completed',
+    })
   }
 
   const handleVoltageChange = useCallback((nextVoltage) => {

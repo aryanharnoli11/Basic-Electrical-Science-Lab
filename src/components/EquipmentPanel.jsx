@@ -12,13 +12,20 @@ import acVoltmeterImg from '../assets/AC_voltmeter_equal.png'
 import transformerImg from '../assets/transformer.png'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+const AUTOTRANSFORMER_OUTPUT_VOLTAGE = 230
+const VOLTMETER_MAX = 240
+const TRANSFORMER_LOAD_CURRENT = 1.02
+const TRANSFORMER_LOAD_POWER = 40
 
 const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage }) => {
   const activeVoltage = powerOn ? voltage : 0
   const ammeterCurrent = readings?.i1 ?? 0
   const branchCurrent = readings?.i2 ?? 0
-  const wattmeterPower = activeVoltage * ammeterCurrent
-  const lowerVoltmeterRotation = getMeterNeedleRotation(clamp(activeVoltage / 10, 0, 1))
+  const autotransformerSet = activeVoltage >= AUTOTRANSFORMER_OUTPUT_VOLTAGE
+  const displayVoltage = autotransformerSet ? AUTOTRANSFORMER_OUTPUT_VOLTAGE : activeVoltage
+  const displayAmmeterCurrent = autotransformerSet ? TRANSFORMER_LOAD_CURRENT : ammeterCurrent
+  const displayWattmeterPower = autotransformerSet ? TRANSFORMER_LOAD_POWER : activeVoltage * ammeterCurrent
+  const lowerVoltmeterRotation = getMeterNeedleRotation(clamp(displayVoltage / VOLTMETER_MAX, 0, 1))
   const lowerAmmeterRotation = getMeterNeedleRotation(clamp(branchCurrent / 10, 0, 1))
 
   return (
@@ -67,9 +74,9 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
       </div>
 
       <div className="equipment-panel__meter-row">
-        <Voltmeter value={activeVoltage} />
-        <Ammeter value={ammeterCurrent} />
-        <Wattmeter value={wattmeterPower} />
+        <Voltmeter value={displayVoltage} />
+        <Ammeter value={displayAmmeterCurrent} />
+        <Wattmeter value={displayWattmeterPower} />
       </div>
     </section>
   )

@@ -1,17 +1,30 @@
 import knobImg from '../assets/knob.png'
-import variacImg from '../assets/Variacoff.png'
+import variacOffImg from '../assets/Variacoff.png'
+import variacOnImg from '../assets/Variacon.png'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 
+const OUTPUT_VOLTAGE = 230
+const MIN_KNOB_ROTATION = -70
+const MAX_KNOB_ROTATION = 235
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+
 const Variac = ({ powerOn, setVoltage, voltage }) => {
-  const handleVoltageChange = (event) => {
-    setVoltage(Number(Number(event.target.value).toFixed(1)))
+  const handleKnobClick = () => {
+    if (!powerOn) {
+      return
+    }
+
+    setVoltage(OUTPUT_VOLTAGE)
   }
 
-  const rotation = -70 + (voltage / 10) * 240
+  const voltageRatio = clamp(voltage / OUTPUT_VOLTAGE, 0, 1)
+  const rotation = MIN_KNOB_ROTATION + voltageRatio * (MAX_KNOB_ROTATION - MIN_KNOB_ROTATION)
+  const variacImg = powerOn ? variacOnImg : variacOffImg
 
   return (
     <article className="variac-device" aria-label="Variac voltage controller">
-      <img alt="Variac off" className="variac-device__image" src={variacImg} />
+      <img alt={powerOn ? 'Autotransformer on' : 'Autotransformer off'} className="variac-device__image" src={variacImg} />
       <img
         alt=""
         aria-hidden="true"
@@ -25,21 +38,16 @@ const Variac = ({ powerOn, setVoltage, voltage }) => {
       <ApparatusTerminal number={13} owner="Variac output" polarity="plus" variant="variac-output" />
       <ApparatusTerminal number={14} owner="Variac output" polarity="minus" variant="variac-output" />
 
-      <label className="variac-device__control" id="voltage-control">
-        <span className="sr-only">Voltage</span>
-        <input
-          aria-label="Voltage"
-          className="variac-device__range"
-          disabled={!powerOn}
-          id="voltage-slider"
-          max="10"
-          min="0"
-          onChange={handleVoltageChange}
-          step="0.1"
-          type="range"
-          value={voltage}
-        />
-      </label>
+      <button
+        aria-label="Set autotransformer to 230 volts"
+        className="variac-device__control"
+        disabled={!powerOn}
+        id="voltage-control"
+        onClick={handleKnobClick}
+        type="button"
+      >
+        <span className="sr-only">Set autotransformer to 230 volts</span>
+      </button>
     </article>
   )
 }
