@@ -1,6 +1,7 @@
 import knobImg from '../assets/knob.png'
 import variacOffImg from '../assets/Variacoff.png'
 import variacOnImg from '../assets/Variacon.png'
+import useDampedRotation from '../hooks/useDampedRotation.js'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 
 const OUTPUT_VOLTAGE = 230
@@ -20,17 +21,25 @@ const Variac = ({ powerOn, setVoltage, voltage }) => {
 
   const voltageRatio = clamp(voltage / OUTPUT_VOLTAGE, 0, 1)
   const rotation = MIN_KNOB_ROTATION + voltageRatio * (MAX_KNOB_ROTATION - MIN_KNOB_ROTATION)
+  const displayRotation = useDampedRotation(rotation, {
+    damping: 18,
+    stiffness: 72,
+  })
   const variacImg = powerOn ? variacOnImg : variacOffImg
 
   return (
     <article className="variac-device" aria-label="Variac voltage controller">
-      <img alt={powerOn ? 'Autotransformer on' : 'Autotransformer off'} className="variac-device__image" src={variacImg} />
+      <img
+        alt={powerOn ? 'Autotransformer on' : 'Autotransformer off'}
+        className={`variac-device__image${powerOn ? ' variac-device__image--on' : ''}`}
+        src={variacImg}
+      />
       <img
         alt=""
         aria-hidden="true"
         className="variac-device__knob"
         src={knobImg}
-        style={{ transform: `rotate(${rotation}deg)` }}
+        style={{ transform: `rotate(${displayRotation}deg)` }}
       />
 
       <ApparatusTerminal number={11} owner="Variac input" polarity="plus" variant="variac-input" />

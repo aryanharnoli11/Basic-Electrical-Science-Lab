@@ -1440,6 +1440,13 @@ input:focus-visible {
   pointer-events: none;
 }
 
+.variac-device__image--on {
+  transform: translate(-7px, -4px) scale(1.1);
+  top: -4.5px;
+  left: -2px;
+  transform-origin: top left;
+}
+
 .variac-device__knob {
   position: absolute;
   top: 48px;
@@ -1450,7 +1457,8 @@ input:focus-visible {
   object-fit: contain;
   pointer-events: none;
   transform-origin: center center;
-  transition: transform 220ms ease;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .variac-device__control {
@@ -1677,7 +1685,8 @@ input:focus-visible {
   height: 0;
   pointer-events: none;
   transform-origin: 0 0;
-  transition: transform 280ms ease;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .meter-needle__image {
@@ -1693,13 +1702,13 @@ input:focus-visible {
 }
 
 .meter-needle--voltmeter {
-  --meter-needle-top: 118px;
+  --meter-needle-top: 114px;
   --meter-needle-left: 79px;
   --meter-needle-size: 92px;
 }
 
 .meter-needle--ammeter {
-  --meter-needle-top: 88px;
+  --meter-needle-top: 99px;
   --meter-needle-left: 75px;
   --meter-needle-size: 70px;
 }
@@ -1707,19 +1716,19 @@ input:focus-visible {
 .meter-needle--wattmeter {
   --meter-needle-top: 111px;
   --meter-needle-left: 79px;
-  --meter-needle-size: 80px;
+  --meter-needle-size: 85px;
 }
 
 .meter-needle--under-voltmeter {
-  --meter-needle-top: 89px;
+  --meter-needle-top: 85px;
   --meter-needle-left: 78px;
-  --meter-needle-size: 84px;
+  --meter-needle-size: 70px;
 }
 
 .meter-needle--under-ammeter {
   --meter-needle-top: 78px;
   --meter-needle-left: 78px;
-  --meter-needle-size: 72px;
+  --meter-needle-size: 60px;
 }
 
 .lamp-load {
@@ -1788,7 +1797,7 @@ input:focus-visible {
   left: var(--switch-left);
   z-index: 3;
   display: block;
-  width: var(--switch-width, 30px);
+  width: var(--switch-width, 22px);
   aspect-ratio: 570 / 854;
   overflow: visible;
   pointer-events: none;
@@ -1809,20 +1818,20 @@ input:focus-visible {
 /* Lamp-load switch positioning. Edit top/left independently for each switch. */
 .lamp-load__switch--1 {
   --switch-top: 30.7%;
-  --switch-left: 75.2%;
+  --switch-left: 76.2%;
 }
 
 .lamp-load__switch--2 {
   --switch-top: 44.5%;
-  --switch-left: 75.2%;
+  --switch-left: 76.2%;
 }
 
 .lamp-load__switch--3 {
   --switch-top: 58.2%;
-  --switch-left: 75.2%;
+  --switch-left: 76.2%;
 }
 
 .lamp-load__switch--4 {
   --switch-top: 71.9%;
-  --switch-left: 75.2%;
+  --switch-left: 76.2%;
 }
