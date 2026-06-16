@@ -76,7 +76,7 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
       <div className="equipment-panel__meter-row">
         <Voltmeter value={displayVoltage} />
         <Ammeter value={displayAmmeterCurrent} />
-        <Wattmeter value={displayWattmeterPower} />
+        <Wattmeter autotransformerSet={autotransformerSet} value={displayWattmeterPower} />
       </div>
     </section>
   )
