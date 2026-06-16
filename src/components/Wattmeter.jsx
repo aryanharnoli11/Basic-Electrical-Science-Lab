@@ -1,5 +1,6 @@
 import bulbOffImg from '../assets/bulboff.png'
 import lampLoadImg from '../assets/lampload.png'
+import switchOffImg from '../assets/switchoff.png'
 import wattmeterImg from '../assets/ac_wattmeter.png'
 import { getMeterNeedleRotation } from '../utils/meterNeedle.js'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
@@ -24,6 +25,13 @@ const LAMP_LOAD_BULBS = [
   { id: 'r4-c2', x: 36.5, y: 71.6 },
   { id: 'r4-c3', x: 49.5, y: 71.6 },
   { id: 'r4-c4', x: 62.5, y: 71.6 },
+]
+
+const LAMP_LOAD_SWITCHES = [
+  { id: 'switch-1' },
+  { id: 'switch-2' },
+  { id: 'switch-3' },
+  { id: 'switch-4' },
 ]
 
 const formatCssLength = (value, unit) => (
@@ -67,6 +75,14 @@ const Wattmeter = ({ value = 0 }) => {
             style={getBulbStyle(bulb)}
           >
             <img alt="" className="lamp-load__bulb-image" src={bulbOffImg} aria-hidden="true" />
+          </span>
+        ))}
+        {LAMP_LOAD_SWITCHES.map((switchItem, index) => (
+          <span
+            className={`lamp-load__switch lamp-load__switch--${index + 1}`}
+            key={switchItem.id}
+          >
+            <img alt="" className="lamp-load__switch-image" src={switchOffImg} aria-hidden="true" />
           </span>
         ))}
         <ApparatusTerminal number={23} owner="Lamp load" polarity="plus" variant="lamp-load" />

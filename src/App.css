@@ -1781,3 +1781,48 @@ input:focus-visible {
   pointer-events: none;
   user-select: none;
 }
+
+.lamp-load__switch {
+  position: absolute;
+  top: var(--switch-top);
+  left: var(--switch-left);
+  z-index: 3;
+  display: block;
+  width: var(--switch-width, 30px);
+  aspect-ratio: 570 / 854;
+  overflow: visible;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.lamp-load__switch-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Lamp-load switch positioning. Edit top/left independently for each switch. */
+.lamp-load__switch--1 {
+  --switch-top: 30.7%;
+  --switch-left: 75.2%;
+}
+
+.lamp-load__switch--2 {
+  --switch-top: 44.5%;
+  --switch-left: 75.2%;
+}
+
+.lamp-load__switch--3 {
+  --switch-top: 58.2%;
+  --switch-left: 75.2%;
+}
+
+.lamp-load__switch--4 {
+  --switch-top: 71.9%;
+  --switch-left: 75.2%;
+}
