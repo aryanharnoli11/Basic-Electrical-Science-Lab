@@ -1,4 +1,4 @@
-
+import { useEffect, useState } from 'react'
 import Ammeter from './Ammeter.jsx'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 import MeterNeedle from './MeterNeedle.jsx'
@@ -6,7 +6,7 @@ import PowerSupply from './PowerSupply.jsx'
 import Variac from './Variac.jsx'
 import Voltmeter from './Voltmeter.jsx'
 import Wattmeter from './Wattmeter.jsx'
-import { getMeterNeedleRotation } from '../utils/meterNeedle.js'
+import useMeterDisplay from '../hooks/useMeterDisplay.js'
 import a2MeterImg from '../assets/A2.png'
 import acVoltmeterImg from '../assets/AC_voltmeter_equal.png'
 import transformerImg from '../assets/transformer.png'
@@ -14,19 +14,52 @@ import transformerImg from '../assets/transformer.png'
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 const AUTOTRANSFORMER_OUTPUT_VOLTAGE = 230
 const VOLTMETER_MAX = 240
-const TRANSFORMER_LOAD_CURRENT = 1.02
-const TRANSFORMER_LOAD_POWER = 40
+const AMMETER_MAX = 10
+const LAMP_LOAD_READING_BY_LEVEL = {
+  1: { a1Current: 1.37, a2Current: 1.5, lowerVoltage: 116, wattmeterPower: 115 },
+  2: { a1Current: 2.22, a2Current: 3.7, lowerVoltage: 114.5, wattmeterPower: 245 },
+  3: { a1Current: 3.37, a2Current: 6.2, lowerVoltage: 112, wattmeterPower: 385 },
+  4: { a1Current: 3.37, a2Current: 8.2, lowerVoltage: 112, wattmeterPower: 495 },
+}
+const NO_LAMP_LOAD_READING = {
+  a1Current: 1.02,
+  a2Current: 0,
+  lowerVoltage: 0,
+  wattmeterPower: 20,
+}
 
 const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage }) => {
+  const [activeLoadLevel, setActiveLoadLevel] = useState(0)
   const activeVoltage = powerOn ? voltage : 0
   const ammeterCurrent = readings?.i1 ?? 0
-  const branchCurrent = readings?.i2 ?? 0
   const autotransformerSet = activeVoltage >= AUTOTRANSFORMER_OUTPUT_VOLTAGE
+  const displayLoadLevel = autotransformerSet ? activeLoadLevel : 0
+  const lampLoadReading = LAMP_LOAD_READING_BY_LEVEL[displayLoadLevel] ?? NO_LAMP_LOAD_READING
   const displayVoltage = autotransformerSet ? AUTOTRANSFORMER_OUTPUT_VOLTAGE : activeVoltage
-  const displayAmmeterCurrent = autotransformerSet ? TRANSFORMER_LOAD_CURRENT : ammeterCurrent
-  const displayWattmeterPower = autotransformerSet ? TRANSFORMER_LOAD_POWER : activeVoltage * ammeterCurrent
-  const lowerVoltmeterRotation = getMeterNeedleRotation(clamp(displayVoltage / VOLTMETER_MAX, 0, 1))
-  const lowerAmmeterRotation = getMeterNeedleRotation(clamp(branchCurrent / 10, 0, 1))
+  const displayAmmeterCurrent = autotransformerSet ? lampLoadReading.a1Current : ammeterCurrent
+  const displayWattmeterPower = autotransformerSet ? lampLoadReading.wattmeterPower : activeVoltage * ammeterCurrent
+  const displayLowerVoltage = autotransformerSet ? lampLoadReading.lowerVoltage : activeVoltage
+  const displayA2Current = autotransformerSet ? lampLoadReading.a2Current : 0
+  const lowerVoltmeterDisplay = useMeterDisplay(displayLowerVoltage, VOLTMETER_MAX)
+  const lowerAmmeterDisplay = useMeterDisplay(displayA2Current, AMMETER_MAX)
+
+  useEffect(() => {
+    if (autotransformerSet || activeLoadLevel === 0) {
+      return undefined
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      setActiveLoadLevel(0)
+    })
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+    }
+  }, [activeLoadLevel, autotransformerSet])
+
+  const handleLoadLevelChange = (nextLoadLevel) => {
+    setActiveLoadLevel(clamp(Math.trunc(Number(nextLoadLevel) || 0), 0, 4))
+  }
 
   return (
     <section className="equipment-panel" id="equipment-panel">
@@ -46,7 +79,7 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
             className="under-variac-meter__image"
             src={acVoltmeterImg}
           />
-          <MeterNeedle className="meter-needle--under-voltmeter" rotation={lowerVoltmeterRotation} />
+          <MeterNeedle className="meter-needle--under-voltmeter" rotation={lowerVoltmeterDisplay.rotation} />
           <ApparatusTerminal number={19} owner="Lower AC voltmeter" polarity="plus" variant="under-voltmeter" />
           <ApparatusTerminal number={20} owner="Lower AC voltmeter" polarity="minus" variant="under-voltmeter" />
         </article>
@@ -56,7 +89,7 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
             className="under-variac-meter__image"
             src={a2MeterImg}
           />
-          <MeterNeedle className="meter-needle--under-ammeter" rotation={lowerAmmeterRotation} />
+          <MeterNeedle className="meter-needle--under-ammeter" rotation={lowerAmmeterDisplay.rotation} />
           <ApparatusTerminal number={21} owner="Ammeter A2" polarity="plus" variant="ammeter-a2" />
           <ApparatusTerminal number={22} owner="Ammeter A2" polarity="minus" variant="ammeter-a2" />
         </article>
@@ -76,7 +109,12 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
       <div className="equipment-panel__meter-row">
         <Voltmeter value={displayVoltage} />
         <Ammeter value={displayAmmeterCurrent} />
-        <Wattmeter autotransformerSet={autotransformerSet} value={displayWattmeterPower} />
+        <Wattmeter
+          activeLoadLevel={displayLoadLevel}
+          autotransformerSet={autotransformerSet}
+          onLoadLevelChange={handleLoadLevelChange}
+          value={displayWattmeterPower}
+        />
       </div>
     </section>
   )

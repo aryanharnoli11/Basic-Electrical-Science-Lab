@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react'
 import bulbOffImg from '../assets/bulboff.png'
 import bulbOnImg from '../assets/bulbon.png'
 import lampLoadImg from '../assets/lampload.png'
 import switchOffImg from '../assets/switchoff.png'
 import switchOnImg from '../assets/switchon.png'
 import wattmeterImg from '../assets/ac_wattmeter.png'
-import { getMeterNeedleRotation } from '../utils/meterNeedle.js'
+import useMeterDisplay from '../hooks/useMeterDisplay.js'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 import MeterNeedle from './MeterNeedle.jsx'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+const WATTMETER_MAX = 600
 
 const LAMP_LOAD_BULBS = [
   { id: 'r1-c1', row: 1, x: 23.5, y: 30.5 },
@@ -62,29 +62,23 @@ const getBulbStyle = ({ rotation, scale, width, x, y }) => {
   return style
 }
 
-const Wattmeter = ({ autotransformerSet = false, value = 0 }) => {
-  const ratio = clamp((Number.isFinite(value) ? value : 0) / 600, 0, 1)
-  const rotation = getMeterNeedleRotation(ratio)
-  const [activeRows, setActiveRows] = useState([])
-
-  useEffect(() => {
-    if (!autotransformerSet) {
-      setActiveRows([])
-    }
-  }, [autotransformerSet])
-
-  const isRowActive = (row) => activeRows.includes(row)
+const Wattmeter = ({
+  activeLoadLevel = 0,
+  autotransformerSet = false,
+  onLoadLevelChange,
+  value = 0,
+}) => {
+  const numericValue = Number.isFinite(value) ? value : 0
+  const meterDisplay = useMeterDisplay(numericValue, WATTMETER_MAX)
+  const loadLevel = clamp(Math.trunc(Number(activeLoadLevel) || 0), 0, LAMP_LOAD_SWITCHES.length)
+  const isRowActive = (row) => row <= loadLevel
 
   const handleSwitchClick = (row) => {
     if (!autotransformerSet) {
       return
     }
 
-    setActiveRows((currentRows) => (
-      currentRows.includes(row)
-        ? currentRows.filter((currentRow) => currentRow !== row)
-        : [...currentRows, row]
-    ))
+    onLoadLevelChange?.(row <= loadLevel ? row - 1 : row)
   }
 
   return (
@@ -108,7 +102,7 @@ const Wattmeter = ({ autotransformerSet = false, value = 0 }) => {
         ))}
         {LAMP_LOAD_SWITCHES.map((switchItem) => (
           <button
-            aria-label={`Toggle lamp load row ${switchItem.row}`}
+            aria-label={`Set lamp load to ${switchItem.row * 4} bulbs`}
             aria-pressed={isRowActive(switchItem.row)}
             className={`lamp-load__switch lamp-load__switch--${switchItem.row}`}
             disabled={!autotransformerSet}
@@ -128,7 +122,7 @@ const Wattmeter = ({ autotransformerSet = false, value = 0 }) => {
         <ApparatusTerminal number={24} owner="Lamp load" polarity="minus" variant="lamp-load" />
       </div>
 
-      <MeterNeedle className="meter-needle--wattmeter" rotation={rotation} />
+      <MeterNeedle className="meter-needle--wattmeter" rotation={meterDisplay.rotation} />
 
       <ApparatusTerminal number={7} owner="AC wattmeter" polarity="plus" variant="wattmeter" />
       <ApparatusTerminal number={8} owner="AC wattmeter" polarity="minus" variant="wattmeter" />

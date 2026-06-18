@@ -842,7 +842,7 @@
   height: var(--ammeter-needle-height);
   pointer-events: none;
   transform-origin: var(--ammeter-needle-origin-x) var(--ammeter-needle-origin-y);
-  transition: transform 280ms ease;
+  transition: none;
 }
 
 .ammeter__needle-image {
@@ -1687,6 +1687,7 @@ input:focus-visible {
   transform-origin: 0 0;
   backface-visibility: hidden;
   will-change: transform;
+  transition: none;
 }
 
 .meter-needle__image {
