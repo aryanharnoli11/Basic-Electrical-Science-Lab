@@ -10,6 +10,7 @@ import MeterNeedle from './MeterNeedle.jsx'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 const WATTMETER_MAX = 600
+const LAMP_LOAD_BULB_Y_OFFSET = -5
 
 const LAMP_LOAD_BULBS = [
   { id: 'r1-c1', row: 1, x: 23.5, y: 30.5 },
@@ -44,7 +45,7 @@ const formatCssLength = (value, unit) => (
 const getBulbStyle = ({ rotation, scale, width, x, y }) => {
   const style = {
     '--bulb-x': `${x}%`,
-    '--bulb-y': `${y}%`,
+    '--bulb-y': `${y + LAMP_LOAD_BULB_Y_OFFSET}%`,
   }
 
   if (width) {

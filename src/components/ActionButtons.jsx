@@ -96,7 +96,7 @@ const ActionButtons = ({
   }
 
   return (
-    <SectionCard className="action-buttons-card h-[176px]" icon="buttons" id="action-buttons-panel" title="ACTION BUTTONS">
+    <SectionCard className="action-buttons-card h-[228px]" icon="buttons" id="action-buttons-panel" title="ACTION BUTTONS">
       <div className="action-buttons__grid">
         {buttons.map(({ id, label, tone, Icon, handlerName, opensInstructions }) => {
           const handler = handlers[handlerName]

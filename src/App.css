@@ -531,7 +531,7 @@
   height: 296px;
   margin: 8px 10px 0;
   overflow: hidden;
-  border: 1px solid rgba(96, 61, 35, 0.34);
+  border: 1px solid rgba(96, 61, 35, 0.48);
   border-radius: 8px;
   background: rgba(255, 247, 236, 0.82);
 }
@@ -541,31 +541,54 @@
   border-collapse: collapse;
   table-layout: fixed;
   color: #3d2416;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .observation-table th {
-  height: 31px;
+  height: 27px;
+  padding: 0 3px;
   color: #fff;
   background: linear-gradient(180deg, #7b461f, #4a2a15);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 900;
+  line-height: 1.05;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .observation-table td {
-  height: 25px;
+  height: 23px;
+  padding: 0 3px;
   color: #2d1b11;
   font-weight: 700;
   text-align: center;
   background: rgba(255, 250, 243, 0.62);
+  white-space: nowrap;
 }
 
 .observation-table tbody tr:nth-child(even) td {
   background: rgba(247, 235, 218, 0.58);
 }
 
-.observation-table th:first-child,
-.observation-table td:first-child {
+.observation-table__col-serial {
+  width: 42px;
+}
+
+.observation-table__col-primary,
+.observation-table__col-secondary {
+  width: 51px;
+}
+
+.observation-table__col-result {
+  width: 49px;
+}
+
+.observation-table__group {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.observation-table__serial {
   width: 42px;
 }
 
@@ -573,6 +596,10 @@
 .observation-table td {
   border-right: 1px solid rgba(91, 58, 35, 0.22);
   border-bottom: 1px solid rgba(91, 58, 35, 0.18);
+}
+
+.observation-table thead th {
+  border-color: rgba(255, 237, 209, 0.46);
 }
 
 .observation-table th:last-child,
@@ -1827,21 +1854,21 @@ input:focus-visible {
 
 /* Lamp-load switch positioning. Edit top/left independently for each switch. */
 .lamp-load__switch--1 {
-  --switch-top: 30.7%;
+  --switch-top: 25.7%;
   --switch-left: 80%;
 }
 
 .lamp-load__switch--2 {
-  --switch-top: 44.5%;
+  --switch-top: 38.5%;
   --switch-left: 80%;
 }
 
 .lamp-load__switch--3 {
-  --switch-top: 58.2%;
+  --switch-top: 53.2%;
   --switch-left: 80%;
 }
 
 .lamp-load__switch--4 {
-  --switch-top: 71.9%;
+  --switch-top: 66.9%;
   --switch-left: 80%;
 }
