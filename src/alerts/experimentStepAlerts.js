@@ -87,6 +87,13 @@ export const EXPERIMENT_ALERTS = {
     title: 'Make and check the connections before turning on the MCB',
     type: 'warning',
   },
+  turnOffMcbBeforeRemovingConnection: {
+    icon: '!',
+    stepNumber: 4,
+    target: '#power-toggle-button',
+    title: 'Turn off MCB before removing the connection.',
+    type: 'warning',
+  },
   cannotStartPower: {
     description: 'Run CHECK and correct the circuit wiring before powering the supply.',
     icon: '⚠️',

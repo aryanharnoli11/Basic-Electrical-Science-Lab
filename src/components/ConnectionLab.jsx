@@ -19,6 +19,7 @@ const ConnectionLab = ({
   checkRequest,
   nextEnabledLoadLevel,
   onCheckConnections,
+  onConnectionRemovalBlocked,
   onLoadLevelChange,
   powerOn,
   readings,
@@ -31,6 +32,16 @@ const ConnectionLab = ({
 }) => {
   const labRef = useRef(null)
   const instanceRef = useRef(null)
+  const onConnectionRemovalBlockedRef = useRef(onConnectionRemovalBlocked)
+  const powerOnRef = useRef(powerOn)
+
+  useEffect(() => {
+    onConnectionRemovalBlockedRef.current = onConnectionRemovalBlocked
+  }, [onConnectionRemovalBlocked])
+
+  useEffect(() => {
+    powerOnRef.current = powerOn
+  }, [powerOn])
 
   useEffect(() => {
     let disposed = false
@@ -75,6 +86,14 @@ const ConnectionLab = ({
 
       activeInstance.bind('beforeDrop', ({ sourceId, targetId }) => {
         return sourceId !== targetId
+      })
+      activeInstance.bind('beforeDetach', () => {
+        if (!powerOnRef.current) {
+          return true
+        }
+
+        onConnectionRemovalBlockedRef.current?.()
+        return false
       })
       activeInstance.bind('connection', refreshWiring)
       activeInstance.bind('connectionDetached', refreshWiring)
@@ -128,6 +147,7 @@ const ConnectionLab = ({
         instanceRef.current = null
       }
 
+      powerOnRef.current = false
       cleanupLayoutListeners()
       activeInstance?.deleteEveryConnection?.()
       activeInstance?.deleteEveryEndpoint?.()
@@ -185,6 +205,11 @@ const ConnectionLab = ({
       const instance = instanceRef.current
 
       if (!instance || !terminalId) {
+        return
+      }
+
+      if (powerOnRef.current) {
+        onConnectionRemovalBlockedRef.current?.()
         return
       }
 

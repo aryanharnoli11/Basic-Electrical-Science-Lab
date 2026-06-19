@@ -438,6 +438,11 @@ const App = () => {
     showStepAlert(EXPERIMENT_ALERTS.completeConnectionsBeforeAutotransformer)
   }, [showStepAlert])
 
+  const handleConnectionRemovalBlocked = useCallback(() => {
+    setStatus('Turn off MCB before removing the connection.')
+    showStepAlert(EXPERIMENT_ALERTS.turnOffMcbBeforeRemovingConnection)
+  }, [showStepAlert])
+
   const handleLoadLevelChange = useCallback((nextLoadLevel) => {
     if (nextLoadLevel !== nextEnabledLoadLevel) {
       return
@@ -548,6 +553,7 @@ const App = () => {
                   checkRequest={checkRequest}
                   nextEnabledLoadLevel={nextEnabledLoadLevel}
                   onCheckConnections={handleCheckConnections}
+                  onConnectionRemovalBlocked={handleConnectionRemovalBlocked}
                   onLoadLevelChange={handleLoadLevelChange}
                   powerOn={powerOn}
                   r1={r1}
