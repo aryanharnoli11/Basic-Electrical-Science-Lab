@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import Ammeter from './Ammeter.jsx'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 import MeterNeedle from './MeterNeedle.jsx'
@@ -10,31 +9,30 @@ import useMeterDisplay from '../hooks/useMeterDisplay.js'
 import a2MeterImg from '../assets/A2.png'
 import acVoltmeterImg from '../assets/AC_voltmeter_equal.png'
 import transformerImg from '../assets/transformer.png'
+import {
+  AUTOTRANSFORMER_OUTPUT_VOLTAGE,
+  getLampLoadReading,
+} from '../utils/lampLoadReadings.js'
 
-const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
-const AUTOTRANSFORMER_OUTPUT_VOLTAGE = 230
 const VOLTMETER_MAX = 240
 const AMMETER_MAX = 10
-const LAMP_LOAD_READING_BY_LEVEL = {
-  1: { a1Current: 1.37, a2Current: 1.5, lowerVoltage: 116, wattmeterPower: 115 },
-  2: { a1Current: 2.22, a2Current: 3.7, lowerVoltage: 114.5, wattmeterPower: 245 },
-  3: { a1Current: 3.37, a2Current: 6.2, lowerVoltage: 112, wattmeterPower: 385 },
-  4: { a1Current: 3.37, a2Current: 8.2, lowerVoltage: 112, wattmeterPower: 495 },
-}
-const NO_LAMP_LOAD_READING = {
-  a1Current: 1.02,
-  a2Current: 0,
-  lowerVoltage: 0,
-  wattmeterPower: 20,
-}
 
-const EquipmentPanel = ({ onTogglePower, onVoltageControlBlocked, powerOn, readings, setVoltage, voltage }) => {
-  const [activeLoadLevel, setActiveLoadLevel] = useState(0)
+const EquipmentPanel = ({
+  activeLoadLevel,
+  nextEnabledLoadLevel,
+  onLoadLevelChange,
+  onTogglePower,
+  onVoltageControlBlocked,
+  powerOn,
+  readings,
+  setVoltage,
+  voltage,
+}) => {
   const activeVoltage = powerOn ? voltage : 0
   const ammeterCurrent = readings?.i1 ?? 0
   const autotransformerSet = activeVoltage >= AUTOTRANSFORMER_OUTPUT_VOLTAGE
   const displayLoadLevel = autotransformerSet ? activeLoadLevel : 0
-  const lampLoadReading = LAMP_LOAD_READING_BY_LEVEL[displayLoadLevel] ?? NO_LAMP_LOAD_READING
+  const lampLoadReading = getLampLoadReading(displayLoadLevel)
   const displayVoltage = autotransformerSet ? AUTOTRANSFORMER_OUTPUT_VOLTAGE : activeVoltage
   const displayAmmeterCurrent = autotransformerSet ? lampLoadReading.a1Current : ammeterCurrent
   const displayWattmeterPower = autotransformerSet ? lampLoadReading.wattmeterPower : activeVoltage * ammeterCurrent
@@ -42,24 +40,6 @@ const EquipmentPanel = ({ onTogglePower, onVoltageControlBlocked, powerOn, readi
   const displayA2Current = autotransformerSet ? lampLoadReading.a2Current : 0
   const lowerVoltmeterDisplay = useMeterDisplay(displayLowerVoltage, VOLTMETER_MAX)
   const lowerAmmeterDisplay = useMeterDisplay(displayA2Current, AMMETER_MAX)
-
-  useEffect(() => {
-    if (autotransformerSet || activeLoadLevel === 0) {
-      return undefined
-    }
-
-    const frameId = window.requestAnimationFrame(() => {
-      setActiveLoadLevel(0)
-    })
-
-    return () => {
-      window.cancelAnimationFrame(frameId)
-    }
-  }, [activeLoadLevel, autotransformerSet])
-
-  const handleLoadLevelChange = (nextLoadLevel) => {
-    setActiveLoadLevel(clamp(Math.trunc(Number(nextLoadLevel) || 0), 0, 4))
-  }
 
   return (
     <section className="equipment-panel" id="equipment-panel">
@@ -113,7 +93,8 @@ const EquipmentPanel = ({ onTogglePower, onVoltageControlBlocked, powerOn, readi
         <Wattmeter
           activeLoadLevel={displayLoadLevel}
           autotransformerSet={autotransformerSet}
-          onLoadLevelChange={handleLoadLevelChange}
+          nextEnabledLoadLevel={nextEnabledLoadLevel}
+          onLoadLevelChange={onLoadLevelChange}
           value={displayWattmeterPower}
         />
       </div>

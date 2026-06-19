@@ -14,9 +14,12 @@ import {
 } from '../utils/jsPlumbWiring.js'
 
 const ConnectionLab = ({
+  activeLoadLevel,
   autoConnectRequest,
   checkRequest,
+  nextEnabledLoadLevel,
   onCheckConnections,
+  onLoadLevelChange,
   powerOn,
   readings,
   resetRequest,
@@ -251,6 +254,9 @@ const ConnectionLab = ({
   return (
     <div className="connection-lab" id="connection-lab" ref={labRef} aria-label="Experiment apparatus area">
       <EquipmentPanel
+        activeLoadLevel={activeLoadLevel}
+        nextEnabledLoadLevel={nextEnabledLoadLevel}
+        onLoadLevelChange={onLoadLevelChange}
         onTogglePower={onTogglePower}
         onVoltageControlBlocked={onVoltageControlBlocked}
         powerOn={powerOn}

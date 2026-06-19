@@ -66,6 +66,7 @@ const getBulbStyle = ({ rotation, scale, width, x, y }) => {
 const Wattmeter = ({
   activeLoadLevel = 0,
   autotransformerSet = false,
+  nextEnabledLoadLevel = 0,
   onLoadLevelChange,
   value = 0,
 }) => {
@@ -73,13 +74,14 @@ const Wattmeter = ({
   const meterDisplay = useMeterDisplay(numericValue, WATTMETER_MAX)
   const loadLevel = clamp(Math.trunc(Number(activeLoadLevel) || 0), 0, LAMP_LOAD_SWITCHES.length)
   const isRowActive = (row) => row <= loadLevel
+  const isSwitchEnabled = (row) => autotransformerSet && row === nextEnabledLoadLevel
 
   const handleSwitchClick = (row) => {
-    if (!autotransformerSet) {
+    if (!isSwitchEnabled(row)) {
       return
     }
 
-    onLoadLevelChange?.(row <= loadLevel ? row - 1 : row)
+    onLoadLevelChange?.(row)
   }
 
   return (
@@ -106,7 +108,7 @@ const Wattmeter = ({
             aria-label={`Set lamp load to ${switchItem.row * 4} bulbs`}
             aria-pressed={isRowActive(switchItem.row)}
             className={`lamp-load__switch lamp-load__switch--${switchItem.row}`}
-            disabled={!autotransformerSet}
+            disabled={!isSwitchEnabled(switchItem.row)}
             key={switchItem.id}
             onClick={() => handleSwitchClick(switchItem.row)}
             type="button"

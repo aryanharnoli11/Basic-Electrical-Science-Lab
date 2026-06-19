@@ -37,7 +37,7 @@
         "en": "Observation Table"
       },
       "description": {
-        "en": "Each added reading appears in this table. Collect at least six readings before plotting the graph."
+        "en": "Each added reading appears in this table. Collect all five readings before plotting the graph."
       },
       "audio": "#",
       "placement": "right"

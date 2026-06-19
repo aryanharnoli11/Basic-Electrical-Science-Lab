@@ -1,4 +1,6 @@
-const MIN_GRAPH_READINGS = 6
+import { MAX_LAMP_LOAD_LEVEL } from '../utils/lampLoadReadings.js'
+
+const MIN_GRAPH_READINGS = MAX_LAMP_LOAD_LEVEL + 1
 const VOLTAGE_MAX = 10
 const CHART_VIEWBOX = {
   height: 220,

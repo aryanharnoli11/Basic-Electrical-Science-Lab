@@ -175,14 +175,14 @@ export const EXPERIMENT_ALERTS = {
     icon: '📊',
     stepNumber: 7,
     target: '#add-reading-button',
-    title: 'Continue Taking Readings Until Minimum 6 Entries',
+    title: 'Continue Taking Readings Until All 5 Entries',
     type: 'info',
   },
   minimumReadingsRequired: {
     icon: '⚠️',
     stepNumber: 7,
     target: '#observation-table-panel',
-    title: 'Minimum 6 Readings Required for Graph Plotting',
+    title: 'All 5 Readings Required for Graph Plotting',
     type: 'warning',
   },
   sufficientData: {

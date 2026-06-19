@@ -15,6 +15,11 @@ import { useAiGuideNarration } from './aiGuide/useAiGuideNarration.js'
  
 import { calculateReadings } from './utils/circuitMath.js'
 import { generateKclReport } from './utils/reportGenerator.js'
+import {
+  AUTOTRANSFORMER_OUTPUT_VOLTAGE,
+  MAX_LAMP_LOAD_LEVEL,
+  createTransformerObservation,
+} from './utils/lampLoadReadings.js'
  
 const BASE_WIDTH = 1435
 const BASE_HEIGHT = 960
@@ -23,20 +28,10 @@ const GRAPH_SECTION_HEIGHT = 430
 const CONTENT_HEIGHT = BASE_HEIGHT + GRAPH_SECTION_GAP + GRAPH_SECTION_HEIGHT
 const PANEL_MAX_SCALE = 0.95
 const PANEL_VIEWPORT_MARGIN = 32
-const MIN_GRAPH_READINGS = 6
-const MAX_OBSERVATIONS = 10
-const AUTOTRANSFORMER_OUTPUT_VOLTAGE = 230
+const MAX_OBSERVATIONS = MAX_LAMP_LOAD_LEVEL + 1
+const MIN_GRAPH_READINGS = MAX_OBSERVATIONS
 const VOLTAGE_SAFETY_LIMIT = 240
 const VOLTAGE_SAFETY_RESET = 220
-
-const getObservationSignature = ({ i1, i2, i3, voltage }) => (
-  [
-    Number(voltage).toFixed(1),
-    Number(i1).toFixed(3),
-    Number(i2).toFixed(3),
-    Number(i3).toFixed(3),
-  ].join('|')
-)
 
 const formatConnectionList = (connections) => (
   connections.map((connection) => connection.label).join(', ')
@@ -75,6 +70,7 @@ const App = () => {
   const [r3, setR3] = useState(0)
   const [voltage, setVoltage] = useState(0)
   const [powerOn, setPowerOn] = useState(false)
+  const [activeLoadLevel, setActiveLoadLevel] = useState(0)
   const [observations, setObservations] = useState([])
   const [graphGenerated, setGraphGenerated] = useState(false)
   const [reportGenerated, setReportGenerated] = useState(false)
@@ -103,18 +99,19 @@ const App = () => {
   )
 
   const normalizedVoltage = Number(voltage.toFixed(1))
-  const currentReadingSignature = getObservationSignature({
-    i1: readings.i1,
-    i2: readings.i2,
-    i3: readings.i3,
-    voltage: normalizedVoltage,
-  })
   const hasDuplicateReading = observations.some((row) => (
-    row.voltage === normalizedVoltage
-      || getObservationSignature(row) === currentReadingSignature
+    row.loadLevel === activeLoadLevel
   ))
   const readingCount = observations.length
   const canPlotGraph = readingCount >= MIN_GRAPH_READINGS
+  const nextEnabledLoadLevel = (
+    powerOn
+    && normalizedVoltage >= AUTOTRANSFORMER_OUTPUT_VOLTAGE
+    && readingCount === activeLoadLevel + 1
+    && activeLoadLevel < MAX_LAMP_LOAD_LEVEL
+  )
+    ? activeLoadLevel + 1
+    : 0
 
   const handleAiGuideStart = useCallback(() => {
     setStatus('AI Guide narration started.')
@@ -177,9 +174,9 @@ const App = () => {
     }
 
     if (readingCount >= MAX_OBSERVATIONS) {
-      setStatus('Ten readings are already recorded. Plot the graph or reset for a new run.')
+      setStatus('All load readings are already recorded. Plot the graph or reset for a new run.')
       showStepAlert(EXPERIMENT_ALERTS.minimumReadingsRequired, {
-        description: 'The observation table already contains the maximum 10 readings.',
+        description: `The observation table already contains the maximum ${MAX_OBSERVATIONS} readings.`,
         title: 'Observation Table Is Full',
       })
       return
@@ -188,22 +185,22 @@ const App = () => {
     if (hasDuplicateReading) {
       setStatus('Duplicate reading cannot be added to the observation table.')
       showStepAlert(EXPERIMENT_ALERTS.readingAlreadyExists, {
-        description: 'This reading already exists in the observation table. Change the voltage before adding another reading.',
+        description: 'This lamp-load reading already exists in the observation table. Turn ON the next enabled switch before adding another reading.',
         title: 'Duplicate Reading Not Allowed',
       })
       return
     }
 
+    const nextObservationId = (observations.at(-1)?.id ?? 0) + 1
     const nextObservation = {
-      id: (observations.at(-1)?.id ?? 0) + 1,
-      voltage: normalizedVoltage,
+      ...createTransformerObservation({
+        id: nextObservationId,
+        loadLevel: activeLoadLevel,
+      }),
       r1,
       r2,
       r3,
       totalResistance: readings.totalResistance,
-      i1: readings.i1,
-      i2: readings.i2,
-      i3: readings.i3,
     }
     const nextObservationCount = readingCount + 1
 
@@ -221,6 +218,7 @@ const App = () => {
     stopAiGuide()
     setPowerOn(false)
     setVoltage(0)
+    setActiveLoadLevel(0)
     setR1(0)
     setR2(0)
     setR3(0)
@@ -265,7 +263,7 @@ const App = () => {
   const handlePrint = () => {
     if (!canPlotGraph) {
       showStepAlert(EXPERIMENT_ALERTS.minimumReadingsRequired, {
-        description: 'Collect at least 6 readings before preparing the print layout.',
+        description: `Collect at least ${MIN_GRAPH_READINGS} readings before preparing the print layout.`,
       })
       return
     }
@@ -293,7 +291,7 @@ const App = () => {
       showStepAlert(EXPERIMENT_ALERTS.minimumReadingsRequired, {
         description: `Add ${remainingReadings} more reading(s), then plot the graph before generating a report.`,
         target: '#generate-report-button',
-        title: 'Report Requires 6 Readings',
+        title: `Report Requires ${MIN_GRAPH_READINGS} Readings`,
       })
       return
     }
@@ -407,6 +405,7 @@ const App = () => {
     if (powerOn) {
       setPowerOn(false)
       setVoltage(0)
+      setActiveLoadLevel(0)
       autotransformerReadyAlertShownRef.current = false
       voltageLimitWarningShownRef.current = false
       setStatus('You turned off the MCB. Turn it back ON to continue the simulation.')
@@ -438,6 +437,17 @@ const App = () => {
     setStatus('Please complete the connections first and turn ON the MCB.')
     showStepAlert(EXPERIMENT_ALERTS.completeConnectionsBeforeAutotransformer)
   }, [showStepAlert])
+
+  const handleLoadLevelChange = useCallback((nextLoadLevel) => {
+    if (nextLoadLevel !== nextEnabledLoadLevel) {
+      return
+    }
+
+    setActiveLoadLevel(nextLoadLevel)
+    setGraphGenerated(false)
+    setReportGenerated(false)
+    setStatus(`Lamp load switch ${nextLoadLevel} turned ON. Click ADD to record the reading.`)
+  }, [nextEnabledLoadLevel])
 
   const handleVoltageChange = useCallback((nextVoltage) => {
     setVoltage(nextVoltage)
@@ -533,9 +543,12 @@ const App = () => {
               <section className="right-panel">
                 <ConnectionLab
                   key={`connection-lab-${resetRequest}`}
+                  activeLoadLevel={activeLoadLevel}
                   autoConnectRequest={autoConnectRequest}
                   checkRequest={checkRequest}
+                  nextEnabledLoadLevel={nextEnabledLoadLevel}
                   onCheckConnections={handleCheckConnections}
+                  onLoadLevelChange={handleLoadLevelChange}
                   powerOn={powerOn}
                   r1={r1}
                   r2={r2}
