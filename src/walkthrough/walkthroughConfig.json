@@ -140,33 +140,9 @@
     },
     {
       "id": 12,
-      "target": "#autotransformer-device",
-      "title": {
-        "en": "Autotransformer"
-      },
-      "description": {
-        "en": "Click the autotransformer knob after the MCB is ON to set the primary voltage to 230 V."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 13,
-      "target": "#transformer-device",
-      "title": {
-        "en": "Transformer"
-      },
-      "description": {
-        "en": "This transformer is the device under test. The load test compares primary input and secondary output readings."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 14,
       "target": "#voltmeter-meter",
       "title": {
-        "en": "Primary Voltmeter"
+        "en": "Upper Voltmeter"
       },
       "description": {
         "en": "This meter displays the primary-side voltage applied through the autotransformer."
@@ -175,10 +151,10 @@
       "placement": "top"
     },
     {
-      "id": 15,
+      "id": 13,
       "target": "#ammeter-meter",
       "title": {
-        "en": "Primary Ammeter"
+        "en": "A1 Ammeter"
       },
       "description": {
         "en": "This meter shows the primary-side current for the current load condition."
@@ -187,7 +163,7 @@
       "placement": "top"
     },
     {
-      "id": 16,
+      "id": 14,
       "target": "#wattmeter-meter",
       "title": {
         "en": "Wattmeter"
@@ -199,70 +175,46 @@
       "placement": "top"
     },
     {
+      "id": 15,
+      "target": "#autotransformer-device",
+      "title": {
+        "en": "Autotransformer"
+      },
+      "description": {
+        "en": "Click the autotransformer knob after the MCB is ON to set the primary voltage to 230 V."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 16,
+      "target": "#transformer-device",
+      "title": {
+        "en": "Transformer"
+      },
+      "description": {
+        "en": "This transformer is the device under test. The load test compares primary input and secondary output readings."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
       "id": 17,
       "target": "#lamp-load",
       "title": {
         "en": "Lamp Load"
       },
       "description": {
-        "en": "The lamp load is enabled step by step. After recording the no-load reading, turn ON one switch at a time and add each reading."
+        "en": "This complete lamp-load section is enabled step by step during the load test."
       },
       "audio": "#",
       "placement": "left"
     },
     {
       "id": 18,
-      "target": ".lamp-load__switch--1",
-      "title": {
-        "en": "Lamp Switch 1"
-      },
-      "description": {
-        "en": "After the no-load reading is added, this first switch becomes enabled. Turn it ON and add the next reading."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 19,
-      "target": ".lamp-load__switch--2",
-      "title": {
-        "en": "Lamp Switch 2"
-      },
-      "description": {
-        "en": "This switch becomes enabled only after the first switch reading is added."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 20,
-      "target": ".lamp-load__switch--3",
-      "title": {
-        "en": "Lamp Switch 3"
-      },
-      "description": {
-        "en": "This switch becomes enabled only after the second switch reading is added."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 21,
-      "target": ".lamp-load__switch--4",
-      "title": {
-        "en": "Lamp Switch 4"
-      },
-      "description": {
-        "en": "This final switch becomes enabled after the third switch reading is added."
-      },
-      "audio": "#",
-      "placement": "left"
-    },
-    {
-      "id": 22,
       "target": "#V2",
       "title": {
-        "en": "Secondary Voltmeter"
+        "en": "Lower Voltmeter"
       },
       "description": {
         "en": "This meter shows the transformer secondary voltage as the load changes."
@@ -271,10 +223,10 @@
       "placement": "left"
     },
     {
-      "id": 23,
+      "id": 19,
       "target": "#A2",
       "title": {
-        "en": "Secondary Ammeter"
+        "en": "A2 Ammeter"
       },
       "description": {
         "en": "This meter shows the transformer secondary current for the active lamp-load level."
@@ -283,7 +235,7 @@
       "placement": "left"
     },
     {
-      "id": 24,
+      "id": 20,
       "target": "#graph-panel",
       "title": {
         "en": "Observation Graph"
