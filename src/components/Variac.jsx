@@ -29,7 +29,7 @@ const Variac = ({ onBlockedControl, powerOn, setVoltage, voltage }) => {
   const variacImg = powerOn ? variacOnImg : variacOffImg
 
   return (
-    <article className="variac-device" aria-label="Variac voltage controller">
+    <article className="variac-device" id="autotransformer-device" aria-label="Variac voltage controller">
       <img
         alt={powerOn ? 'Autotransformer on' : 'Autotransformer off'}
         className={`variac-device__image${powerOn ? ' variac-device__image--on' : ''}`}

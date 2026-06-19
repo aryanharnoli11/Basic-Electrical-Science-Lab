@@ -13,43 +13,283 @@
         "en": "Experiment Goal"
       },
       "description": {
-        "en": "This board states the lab objective. The walkthrough follows the same order students use to verify Kirchhoff's Current Law."
+        "en": "This board shows the experiment objective for the single-phase transformer load test."
       },
       "audio": "#",
       "placement": "bottom"
     },
     {
       "id": 2,
-      "target": "#action-buttons-panel",
+      "target": "#instruction-button",
       "title": {
-        "en": "Lab Actions"
+        "en": "Instruction Button"
       },
       "description": {
-        "en": "Use these controls to record readings, plot the graph, reset the setup, print results, or open the guide."
+        "en": "Open this button to view the written experiment instructions."
       },
       "audio": "#",
       "placement": "right"
     },
     {
       "id": 3,
-      "target": "#observation-table-panel",
+      "target": "#ai-guide-button",
       "title": {
-        "en": "Observation Table"
+        "en": "AI Guide Button"
       },
       "description": {
-        "en": "Each added reading appears in this table. Collect all five readings before plotting the graph."
+        "en": "Use this button to start or stop the guided narration."
       },
       "audio": "#",
       "placement": "right"
     },
     {
       "id": 4,
+      "target": "#check-button",
+      "title": {
+        "en": "Check Button"
+      },
+      "description": {
+        "en": "After wiring the circuit, click CHECK to verify that all connections are correct."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
+      "id": 5,
+      "target": "#auto-connect-button",
+      "title": {
+        "en": "Auto Connect Button"
+      },
+      "description": {
+        "en": "Use AUTO CONNECT to place the default wiring, then verify it with CHECK."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
+      "id": 6,
+      "target": "#add-reading-button",
+      "title": {
+        "en": "Add Button"
+      },
+      "description": {
+        "en": "Click ADD to store the current meter readings in the observation table."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
+      "id": 7,
+      "target": "#plot-button",
+      "title": {
+        "en": "Plot Button"
+      },
+      "description": {
+        "en": "After all five readings are added, click PLOT to generate the graph."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
+      "id": 8,
+      "target": "#reset-button",
+      "title": {
+        "en": "Reset Button"
+      },
+      "description": {
+        "en": "Click RESET to clear the simulation and start the experiment again."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
+      "id": 9,
+      "target": "#print-button",
+      "title": {
+        "en": "Print Button"
+      },
+      "description": {
+        "en": "Use PRINT after plotting the graph to print the experiment output."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
+      "id": 10,
+      "target": "#observation-table-panel",
+      "title": {
+        "en": "Observation Table"
+      },
+      "description": {
+        "en": "Every ADD action records one row here. Add the no-load row first, then one row after each lamp-load switch."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
+      "id": 11,
+      "target": "#power-supply",
+      "title": {
+        "en": "MCB"
+      },
+      "description": {
+        "en": "The MCB turns the verified circuit ON or OFF. It should be turned ON only after the connections are checked."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 12,
+      "target": "#autotransformer-device",
+      "title": {
+        "en": "Autotransformer"
+      },
+      "description": {
+        "en": "Click the autotransformer knob after the MCB is ON to set the primary voltage to 230 V."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 13,
+      "target": "#transformer-device",
+      "title": {
+        "en": "Transformer"
+      },
+      "description": {
+        "en": "This transformer is the device under test. The load test compares primary input and secondary output readings."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 14,
+      "target": "#voltmeter-meter",
+      "title": {
+        "en": "Primary Voltmeter"
+      },
+      "description": {
+        "en": "This meter displays the primary-side voltage applied through the autotransformer."
+      },
+      "audio": "#",
+      "placement": "top"
+    },
+    {
+      "id": 15,
+      "target": "#ammeter-meter",
+      "title": {
+        "en": "Primary Ammeter"
+      },
+      "description": {
+        "en": "This meter shows the primary-side current for the current load condition."
+      },
+      "audio": "#",
+      "placement": "top"
+    },
+    {
+      "id": 16,
+      "target": "#wattmeter-meter",
+      "title": {
+        "en": "Wattmeter"
+      },
+      "description": {
+        "en": "The wattmeter displays the input power used for the observation table."
+      },
+      "audio": "#",
+      "placement": "top"
+    },
+    {
+      "id": 17,
+      "target": "#lamp-load",
+      "title": {
+        "en": "Lamp Load"
+      },
+      "description": {
+        "en": "The lamp load is enabled step by step. After recording the no-load reading, turn ON one switch at a time and add each reading."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 18,
+      "target": ".lamp-load__switch--1",
+      "title": {
+        "en": "Lamp Switch 1"
+      },
+      "description": {
+        "en": "After the no-load reading is added, this first switch becomes enabled. Turn it ON and add the next reading."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 19,
+      "target": ".lamp-load__switch--2",
+      "title": {
+        "en": "Lamp Switch 2"
+      },
+      "description": {
+        "en": "This switch becomes enabled only after the first switch reading is added."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 20,
+      "target": ".lamp-load__switch--3",
+      "title": {
+        "en": "Lamp Switch 3"
+      },
+      "description": {
+        "en": "This switch becomes enabled only after the second switch reading is added."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 21,
+      "target": ".lamp-load__switch--4",
+      "title": {
+        "en": "Lamp Switch 4"
+      },
+      "description": {
+        "en": "This final switch becomes enabled after the third switch reading is added."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 22,
+      "target": "#V2",
+      "title": {
+        "en": "Secondary Voltmeter"
+      },
+      "description": {
+        "en": "This meter shows the transformer secondary voltage as the load changes."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 23,
+      "target": "#A2",
+      "title": {
+        "en": "Secondary Ammeter"
+      },
+      "description": {
+        "en": "This meter shows the transformer secondary current for the active lamp-load level."
+      },
+      "audio": "#",
+      "placement": "left"
+    },
+    {
+      "id": 24,
       "target": "#graph-panel",
       "title": {
         "en": "Observation Graph"
       },
       "description": {
-        "en": "Once enough readings are available, PLOT displays current-versus-voltage traces for I1, I2, and I3."
+        "en": "The walkthrough ends here. After all readings are recorded, the graph displays the plotted results."
       },
       "audio": "#",
       "placement": "top"
