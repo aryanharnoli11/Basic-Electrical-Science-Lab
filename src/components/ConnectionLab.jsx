@@ -2,7 +2,9 @@ import { useEffect, useRef } from 'react'
 
 import EquipmentPanel from './EquipmentPanel.jsx'
 import {
+  DEFAULT_WIRE_CURVINESS,
   addAllEndpoints,
+  applyAllWireCurviness,
   autoConnectDefaultCircuit,
   deleteConnectionsForTerminal,
   resolveJsPlumb,
@@ -55,7 +57,7 @@ const ConnectionLab = ({
 
       activeInstance = jsPlumb.getInstance({
         ConnectionsDetachable: true,
-        Connector: ['Bezier', { curviness: 48 }],
+        Connector: ['Bezier', { curviness: DEFAULT_WIRE_CURVINESS }],
         Container: labRef.current,
         Endpoint: ['Dot', { radius: 5 }],
       })
@@ -80,6 +82,7 @@ const ConnectionLab = ({
         }
 
         syncWireAnchors(labRef.current, activeInstance)
+        applyAllWireCurviness(activeInstance)
         activeInstance.repaintEverything?.()
         updateTerminalConnectionStates(activeInstance)
       }

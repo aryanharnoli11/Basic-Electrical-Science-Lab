@@ -33,6 +33,7 @@ export const CIRCUIT_POSITIVE_TERMINALS = []
 export const CIRCUIT_NEGATIVE_TERMINALS = []
 
 const WIRE_ANCHOR_SIZE = 28
+export const DEFAULT_WIRE_CURVINESS = 58
 
 export const REQUIRED_CONNECTIONS = [
   ['1-endpoint', '11-endpoint'],
@@ -55,6 +56,25 @@ export const REQUIRED_CONNECTIONS = [
 export const VALID_CONNECTION_SEQUENCE = REQUIRED_CONNECTIONS.flat()
 
 export const DEFAULT_AUTO_CONNECTIONS = REQUIRED_CONNECTIONS
+
+// Edit these values to tune each wire curve. Higher values bend more; missing pairs use the default.
+export const WIRE_CURVINESS_BY_CONNECTION = {
+  '1-11': 64,
+  '2-12': 64,
+  '3-13': 58,
+  '4-14': 58,
+  '3-5': 42,
+  '6-7': 36,
+  '7-9': 44,
+  '8-15': 72,
+  '10-17': 76,
+  '14-17': 66,
+  '16-19': 54,
+  '18-20': 54,
+  '19-21': 46,
+  '22-23': 78,
+  '20-24': 82,
+}
 
 export const DEFAULT_AMMETER_CURRENT_KEYS = {
   A1: 'i1',
@@ -272,9 +292,53 @@ const getConnectionKey = (firstTerminal, secondTerminal) => (
   [firstTerminal, secondTerminal].sort().join('|')
 )
 
+const getConnectionCurvinessKey = (firstTerminal, secondTerminal) => (
+  [getTerminalNumber(firstTerminal), getTerminalNumber(secondTerminal)]
+    .sort((first, second) => Number(first) - Number(second))
+    .join('-')
+)
+
 const getTerminalPairLabel = (firstTerminal, secondTerminal) => (
   `${getTerminalNumber(firstTerminal)}-${getTerminalNumber(secondTerminal)}`
 )
+
+export const getWireCurviness = (firstTerminal, secondTerminal) => {
+  const curviness = WIRE_CURVINESS_BY_CONNECTION[
+    getConnectionCurvinessKey(firstTerminal, secondTerminal)
+  ]
+
+  return Number.isFinite(curviness) ? curviness : DEFAULT_WIRE_CURVINESS
+}
+
+export const getWireConnectorSpec = (firstTerminal, secondTerminal) => [
+  'Bezier',
+  {
+    curviness: getWireCurviness(firstTerminal, secondTerminal),
+  },
+]
+
+export const applyWireCurviness = (connection) => {
+  const sourceId = connection?.sourceId || connection?.source?.id
+  const targetId = connection?.targetId || connection?.target?.id
+
+  if (!sourceId || !targetId || typeof connection?.setConnector !== 'function') {
+    return
+  }
+
+  const curviness = getWireCurviness(sourceId, targetId)
+  const curvinessKey = `Bezier:${curviness}`
+
+  if (connection.getParameter?.('wireCurvinessKey') === curvinessKey) {
+    return
+  }
+
+  connection.setConnector(['Bezier', { curviness }], true)
+  connection.setParameter?.('wireCurvinessKey', curvinessKey)
+}
+
+export const applyAllWireCurviness = (instance) => {
+  getAllConnections(instance).forEach(applyWireCurviness)
+}
 
 const getCssValue = (styles, propertyName, fallback) => {
   const value = styles.getPropertyValue(propertyName).trim()
@@ -466,10 +530,13 @@ export const autoConnectDefaultCircuit = (instance) => {
     }
 
     instance.connect({
+      connector: getWireConnectorSpec(source, target),
       uuids: [source, target],
       type: isNegativeTerminal(source) ? 'negative' : 'positive',
     })
   })
+
+  applyAllWireCurviness(instance)
 }
 
 export const validateOldExperimentConnections = (instance) => {
