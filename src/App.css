@@ -528,8 +528,7 @@
 .observation-table-wrap {
   position: relative;
   z-index: 1;
-  height: 296px;
-  margin: 8px 10px 0;
+  margin: 8px 10px 10px;
   overflow: hidden;
   border: 1px solid rgba(96, 61, 35, 0.48);
   border-radius: 8px;

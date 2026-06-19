@@ -14,7 +14,7 @@ const getNumber = (...values) => {
 }
 
 const ObservationTable = ({ observations }) => (
-  <SectionCard className="h-[250px]" icon="table" id="observation-table-panel" title="OBSERVATION TABLE">
+  <SectionCard icon="table" id="observation-table-panel" title="OBSERVATION TABLE">
     <div className="observation-table-wrap">
       <table className="observation-table">
         <colgroup>
