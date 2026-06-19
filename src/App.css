@@ -1181,12 +1181,10 @@
 }
 
 .report-button {
-  position: absolute;
-  right: 36px;
-  bottom: 17px;
-  z-index: 4;
+  position: relative;
+  z-index: 2;
   display: inline-flex;
-  min-width: 178px;
+  width: 466px;
   height: 46px;
   align-items: center;
   justify-content: center;

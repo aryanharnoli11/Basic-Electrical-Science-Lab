@@ -116,18 +116,6 @@
     },
     {
       "id": 10,
-      "target": "#observation-table-panel",
-      "title": {
-        "en": "Observation Table"
-      },
-      "description": {
-        "en": "Every ADD action records one row here. Add the no-load row first, then one row after each lamp-load switch."
-      },
-      "audio": "#",
-      "placement": "right"
-    },
-    {
-      "id": 11,
       "target": "#power-supply",
       "title": {
         "en": "MCB"
@@ -139,7 +127,7 @@
       "placement": "left"
     },
     {
-      "id": 12,
+      "id": 11,
       "target": "#voltmeter-meter",
       "title": {
         "en": "Upper Voltmeter"
@@ -151,7 +139,7 @@
       "placement": "top"
     },
     {
-      "id": 13,
+      "id": 12,
       "target": "#ammeter-meter",
       "title": {
         "en": "A1 Ammeter"
@@ -163,7 +151,7 @@
       "placement": "top"
     },
     {
-      "id": 14,
+      "id": 13,
       "target": "#wattmeter-meter",
       "title": {
         "en": "Wattmeter"
@@ -175,7 +163,7 @@
       "placement": "top"
     },
     {
-      "id": 15,
+      "id": 14,
       "target": "#autotransformer-device",
       "title": {
         "en": "Autotransformer"
@@ -187,7 +175,7 @@
       "placement": "left"
     },
     {
-      "id": 16,
+      "id": 15,
       "target": "#transformer-device",
       "title": {
         "en": "Transformer"
@@ -199,7 +187,7 @@
       "placement": "left"
     },
     {
-      "id": 17,
+      "id": 16,
       "target": "#lamp-load",
       "title": {
         "en": "Lamp Load"
@@ -211,7 +199,7 @@
       "placement": "left"
     },
     {
-      "id": 18,
+      "id": 17,
       "target": "#V2",
       "title": {
         "en": "Lower Voltmeter"
@@ -223,7 +211,7 @@
       "placement": "left"
     },
     {
-      "id": 19,
+      "id": 18,
       "target": "#A2",
       "title": {
         "en": "A2 Ammeter"
@@ -235,7 +223,31 @@
       "placement": "left"
     },
     {
+      "id": 19,
+      "target": "#observation-table-panel",
+      "title": {
+        "en": "Observation Table"
+      },
+      "description": {
+        "en": "Every ADD action records one row here. Add the no-load row first, then one row after each lamp-load switch."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
       "id": 20,
+      "target": "#generate-report-button",
+      "title": {
+        "en": "Generate Report Button"
+      },
+      "description": {
+        "en": "After all readings are recorded and the graph is plotted, use this button to generate the report."
+      },
+      "audio": "#",
+      "placement": "right"
+    },
+    {
+      "id": 21,
       "target": "#graph-panel",
       "title": {
         "en": "Observation Graph"

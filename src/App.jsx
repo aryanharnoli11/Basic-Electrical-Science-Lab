@@ -543,6 +543,14 @@ const App = () => {
                   setR2={setR2}
                   setR3={setR3}
                 />
+
+                <ReportControls
+                  graphGenerated={graphGenerated}
+                  minReadings={MIN_GRAPH_READINGS}
+                  onGenerateReport={handleGenerateReport}
+                  readingCount={readingCount}
+                  reportGenerated={reportGenerated}
+                />
               </aside>
 
               <section className="right-panel">
@@ -569,14 +577,6 @@ const App = () => {
                 />
               </section>
             </section>
-
-            <ReportControls
-              graphGenerated={graphGenerated}
-              minReadings={MIN_GRAPH_READINGS}
-              onGenerateReport={handleGenerateReport}
-              readingCount={readingCount}
-              reportGenerated={reportGenerated}
-            />
 
           </main>
 
