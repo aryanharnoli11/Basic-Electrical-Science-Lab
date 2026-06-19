@@ -73,6 +73,20 @@ export const EXPERIMENT_ALERTS = {
     title: 'Power Supply Turned ON',
     type: 'success',
   },
+  mcbTurnedOffDuringExperiment: {
+    icon: '!',
+    stepNumber: 4,
+    target: '#power-toggle-button',
+    title: 'You turned off the MCB. Turn it back ON to continue the simulation',
+    type: 'warning',
+  },
+  makeConnectionsBeforeMcb: {
+    icon: '!',
+    stepNumber: 4,
+    target: '#connection-lab',
+    title: 'Make and check the connections before turning on the MCB',
+    type: 'warning',
+  },
   cannotStartPower: {
     description: 'Run CHECK and correct the circuit wiring before powering the supply.',
     icon: '⚠️',
@@ -88,6 +102,20 @@ export const EXPERIMENT_ALERTS = {
     stepNumber: 5,
     target: '#voltage-control',
     title: 'Adjust Voltage to Observe Ammeter Readings',
+    type: 'info',
+  },
+  completeConnectionsBeforeAutotransformer: {
+    icon: '!',
+    stepNumber: 5,
+    target: '#voltage-control',
+    title: 'Please complete the connections first and turn ON the MCB',
+    type: 'warning',
+  },
+  autotransformerReadingsReady: {
+    icon: 'i',
+    stepNumber: 5,
+    target: '#add-reading-button',
+    title: 'The readings are now displayed on the meters. Now, click on the add button to add the readings to the observation table',
     type: 'info',
   },
   currentUpdating: {
@@ -118,6 +146,13 @@ export const EXPERIMENT_ALERTS = {
     target: '#observation-table-panel',
     title: 'Adding Current Readings to Observation Table',
     type: 'info',
+  },
+  rotateAutotransformerBeforeAdd: {
+    icon: '!',
+    stepNumber: 6,
+    target: '#voltage-control',
+    title: 'Please rotate the autotransformer knob first',
+    type: 'warning',
   },
   readingAdded: {
     description: 'The observation row has been stored.',
@@ -252,5 +287,12 @@ export const EXPERIMENT_ALERTS = {
     target: '#circuit-panel',
     title: 'Experiment Reset Successfully',
     type: 'success',
+  },
+  simulationReset: {
+    icon: 'i',
+    stepNumber: 11,
+    target: '#reset-button',
+    title: 'The simulation has been reset. You can start again',
+    type: 'info',
   },
 }

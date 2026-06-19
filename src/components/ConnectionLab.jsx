@@ -22,6 +22,7 @@ const ConnectionLab = ({
   resetRequest,
   scale,
   onTogglePower,
+  onVoltageControlBlocked,
   setVoltage,
   voltage,
 }) => {
@@ -251,6 +252,7 @@ const ConnectionLab = ({
     <div className="connection-lab" id="connection-lab" ref={labRef} aria-label="Experiment apparatus area">
       <EquipmentPanel
         onTogglePower={onTogglePower}
+        onVoltageControlBlocked={onVoltageControlBlocked}
         powerOn={powerOn}
         readings={readings}
         setVoltage={setVoltage}

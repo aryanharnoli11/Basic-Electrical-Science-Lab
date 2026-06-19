@@ -25,6 +25,7 @@ const PANEL_MAX_SCALE = 0.95
 const PANEL_VIEWPORT_MARGIN = 32
 const MIN_GRAPH_READINGS = 6
 const MAX_OBSERVATIONS = 10
+const AUTOTRANSFORMER_OUTPUT_VOLTAGE = 230
 const VOLTAGE_SAFETY_LIMIT = 240
 const VOLTAGE_SAFETY_RESET = 220
 
@@ -84,6 +85,7 @@ const App = () => {
   const [resetRequest, setResetRequest] = useState(0)
   const [connectionsVerified, setConnectionsVerified] = useState(false)
   const [sessionStart, setSessionStart] = useState(() => Date.now())
+  const autotransformerReadyAlertShownRef = useRef(false)
   const voltageLimitWarningShownRef = useRef(false)
 
   useEffect(() => {
@@ -168,14 +170,9 @@ const App = () => {
       return
     }
 
-    if (normalizedVoltage <= 0) {
-      setStatus('Set the power supply voltage before adding a reading.')
-      showStepAlert(EXPERIMENT_ALERTS.adjustVoltage, {
-        dedupeKey: 'step-6-zero-voltage',
-        description: 'Increase the voltage above 0 V before adding a reading.',
-        target: '#voltage-control',
-        type: 'warning',
-      })
+    if (normalizedVoltage < AUTOTRANSFORMER_OUTPUT_VOLTAGE) {
+      setStatus('Please rotate the autotransformer knob first.')
+      showStepAlert(EXPERIMENT_ALERTS.rotateAutotransformerBeforeAdd)
       return
     }
 
@@ -235,9 +232,10 @@ const App = () => {
     setConnectionsVerified(false)
     setResetRequest((current) => current + 1)
     setSessionStart(Date.now())
+    autotransformerReadyAlertShownRef.current = false
     voltageLimitWarningShownRef.current = false
-    setStatus('Simulation reset. Apparatus area is clear for the next setup.')
-    showStepAlert(EXPERIMENT_ALERTS.resetSuccess)
+    setStatus('The simulation has been reset. You can start again.')
+    showStepAlert(EXPERIMENT_ALERTS.simulationReset)
   }, [showStepAlert, stopAiGuide])
 
   const handleReset = () => {
@@ -401,16 +399,18 @@ const App = () => {
   }
   const handleTogglePower = () => {
     if (!powerOn && !connectionsVerified) {
-      setStatus('Check the circuit connections before switching on the power supply.')
-      showStepAlert(EXPERIMENT_ALERTS.cannotStartPower)
+      setStatus('Make and check the connections before turning on the MCB.')
+      showStepAlert(EXPERIMENT_ALERTS.makeConnectionsBeforeMcb)
       return
     }
 
     if (powerOn) {
       setPowerOn(false)
       setVoltage(0)
+      autotransformerReadyAlertShownRef.current = false
       voltageLimitWarningShownRef.current = false
-      setStatus('Power supply switched off.')
+      setStatus('You turned off the MCB. Turn it back ON to continue the simulation.')
+      showStepAlert(EXPERIMENT_ALERTS.mcbTurnedOffDuringExperiment)
       return
     }
 
@@ -434,15 +434,31 @@ const App = () => {
     })
   }
 
+  const handleVoltageControlBlocked = useCallback(() => {
+    setStatus('Please complete the connections first and turn ON the MCB.')
+    showStepAlert(EXPERIMENT_ALERTS.completeConnectionsBeforeAutotransformer)
+  }, [showStepAlert])
+
   const handleVoltageChange = useCallback((nextVoltage) => {
     setVoltage(nextVoltage)
 
     if (!powerOn || nextVoltage <= 0) {
       if (nextVoltage < VOLTAGE_SAFETY_RESET) {
+        autotransformerReadyAlertShownRef.current = false
         voltageLimitWarningShownRef.current = false
       }
 
       return
+    }
+
+    if (
+      nextVoltage >= AUTOTRANSFORMER_OUTPUT_VOLTAGE
+      && voltage < AUTOTRANSFORMER_OUTPUT_VOLTAGE
+      && !autotransformerReadyAlertShownRef.current
+    ) {
+      autotransformerReadyAlertShownRef.current = true
+      setStatus('The readings are now displayed on the meters. Now, click on the add button to add the readings to the observation table.')
+      showStepAlert(EXPERIMENT_ALERTS.autotransformerReadingsReady)
     }
 
     if (nextVoltage >= VOLTAGE_SAFETY_LIMIT && !voltageLimitWarningShownRef.current) {
@@ -454,9 +470,10 @@ const App = () => {
     }
 
     if (nextVoltage < VOLTAGE_SAFETY_RESET) {
+      autotransformerReadyAlertShownRef.current = false
       voltageLimitWarningShownRef.current = false
     }
-  }, [powerOn, showStepAlert])
+  }, [powerOn, showStepAlert, voltage])
 
   return (
     <div id="app-wrapper">
@@ -487,7 +504,6 @@ const App = () => {
                     onAiGuide: aiGuidePlaying,
                   }}
                   disabledButtons={{
-                    onAdd: true,
                     onAutoConnect: connectionsVerified || powerOn,
                     onCheck: connectionsVerified,
                     onPlot: false,
@@ -528,6 +544,7 @@ const App = () => {
                   resetRequest={resetRequest}
                   scale={scale}
                   onTogglePower={handleTogglePower}
+                  onVoltageControlBlocked={handleVoltageControlBlocked}
                   setVoltage={handleVoltageChange}
                   voltage={voltage}
                 />

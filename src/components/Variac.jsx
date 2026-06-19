@@ -10,9 +10,10 @@ const MAX_KNOB_ROTATION = 235
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 
-const Variac = ({ powerOn, setVoltage, voltage }) => {
+const Variac = ({ onBlockedControl, powerOn, setVoltage, voltage }) => {
   const handleKnobClick = () => {
     if (!powerOn) {
+      onBlockedControl?.()
       return
     }
 
@@ -49,8 +50,8 @@ const Variac = ({ powerOn, setVoltage, voltage }) => {
 
       <button
         aria-label="Set autotransformer to 230 volts"
+        aria-disabled={!powerOn}
         className="variac-device__control"
-        disabled={!powerOn}
         id="voltage-control"
         onClick={handleKnobClick}
         type="button"

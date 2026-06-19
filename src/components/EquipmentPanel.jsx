@@ -28,7 +28,7 @@ const NO_LAMP_LOAD_READING = {
   wattmeterPower: 20,
 }
 
-const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage }) => {
+const EquipmentPanel = ({ onTogglePower, onVoltageControlBlocked, powerOn, readings, setVoltage, voltage }) => {
   const [activeLoadLevel, setActiveLoadLevel] = useState(0)
   const activeVoltage = powerOn ? voltage : 0
   const ammeterCurrent = readings?.i1 ?? 0
@@ -69,6 +69,7 @@ const EquipmentPanel = ({ onTogglePower, powerOn, readings, setVoltage, voltage 
           powerOn={powerOn}
         />
         <Variac
+          onBlockedControl={onVoltageControlBlocked}
           powerOn={powerOn}
           setVoltage={setVoltage}
           voltage={voltage}
