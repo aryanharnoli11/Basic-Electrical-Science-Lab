@@ -3,6 +3,9 @@ import { useEffect, useRef } from 'react'
 import EquipmentPanel from './EquipmentPanel.jsx'
 import {
   DEFAULT_WIRE_CURVINESS,
+  WIRE_CONNECTOR_TYPE,
+  WIRE_CURVINESS_CONFIG_SIGNATURE,
+  WIRE_PROXIMITY_LIMIT,
   addAllEndpoints,
   applyAllWireCurviness,
   autoConnectDefaultCircuit,
@@ -36,6 +39,7 @@ const ConnectionLab = ({
   const instanceRef = useRef(null)
   const onConnectionRemovalBlockedRef = useRef(onConnectionRemovalBlocked)
   const powerOnRef = useRef(powerOn)
+  const wireCurvinessConfigSignatureRef = useRef(WIRE_CURVINESS_CONFIG_SIGNATURE)
 
   useEffect(() => {
     onConnectionRemovalBlockedRef.current = onConnectionRemovalBlocked
@@ -57,7 +61,13 @@ const ConnectionLab = ({
 
       activeInstance = jsPlumb.getInstance({
         ConnectionsDetachable: true,
-        Connector: ['Bezier', { curviness: DEFAULT_WIRE_CURVINESS }],
+        Connector: [
+          WIRE_CONNECTOR_TYPE,
+          {
+            curviness: DEFAULT_WIRE_CURVINESS,
+            proximityLimit: WIRE_PROXIMITY_LIMIT,
+          },
+        ],
         Container: labRef.current,
         Endpoint: ['Dot', { radius: 5 }],
       })
@@ -172,6 +182,25 @@ const ConnectionLab = ({
       updateTerminalConnectionStates(instance)
     })
   }, [autoConnectRequest])
+
+  useEffect(() => {
+    if (wireCurvinessConfigSignatureRef.current === WIRE_CURVINESS_CONFIG_SIGNATURE) {
+      return
+    }
+
+    const instance = instanceRef.current
+
+    if (!instance) {
+      return
+    }
+
+    wireCurvinessConfigSignatureRef.current = WIRE_CURVINESS_CONFIG_SIGNATURE
+
+    window.requestAnimationFrame(() => {
+      applyAllWireCurviness(instance)
+      instance.repaintEverything?.()
+    })
+  })
 
   useEffect(() => {
     const instance = instanceRef.current

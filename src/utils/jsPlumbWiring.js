@@ -33,7 +33,9 @@ export const CIRCUIT_POSITIVE_TERMINALS = []
 export const CIRCUIT_NEGATIVE_TERMINALS = []
 
 const WIRE_ANCHOR_SIZE = 28
+export const WIRE_CONNECTOR_TYPE = 'StateMachine'
 export const DEFAULT_WIRE_CURVINESS = 58
+export const WIRE_PROXIMITY_LIMIT = 0
 
 export const REQUIRED_CONNECTIONS = [
   ['1-endpoint', '11-endpoint'],
@@ -59,22 +61,29 @@ export const DEFAULT_AUTO_CONNECTIONS = REQUIRED_CONNECTIONS
 
 // Edit these values to tune each wire curve. Higher values bend more; missing pairs use the default.
 export const WIRE_CURVINESS_BY_CONNECTION = {
-  '1-11': 64,
-  '2-12': 64,
-  '3-13': 58,
-  '4-14': 58,
-  '3-5': 42,
-  '6-7': 36,
-  '7-9': 44,
-  '8-15': 72,
-  '10-17': 76,
-  '14-17': 66,
-  '16-19': 54,
-  '18-20': 54,
-  '19-21': 46,
-  '22-23': 78,
-  '20-24': 82,
+  '1-11': -64,
+  '2-12': -64,
+  '3-13': -58,
+  '4-14': -58,
+  '3-5': -42,
+  '6-7': -36,
+  '7-9': -44,
+  '8-15': -72,
+  '10-17': -76,
+  '14-17': -66,
+  '16-19': -54,
+  '18-20': -54,
+  '19-21':- 46,
+  '22-23': -78,
+  '20-24': -102,
 }
+
+export const WIRE_CURVINESS_CONFIG_SIGNATURE = JSON.stringify({
+  connectorType: WIRE_CONNECTOR_TYPE,
+  curvinessByConnection: WIRE_CURVINESS_BY_CONNECTION,
+  defaultCurviness: DEFAULT_WIRE_CURVINESS,
+  proximityLimit: WIRE_PROXIMITY_LIMIT,
+})
 
 export const DEFAULT_AMMETER_CURRENT_KEYS = {
   A1: 'i1',
@@ -311,9 +320,10 @@ export const getWireCurviness = (firstTerminal, secondTerminal) => {
 }
 
 export const getWireConnectorSpec = (firstTerminal, secondTerminal) => [
-  'Bezier',
+  WIRE_CONNECTOR_TYPE,
   {
     curviness: getWireCurviness(firstTerminal, secondTerminal),
+    proximityLimit: WIRE_PROXIMITY_LIMIT,
   },
 ]
 
@@ -326,13 +336,13 @@ export const applyWireCurviness = (connection) => {
   }
 
   const curviness = getWireCurviness(sourceId, targetId)
-  const curvinessKey = `Bezier:${curviness}`
+  const curvinessKey = `${WIRE_CONNECTOR_TYPE}:${curviness}:${WIRE_PROXIMITY_LIMIT}`
 
   if (connection.getParameter?.('wireCurvinessKey') === curvinessKey) {
     return
   }
 
-  connection.setConnector(['Bezier', { curviness }], true)
+  connection.setConnector(getWireConnectorSpec(sourceId, targetId), true)
   connection.setParameter?.('wireCurvinessKey', curvinessKey)
 }
 
