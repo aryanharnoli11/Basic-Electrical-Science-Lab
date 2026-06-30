@@ -891,7 +891,7 @@ tr:nth-child(even) {
         <p class="report-stamp">Generated on ${escapeHtml(reportDateText)}</p>
       </div>
       <p class="report-experiment-label">Experiment Title</p>
-      <p class="report-experiment-title">To Verify Kirchhoff's Current Law</p>
+      <p class="report-experiment-title">To Study the efficiency of single phase transformer by load test</p>
       <div class="info-grid">
         <div class="info-card"><span class="label">Start Time:</span>${escapeHtml(startTimeText)}</div>
         <div class="info-card"><span class="label">End Time:</span>${escapeHtml(endTimeText)}</div>

@@ -21,12 +21,12 @@ import {
   createTransformerObservation,
 } from './utils/lampLoadReadings.js'
  
-const BASE_WIDTH = 1435
+const BASE_WIDTH = 1440
 const BASE_HEIGHT = 960
 const GRAPH_SECTION_GAP = 28
 const GRAPH_SECTION_HEIGHT = 430
 const CONTENT_HEIGHT = BASE_HEIGHT + GRAPH_SECTION_GAP + GRAPH_SECTION_HEIGHT
-const PANEL_MAX_SCALE = 0.95
+const PANEL_MAX_SCALE = 1
 const PANEL_VIEWPORT_MARGIN = 32
 const MAX_OBSERVATIONS = MAX_LAMP_LOAD_LEVEL + 1
 const MIN_GRAPH_READINGS = MAX_OBSERVATIONS
@@ -261,25 +261,6 @@ const App = () => {
   }
 
   const handlePrint = () => {
-    if (!canPlotGraph) {
-      showStepAlert(EXPERIMENT_ALERTS.minimumReadingsRequired, {
-        description: `Collect at least ${MIN_GRAPH_READINGS} readings before preparing the print layout.`,
-      })
-      return
-    }
-
-    if (!graphGenerated) {
-      setStatus('Please generate the graph first.')
-      showStepAlert(EXPERIMENT_ALERTS.insufficientGraphReadings, {
-        description: 'Please generate the graph first.',
-        target: '#plot-button',
-        title: 'Generate Graph First',
-        type: 'warning',
-      })
-      window.alert('Please generate the graph first.')
-      return
-    }
-
     window.print()
   }
 
@@ -502,8 +483,8 @@ const App = () => {
         <div
           id="app-scale"
           style={{
+            '--app-scale': scale,
             height: `${CONTENT_HEIGHT}px`,
-            transform: `scale(${scale})`,
           }}
         >
           <main className="simulation-shell" id="walkthrough-demo-experiment">

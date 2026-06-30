@@ -532,13 +532,13 @@
 }
 
 .endpoint-5 {
-  --terminal-base-top: 138px;
-  --terminal-base-left: 34px;
+  --terminal-base-top: 154px;
+  --terminal-base-left: 31px;
 }
 
 #label-5 {
-  top: 170px;
-  left: 45px;
+  top: 186px;
+  left: 41px;
 }
 
 .endpoint-6 {
@@ -547,13 +547,13 @@
 }
 
 .endpoint-6 {
-  --terminal-base-top: 138px;
-  --terminal-base-left: 94px;
+  --terminal-base-top: 154px;
+  --terminal-base-left: 105px;
 }
 
 #label-6 {
-  top: 170px;
-  left: 104px;
+  top: 186px;
+  left: 115px;
 }
 
 .endpoint-7 {
