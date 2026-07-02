@@ -11,7 +11,9 @@ const Voltmeter = ({ value = 0 }) => {
 
   return (
     <article className="lab-meter lab-meter--image lab-meter--voltmeter" id="voltmeter-meter" aria-label="AC voltmeter">
-      <img alt="AC voltmeter" className="lab-meter__image" src={voltmeterImg} />
+      <span className="lab-meter__image-frame">
+        <img alt="AC voltmeter" className="lab-meter__image" src={voltmeterImg} />
+      </span>
 
       <MeterNeedle className="meter-needle--voltmeter" rotation={meterDisplay.rotation} />
 

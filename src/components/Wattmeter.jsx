@@ -86,7 +86,9 @@ const Wattmeter = ({
 
   return (
     <article className="lab-meter lab-meter--wattmeter" id="wattmeter-meter" aria-label="AC wattmeter">
-      <img alt="AC wattmeter" className="lab-meter__image" src={wattmeterImg} />
+      <span className="lab-meter__image-frame">
+        <img alt="AC wattmeter" className="lab-meter__image" src={wattmeterImg} />
+      </span>
       <div className="lamp-load" id="lamp-load" role="img" aria-label="Lamp load with 16 bulbs">
         <img alt="" className="lamp-load__image" src={lampLoadImg} aria-hidden="true" />
         {LAMP_LOAD_BULBS.map((bulb) => (

@@ -11,7 +11,9 @@ const Ammeter = ({ value = 0 }) => {
 
   return (
     <article className="lab-meter lab-meter--image lab-meter--ammeter" id="ammeter-meter" aria-label="A1 ammeter">
-      <img alt="A1 ammeter" className="lab-meter__image" src={ammeterImg} />
+      <span className="lab-meter__image-frame">
+        <img alt="A1 ammeter" className="lab-meter__image" src={ammeterImg} />
+      </span>
 
       <MeterNeedle className="meter-needle--ammeter" rotation={meterDisplay.rotation} />
 

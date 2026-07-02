@@ -17,25 +17,26 @@
 
 #app-scale {
   --app-scale: 1;
+  --app-render-scale: 1;
   position: absolute;
   top: 0;
   left: 0;
   width: 1440px;
   height: 1418px;
-  transform: scale(var(--app-scale));
+  transform: scale(calc(var(--app-scale) / var(--app-render-scale)));
   transform-origin: top left;
-  backface-visibility: hidden;
-  contain: layout paint style;
-  will-change: transform;
+  contain: layout style;
 }
 
-@supports (zoom: 1) {
-  #app-scale {
-    zoom: var(--app-scale);
-    transform: none;
-    backface-visibility: visible;
-    will-change: auto;
-  }
+#app-render {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1440px;
+  height: 1418px;
+  transform: scale(var(--app-render-scale));
+  transform-origin: top left;
+  will-change: transform;
 }
 
 .simulation-shell {
@@ -1494,8 +1495,6 @@ input:focus-visible {
   object-fit: contain;
   pointer-events: none;
   transform-origin: center center;
-  backface-visibility: hidden;
-  will-change: transform;
 }
 
 .variac-device__control {
@@ -1584,22 +1583,6 @@ input:focus-visible {
   height: 155px;
   transform: scale(var(--under-meter-scale));
   transform-origin: top left;
-}
-
-@supports (zoom: 1) {
-  #A2 {
-    zoom: var(--under-meter-scale);
-    top: 336px;
-    left: 157px;
-    transform: none;
-  }
-
-  #V2 {
-    zoom: var(--under-meter-scale);
-    top: 341px;
-    left: -15px;
-    transform: none;
-  }
 }
 
 .lab-meter {
@@ -1724,24 +1707,30 @@ input:focus-visible {
   transform-origin: top center;
 }
 
-.lab-meter--image .lab-meter__image,
-.lab-meter--wattmeter .lab-meter__image {
+.lab-meter__image-frame {
   position: absolute;
   inset: 0;
   z-index: 1;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  display: block;
+  overflow: hidden;
   pointer-events: none;
 }
 
-.lab-meter--ammeter .lab-meter__image {
-  transform: scale(1.1);
-  transform-origin: center center;
+.lab-meter__image-frame .lab-meter__image {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: block;
+  width: auto;
+  max-width: none;
+  height: 100%;
+  pointer-events: none;
+  transform: translateX(-50%);
+  user-select: none;
 }
 
-.lab-meter--voltmeter .lab-meter__image {
-  image-rendering: -webkit-optimize-contrast;
+.lab-meter__image {
+  image-rendering: auto;
 }
 
 .meter-needle {
@@ -1753,8 +1742,6 @@ input:focus-visible {
   height: 0;
   pointer-events: none;
   transform-origin: 0 0;
-  backface-visibility: hidden;
-  will-change: transform;
   transition: none;
 }
 
@@ -1977,6 +1964,16 @@ input:focus-visible {
     contain: none;
     transform: scale(0.55) !important;
     transform-origin: top left;
+  }
+
+  #app-render {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 1440px !important;
+    height: 1418px !important;
+    transform: none !important;
+    will-change: auto;
   }
 
   .lab-alert-region,

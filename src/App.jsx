@@ -28,6 +28,8 @@ const GRAPH_SECTION_HEIGHT = 430
 const CONTENT_HEIGHT = BASE_HEIGHT + GRAPH_SECTION_GAP + GRAPH_SECTION_HEIGHT
 const PANEL_MAX_SCALE = 1
 const PANEL_VIEWPORT_MARGIN = 32
+const MIN_RENDER_SCALE = 2
+const MAX_RENDER_SCALE = 3
 const MAX_OBSERVATIONS = MAX_LAMP_LOAD_LEVEL + 1
 const MIN_GRAPH_READINGS = MAX_OBSERVATIONS
 const VOLTAGE_SAFETY_LIMIT = 240
@@ -62,9 +64,27 @@ const getScale = () => {
   return Math.max(Math.min(widthScale, PANEL_MAX_SCALE), 0.1)
 }
 
+const getRenderScale = () => {
+  if (typeof window === 'undefined') {
+    return MIN_RENDER_SCALE
+  }
+
+  const dpr = Number.isFinite(window.devicePixelRatio)
+    ? window.devicePixelRatio
+    : 1
+
+  return Math.min(Math.max(Math.ceil(dpr), MIN_RENDER_SCALE), MAX_RENDER_SCALE)
+}
+
+const getViewportMetrics = () => ({
+  renderScale: getRenderScale(),
+  scale: getScale(),
+})
+
 const App = () => {
   const { clearAlerts, showStepAlert } = useLabAlerts()
-  const [scale, setScale] = useState(getScale)
+  const [viewportMetrics, setViewportMetrics] = useState(getViewportMetrics)
+  const { renderScale, scale } = viewportMetrics
   const [r1, setR1] = useState(0)
   const [r2, setR2] = useState(0)
   const [r3, setR3] = useState(0)
@@ -85,7 +105,7 @@ const App = () => {
   const voltageLimitWarningShownRef = useRef(false)
 
   useEffect(() => {
-    const handleResize = () => setScale(getScale())
+    const handleResize = () => setViewportMetrics(getViewportMetrics())
 
     handleResize()
     window.addEventListener('resize', handleResize)
@@ -484,89 +504,93 @@ const App = () => {
           id="app-scale"
           style={{
             '--app-scale': scale,
-            height: `${CONTENT_HEIGHT}px`,
+            '--app-render-scale': renderScale,
+            height: `${CONTENT_HEIGHT * renderScale}px`,
+            width: `${BASE_WIDTH * renderScale}px`,
           }}
         >
-          <main className="simulation-shell" id="walkthrough-demo-experiment">
-            <HeaderBoard />
-            <WalkthroughStartButton variant="side-tab" />
-            {/* <StatusBar status={status} /> */}
-            <span className="sr-only" role="status" aria-live="polite">{status}</span>
+          <div id="app-render">
+            <main className="simulation-shell" id="walkthrough-demo-experiment">
+              <HeaderBoard />
+              <WalkthroughStartButton variant="side-tab" />
+              {/* <StatusBar status={status} /> */}
+              <span className="sr-only" role="status" aria-live="polite">{status}</span>
 
-            <section className="workspace-grid">
-              <aside className="left-panel">
-                <ActionButtons
-                  activeButtons={{
-                    onAiGuide: aiGuidePlaying,
-                  }}
-                  disabledButtons={{
-                    onAutoConnect: connectionsVerified || powerOn,
-                    onCheck: connectionsVerified,
-                    onPlot: false,
-                    onPrint: false,
-                  }}
-                  onAdd={recordObservation}
-                  onCheck={handleCheck}
-                  onPlot={handlePlot}
-                  onPrint={handlePrint}
-                  onReset={handleReset}
-                  onAutoConnect={handleAutoConnect}
-                  onAiGuide={handleAiGuide}
-                />
+              <section className="workspace-grid">
+                <aside className="left-panel">
+                  <ActionButtons
+                    activeButtons={{
+                      onAiGuide: aiGuidePlaying,
+                    }}
+                    disabledButtons={{
+                      onAutoConnect: connectionsVerified || powerOn,
+                      onCheck: connectionsVerified,
+                      onPlot: false,
+                      onPrint: false,
+                    }}
+                    onAdd={recordObservation}
+                    onCheck={handleCheck}
+                    onPlot={handlePlot}
+                    onPrint={handlePrint}
+                    onReset={handleReset}
+                    onAutoConnect={handleAutoConnect}
+                    onAiGuide={handleAiGuide}
+                  />
 
-                <ControlPanel
-                  locked={!connectionsVerified || powerOn || observations.length > 0}
-                  observations={observations}
-                  r1={r1}
-                  r2={r2}
-                  r3={r3}
-                  setR1={setR1}
-                  setR2={setR2}
-                  setR3={setR3}
-                />
+                  <ControlPanel
+                    locked={!connectionsVerified || powerOn || observations.length > 0}
+                    observations={observations}
+                    r1={r1}
+                    r2={r2}
+                    r3={r3}
+                    setR1={setR1}
+                    setR2={setR2}
+                    setR3={setR3}
+                  />
 
-                <ReportControls
-                  graphGenerated={graphGenerated}
-                  minReadings={MIN_GRAPH_READINGS}
-                  onGenerateReport={handleGenerateReport}
-                  readingCount={readingCount}
-                  reportGenerated={reportGenerated}
-                />
-              </aside>
+                  <ReportControls
+                    graphGenerated={graphGenerated}
+                    minReadings={MIN_GRAPH_READINGS}
+                    onGenerateReport={handleGenerateReport}
+                    readingCount={readingCount}
+                    reportGenerated={reportGenerated}
+                  />
+                </aside>
 
-              <section className="right-panel">
-                <ConnectionLab
-                  key={`connection-lab-${resetRequest}`}
-                  activeLoadLevel={activeLoadLevel}
-                  autoConnectRequest={autoConnectRequest}
-                  checkRequest={checkRequest}
-                  nextEnabledLoadLevel={nextEnabledLoadLevel}
-                  onCheckConnections={handleCheckConnections}
-                  onConnectionRemovalBlocked={handleConnectionRemovalBlocked}
-                  onLoadLevelChange={handleLoadLevelChange}
-                  powerOn={powerOn}
-                  r1={r1}
-                  r2={r2}
-                  r3={r3}
-                  readings={readings}
-                  resetRequest={resetRequest}
-                  scale={scale}
-                  onTogglePower={handleTogglePower}
-                  onVoltageControlBlocked={handleVoltageControlBlocked}
-                  setVoltage={handleVoltageChange}
-                  voltage={voltage}
-                />
+                <section className="right-panel">
+                  <ConnectionLab
+                    key={`connection-lab-${resetRequest}`}
+                    activeLoadLevel={activeLoadLevel}
+                    autoConnectRequest={autoConnectRequest}
+                    checkRequest={checkRequest}
+                    nextEnabledLoadLevel={nextEnabledLoadLevel}
+                    onCheckConnections={handleCheckConnections}
+                    onConnectionRemovalBlocked={handleConnectionRemovalBlocked}
+                    onLoadLevelChange={handleLoadLevelChange}
+                    powerOn={powerOn}
+                    r1={r1}
+                    r2={r2}
+                    r3={r3}
+                    readings={readings}
+                    resetRequest={resetRequest}
+                    scale={scale}
+                    onTogglePower={handleTogglePower}
+                    onVoltageControlBlocked={handleVoltageControlBlocked}
+                    setVoltage={handleVoltageChange}
+                    voltage={voltage}
+                  />
+                </section>
               </section>
-            </section>
 
-          </main>
+            </main>
 
-          <GraphPanel
-            className="graph-panel--separate"
-            id="graph-panel"
-            observations={observations}
-            plotted={graphGenerated}
-          />
+            <GraphPanel
+              className="graph-panel--separate"
+              id="graph-panel"
+              observations={observations}
+              plotted={graphGenerated}
+            />
+          </div>
         </div>
       </div>
     </div>
