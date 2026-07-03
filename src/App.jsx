@@ -4,9 +4,9 @@ import './ConnectionEndpoints.css'
 import ConnectionLab from './components/ConnectionLab.jsx'
 import ActionButtons from './components/ActionButtons.jsx'
 import ControlPanel from './components/ControlPanel.jsx'
-import GraphPanel from './components/GraphPanel.jsx'
 import HeaderBoard from './components/HeaderBoard.jsx'
 import ReportControls from './components/ReportControls.jsx'
+import ResultsGraphs from './components/ResultsGraphs.jsx'
 import WalkthroughStartButton from './walkthrough/components/WalkthroughStartButton.jsx'
 import { EXPERIMENT_ALERTS } from './alerts/experimentStepAlerts.js'
 import { useLabAlerts } from './alerts/useLabAlerts.js'
@@ -24,8 +24,10 @@ import {
 const BASE_WIDTH = 1440
 const BASE_HEIGHT = 960
 const GRAPH_SECTION_GAP = 28
-const GRAPH_SECTION_HEIGHT = 430
-const CONTENT_HEIGHT = BASE_HEIGHT + GRAPH_SECTION_GAP + GRAPH_SECTION_HEIGHT
+const RESULTS_GRAPH_SECTION_HEIGHT = 430
+const CONTENT_HEIGHT = BASE_HEIGHT
+  + GRAPH_SECTION_GAP
+  + RESULTS_GRAPH_SECTION_HEIGHT
 const PANEL_MAX_SCALE = 1
 const PANEL_VIEWPORT_MARGIN = 32
 const MIN_RENDER_SCALE = 2
@@ -584,12 +586,7 @@ const App = () => {
 
             </main>
 
-            <GraphPanel
-              className="graph-panel--separate"
-              id="graph-panel"
-              observations={observations}
-              plotted={graphGenerated}
-            />
+            <ResultsGraphs observations={observations} />
           </div>
         </div>
       </div>
