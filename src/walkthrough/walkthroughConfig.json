@@ -13,7 +13,7 @@
         "en": "Experiment Goal"
       },
       "description": {
-        "en": "This board shows the experiment objective for the single-phase transformer load test."
+        "en": "The aim of the experiment is to Study the efficiency of single phase transformer by load test"
       },
       "audio": "#",
       "placement": "bottom"
@@ -25,7 +25,7 @@
         "en": "Instruction Button"
       },
       "description": {
-        "en": "Open this button to view the written experiment instructions."
+        "en": "The Instructions provide step-by-step guidance on how to perform the simulation"
       },
       "audio": "#",
       "placement": "right"
@@ -37,7 +37,7 @@
         "en": "AI Guide Button"
       },
       "description": {
-        "en": "Use this button to start or stop the guided narration."
+        "en": "To use this feature, click on the “AI Guide” button. The AI guide will assist you in performing the simulation accurately at each step."
       },
       "audio": "#",
       "placement": "right"
@@ -49,7 +49,7 @@
         "en": "Check Button"
       },
       "description": {
-        "en": "After wiring the circuit, click CHECK to verify that all connections are correct."
+        "en": "The CHECK button verifies all the connections to ensure that they are correct."
       },
       "audio": "#",
       "placement": "right"
@@ -61,7 +61,7 @@
         "en": "Auto Connect Button"
       },
       "description": {
-        "en": "Use AUTO CONNECT to place the default wiring, then verify it with CHECK."
+        "en": "The AUTO CONNECT button makes all the connections automatically."
       },
       "audio": "#",
       "placement": "right"
@@ -73,7 +73,7 @@
         "en": "Add Button"
       },
       "description": {
-        "en": "Click ADD to store the current meter readings in the observation table."
+        "en": "The ADD button adds the readings to the observation table."
       },
       "audio": "#",
       "placement": "right"
@@ -85,7 +85,7 @@
         "en": "Plot Button"
       },
       "description": {
-        "en": "After all five readings are added, click PLOT to generate the graph."
+        "en": "The PLOT button helps visualise the readings through a graph."
       },
       "audio": "#",
       "placement": "right"
@@ -97,7 +97,7 @@
         "en": "Reset Button"
       },
       "description": {
-        "en": "Click RESET to clear the simulation and start the experiment again."
+        "en": " The RESET button refresh the simulation to its initial state for a fresh start. "
       },
       "audio": "#",
       "placement": "right"
@@ -109,7 +109,7 @@
         "en": "Print Button"
       },
       "description": {
-        "en": "Use PRINT after plotting the graph to print the experiment output."
+        "en": " The PRINT button allows you to print the simulation."
       },
       "audio": "#",
       "placement": "right"

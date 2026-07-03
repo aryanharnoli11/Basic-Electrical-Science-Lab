@@ -11,14 +11,14 @@ const EMPTY_GRAPH_DATA = {
   voltageRegulation: [],
 }
 const CHART_VIEWBOX = {
-  height: 330,
-  width: 560,
+  height: 286,
+  width: 650,
 }
 const PLOT = {
-  height: 210,
-  left: 70,
-  top: 54,
-  width: 430,
+  height: 176,
+  left: 80,
+  top: 36,
+  width: 520,
 }
 const TICK_COUNT = 5
 
@@ -167,7 +167,7 @@ const ResultsLineChart = ({
       <svg
         aria-label={title}
         className="results-graph-card__chart"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid meet"
         role="img"
         viewBox={`0 0 ${CHART_VIEWBOX.width} ${CHART_VIEWBOX.height}`}
       >
@@ -187,7 +187,7 @@ const ResultsLineChart = ({
             <g key={`x-${tick}`}>
               <line className="results-graph__grid-line" x1={x} x2={x} y1={PLOT.top} y2={chartBottom} />
               <line className="results-graph__tick-line" x1={x} x2={x} y1={chartBottom} y2={chartBottom + 6} />
-              <text className="results-graph__tick-label" textAnchor="middle" x={x} y={chartBottom + 22}>{formatAxisTick(tick)}</text>
+              <text className="results-graph__tick-label" textAnchor="middle" x={x} y={chartBottom + 24}>{formatAxisTick(tick)}</text>
             </g>
           )
         })}
@@ -207,14 +207,14 @@ const ResultsLineChart = ({
         <path className="results-graph__axis-line" d={`M${PLOT.left} ${chartBottom}H${chartRight}`} />
         <path className="results-graph__axis-line" d={`M${PLOT.left} ${chartBottom}V${PLOT.top}`} />
 
-        <text className="results-graph__axis-title" textAnchor="middle" x={PLOT.left + PLOT.width / 2} y={CHART_VIEWBOX.height - 18}>
+        <text className="results-graph__axis-title" textAnchor="middle" x={PLOT.left + PLOT.width / 2} y={CHART_VIEWBOX.height - 10}>
           Output Power (W)
         </text>
         <text
           className="results-graph__axis-title"
           textAnchor="middle"
-          transform={`rotate(-90 22 ${PLOT.top + PLOT.height / 2})`}
-          x="22"
+          transform={`rotate(-90 24 ${PLOT.top + PLOT.height / 2})`}
+          x="24"
           y={PLOT.top + PLOT.height / 2}
         >
           {yAxisLabel}
