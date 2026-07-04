@@ -115,6 +115,7 @@ const getSmoothPath = (points) => {
 
 const ResultsLineChart = ({
   color,
+  id,
   points,
   softColor,
   title,
@@ -134,6 +135,7 @@ const ResultsLineChart = ({
   return (
     <article
       className="results-graph-card"
+      id={id}
       style={{
         '--results-graph-color': color,
         '--results-graph-soft-color': softColor,
@@ -223,6 +225,7 @@ function drawEfficiencyGraph(points) {
   return (
     <ResultsLineChart
       color="#0f766e"
+      id="efficiency-graph-card"
       points={points}
       softColor="#d9f5f0"
       title="Efficiency vs Output Power"
@@ -235,6 +238,7 @@ function drawVoltageRegulationGraph(points) {
   return (
     <ResultsLineChart
       color="#b45309"
+      id="voltage-regulation-graph-card"
       points={points}
       softColor="#fff1d6"
       title="Voltage Regulation vs Output Power"
