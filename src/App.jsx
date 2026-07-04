@@ -14,7 +14,7 @@ import { useAiGuideNarration } from './aiGuide/useAiGuideNarration.js'
 // import StatusBar from './components/StatusBar.jsx'
  
 import { calculateReadings } from './utils/circuitMath.js'
-import { generateKclReport } from './utils/reportGenerator.js'
+import { generateTransformerReport } from './utils/reportGenerator.js'
 import {
   AUTOTRANSFORMER_OUTPUT_VOLTAGE,
   MAX_LAMP_LOAD_LEVEL,
@@ -292,28 +292,15 @@ const App = () => {
 
       setStatus(`Add ${remainingReadings} more reading(s) before generating the report.`)
       showStepAlert(EXPERIMENT_ALERTS.minimumReadingsRequired, {
-        description: `Add ${remainingReadings} more reading(s), then plot the graph before generating a report.`,
+        description: `Add ${remainingReadings} more reading(s) before generating a report.`,
         target: '#generate-report-button',
         title: `Report Requires ${MIN_GRAPH_READINGS} Readings`,
       })
       return
     }
 
-    if (!graphGenerated) {
-      setStatus('Please generate the graph first.')
-      showStepAlert(EXPERIMENT_ALERTS.insufficientGraphReadings, {
-        description: 'Please generate the graph first.',
-        target: '#plot-button',
-        title: 'Generate Graph First',
-        type: 'warning',
-      })
-      window.alert('Please generate the graph first.')
-      return
-    }
-
-    const generated = generateKclReport({
+    const generated = generateTransformerReport({
       observations,
-      resistances: { r1, r2, r3 },
       sessionStart,
     })
 
@@ -324,9 +311,9 @@ const App = () => {
     }
 
     setReportGenerated(true)
-    setStatus('Experiment report generated from the plotted graph and current observations.')
+    setStatus('Transformer load-test report generated from the current observations.')
     showStepAlert(EXPERIMENT_ALERTS.printLayoutGenerated, {
-      description: 'The KCL report was generated from the plotted graph and current observations.',
+      description: 'The transformer load-test report was generated from the current observations.',
       target: '#generate-report-button',
       title: 'Report Generated Successfully',
     })
@@ -551,7 +538,6 @@ const App = () => {
                   />
 
                   <ReportControls
-                    graphGenerated={graphGenerated}
                     minReadings={MIN_GRAPH_READINGS}
                     onGenerateReport={handleGenerateReport}
                     readingCount={readingCount}
@@ -586,7 +572,11 @@ const App = () => {
 
             </main>
 
-            <ResultsGraphs observations={observations} />
+            <ResultsGraphs
+              minReadings={MIN_GRAPH_READINGS}
+              observations={observations}
+              plotted={graphGenerated}
+            />
           </div>
         </div>
       </div>

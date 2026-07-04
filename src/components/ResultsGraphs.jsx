@@ -1,11 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 
-const TABLE_SELECTOR = '#observation-table-panel .observation-table'
-const TABLE_COLUMNS = {
-  outputPower: 6,
-  voltageRegulation: 7,
-  efficiency: 8,
-}
 const EMPTY_GRAPH_DATA = {
   efficiency: [],
   voltageRegulation: [],
@@ -28,27 +22,11 @@ const toNumericValue = (value) => {
   return Number.isFinite(numericValue) ? numericValue : undefined
 }
 
-const getTableCellValue = (row, columnIndex) => (
-  toNumericValue(row.cells[columnIndex]?.textContent ?? '')
-)
-
-const getObservationTable = () => {
-  if (typeof document === 'undefined') {
-    return null
-  }
-
-  return document.querySelector(TABLE_SELECTOR)
-}
-
-const readGraphPoints = (table, valueColumnIndex) => {
-  if (!table?.tBodies?.[0]) {
-    return []
-  }
-
-  return Array.from(table.tBodies[0].rows)
+const readGraphPoints = (observations, valueKey) => (
+  observations
     .map((row) => {
-      const outputPower = getTableCellValue(row, TABLE_COLUMNS.outputPower)
-      const value = getTableCellValue(row, valueColumnIndex)
+      const outputPower = toNumericValue(row.secondaryPower)
+      const value = toNumericValue(row[valueKey])
 
       if (!Number.isFinite(outputPower) || !Number.isFinite(value)) {
         return null
@@ -58,14 +36,12 @@ const readGraphPoints = (table, valueColumnIndex) => {
     })
     .filter(Boolean)
     .sort((current, next) => current.outputPower - next.outputPower)
-}
+)
 
-function updateGraphsFromTable(table = getObservationTable()) {
-  return {
-    efficiency: readGraphPoints(table, TABLE_COLUMNS.efficiency),
-    voltageRegulation: readGraphPoints(table, TABLE_COLUMNS.voltageRegulation),
-  }
-}
+const getGraphData = (observations) => ({
+  efficiency: readGraphPoints(observations, 'efficiency'),
+  voltageRegulation: readGraphPoints(observations, 'voltageRegulation'),
+})
 
 const getNiceStep = (roughStep) => {
   if (roughStep <= 0) {
@@ -267,31 +243,12 @@ function drawVoltageRegulationGraph(points) {
   )
 }
 
-const ResultsGraphs = ({ observations = [] }) => {
-  const [graphData, setGraphData] = useState(EMPTY_GRAPH_DATA)
-
-  useEffect(() => {
-    const refreshGraphs = () => {
-      setGraphData(updateGraphsFromTable())
-    }
-
-    refreshGraphs()
-
-    const table = getObservationTable()
-
-    if (!table || typeof MutationObserver === 'undefined') {
-      return undefined
-    }
-
-    const observer = new MutationObserver(refreshGraphs)
-    observer.observe(table, {
-      characterData: true,
-      childList: true,
-      subtree: true,
-    })
-
-    return () => observer.disconnect()
-  }, [observations])
+const ResultsGraphs = ({ minReadings = 0, observations = [], plotted = false }) => {
+  const shouldPlot = plotted && observations.length >= minReadings
+  const graphData = useMemo(
+    () => (shouldPlot ? getGraphData(observations) : EMPTY_GRAPH_DATA),
+    [observations, shouldPlot],
+  )
 
   return (
     <section className="results-graphs-panel" aria-label="Experiment result graphs">

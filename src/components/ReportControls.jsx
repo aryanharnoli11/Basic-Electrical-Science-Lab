@@ -1,7 +1,6 @@
 import { PdfIcon } from './Icons.jsx'
 
 const ReportControls = ({
-  graphGenerated,
   minReadings,
   onGenerateReport,
   readingCount,
@@ -10,9 +9,9 @@ const ReportControls = ({
   const readingsReady = readingCount >= minReadings
   const buttonTitle = reportGenerated
     ? 'Report generated. Click to regenerate the report.'
-    : readingsReady && !graphGenerated
-      ? 'Please generate the graph first.'
-      : `Generate report after ${minReadings} readings and graph plotting.`
+    : readingsReady
+      ? 'Generate report from the current observations.'
+      : `Generate report after ${minReadings} readings.`
 
   return (
     <button

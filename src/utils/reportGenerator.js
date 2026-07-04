@@ -1,23 +1,19 @@
+import {
+  AUTOTRANSFORMER_OUTPUT_VOLTAGE,
+  NO_LOAD_SECONDARY_VOLTAGE,
+} from './lampLoadReadings.js'
+
 const GRAPH_VIEWBOX = {
-  height: 320,
-  width: 960,
+  height: 286,
+  width: 650,
 }
-
-const GRAPH_CHART = {
-  height: 178,
-  left: 92,
-  top: 48,
-  width: 762,
+const GRAPH_PLOT = {
+  height: 176,
+  left: 80,
+  top: 36,
+  width: 520,
 }
-
-const GRAPH_VOLTAGE_MAX = 10
-const GRAPH_X_TICKS = [0, 2, 4, 6, 8, 10]
-const GRAPH_Y_TICK_COUNT = 5
-const GRAPH_SERIES = [
-  { className: 'i1', color: '#c83f35', key: 'i1', labelIndex: '1', labelOffset: -12 },
-  { className: 'i2', color: '#1579a8', key: 'i2', labelIndex: '2', labelOffset: 14 },
-  { className: 'i3', color: '#3f8f43', key: 'i3', labelIndex: '3', labelOffset: -2 },
-]
+const GRAPH_TICK_COUNT = 5
 
 const escapeHtml = (value) => String(value)
   .replace(/&/g, '&amp;')
@@ -32,225 +28,22 @@ const toNumber = (value) => {
   return Number.isFinite(number) ? number : 0
 }
 
-const formatNumber = (value, fractionDigits = 3) => toNumber(value).toFixed(fractionDigits)
+const toOptionalNumber = (value) => {
+  const number = Number(value)
 
-const formatCurrentTick = (value) => {
-  if (value === 0) {
-    return '0'
-  }
-
-  return formatNumber(value, 2)
+  return Number.isFinite(number) ? number : undefined
 }
 
-const getNiceMaxCurrent = (observations) => {
-  const maxCurrent = observations.reduce(
-    (currentMax, row) => Math.max(currentMax, toNumber(row.i1), toNumber(row.i2), toNumber(row.i3)),
-    0,
-  )
-  const paddedCurrent = Math.max(maxCurrent * 1.08, 0.1)
-  const roughStep = paddedCurrent / (GRAPH_Y_TICK_COUNT - 1)
-  const magnitude = 10 ** Math.floor(Math.log10(roughStep))
-  const normalizedStep = roughStep / magnitude
-  const niceStep = (
-    normalizedStep <= 1 ? 1
-      : normalizedStep <= 2 ? 2
-        : normalizedStep <= 2.5 ? 2.5
-          : normalizedStep <= 5 ? 5
-            : 10
-  ) * magnitude
-
-  return niceStep * (GRAPH_Y_TICK_COUNT - 1)
-}
-
-const getYTicks = (maxCurrent) => (
-  Array.from({ length: GRAPH_Y_TICK_COUNT }, (_, index) => (
-    (maxCurrent / (GRAPH_Y_TICK_COUNT - 1)) * index
-  ))
+const formatNumber = (value, fractionDigits = 1) => (
+  toNumber(value).toFixed(fractionDigits)
 )
 
-const getXFromVoltage = (voltage) => {
-  const ratio = Math.min(Math.max(toNumber(voltage) / GRAPH_VOLTAGE_MAX, 0), 1)
-
-  return GRAPH_CHART.left + ratio * GRAPH_CHART.width
-}
-
-const getYFromCurrent = (current, maxCurrent) => {
-  const ratio = Math.min(Math.max(toNumber(current) / maxCurrent, 0), 1)
-
-  return GRAPH_CHART.top + GRAPH_CHART.height - ratio * GRAPH_CHART.height
-}
-
-const getPoint = (row, current, maxCurrent) => ({
-  x: getXFromVoltage(row.voltage),
-  y: getYFromCurrent(current, maxCurrent),
-})
-
-const getLinePath = (observations, currentKey, maxCurrent) => (
-  observations
-    .map((row, index) => {
-      const point = getPoint(row, row[currentKey], maxCurrent)
-      const command = index === 0 ? 'M' : 'L'
-
-      return `${command}${point.x.toFixed(1)} ${point.y.toFixed(1)}`
-    })
-    .join(' ')
-)
-
-const getSeriesLabelPoint = (observations, currentKey, maxCurrent, offset) => {
-  const row = observations.at(-1)
-  const point = getPoint(row, row[currentKey], maxCurrent)
-  const y = Math.min(
-    Math.max(point.y + offset, GRAPH_CHART.top + 12),
-    GRAPH_CHART.top + GRAPH_CHART.height - 12,
-  )
-
-  return {
-    x: Math.min(point.x + 17, GRAPH_VIEWBOX.width - 54),
-    y,
-  }
-}
-
-const createReportGraphSvg = (observations) => {
-  if (!observations.length) {
-    return '<em>No readings available to plot.</em>'
+const formatTick = (value) => {
+  if (Math.abs(value) >= 100) {
+    return value.toFixed(0)
   }
 
-  const plottedObservations = [...observations].sort((current, next) => current.voltage - next.voltage)
-  const maxCurrent = getNiceMaxCurrent(plottedObservations)
-  const yTicks = getYTicks(maxCurrent)
-  const chartBottom = GRAPH_CHART.top + GRAPH_CHART.height
-  const chartRight = GRAPH_CHART.left + GRAPH_CHART.width
-  const yAxisTitleX = 31
-  const yAxisTitleY = GRAPH_CHART.top + GRAPH_CHART.height / 2
-
-  const xTickMarkup = GRAPH_X_TICKS.map((tick) => {
-    const x = getXFromVoltage(tick)
-
-    return `
-      <g>
-        <line class="report-graph__grid report-graph__grid--vertical" x1="${x}" x2="${x}" y1="${GRAPH_CHART.top}" y2="${chartBottom}" />
-        <line class="report-graph__tick" x1="${x}" x2="${x}" y1="${chartBottom}" y2="${chartBottom + 7}" />
-        <text class="report-graph__tick-label" text-anchor="middle" x="${x}" y="${chartBottom + 27}">${tick}</text>
-      </g>
-    `
-  }).join('')
-
-  const yTickMarkup = yTicks.map((tick) => {
-    const y = getYFromCurrent(tick, maxCurrent)
-
-    return `
-      <g>
-        <line class="report-graph__grid report-graph__grid--horizontal" x1="${GRAPH_CHART.left}" x2="${chartRight}" y1="${y}" y2="${y}" />
-        <line class="report-graph__tick" x1="${GRAPH_CHART.left - 7}" x2="${GRAPH_CHART.left}" y1="${y}" y2="${y}" />
-        <text class="report-graph__tick-label report-graph__tick-label--y" text-anchor="end" x="${GRAPH_CHART.left - 13}" y="${y + 4}">${formatCurrentTick(tick)}</text>
-      </g>
-    `
-  }).join('')
-
-  const bandMarkup = yTicks.slice(0, -1).map((tick, index) => {
-    const nextTick = yTicks[index + 1]
-    const y = getYFromCurrent(nextTick, maxCurrent)
-    const height = getYFromCurrent(tick, maxCurrent) - y
-
-    return `<rect class="report-graph__band" height="${height}" width="${GRAPH_CHART.width}" x="${GRAPH_CHART.left}" y="${y}" />`
-  }).join('')
-
-  const lineMarkup = GRAPH_SERIES.map((series) => (
-    `<path class="report-graph__line report-graph__line--${series.className}" d="${getLinePath(plottedObservations, series.key, maxCurrent)}" />`
-  )).join('')
-
-  const pointMarkup = GRAPH_SERIES.map((series) => (
-    plottedObservations.map((row) => {
-      const point = getPoint(row, row[series.key], maxCurrent)
-
-      return `<circle class="report-graph__point report-graph__point--${series.className}" cx="${point.x}" cy="${point.y}" r="3.8" />`
-    }).join('')
-  )).join('')
-
-  const labelMarkup = GRAPH_SERIES.map((series) => {
-    const point = getSeriesLabelPoint(plottedObservations, series.key, maxCurrent, series.labelOffset)
-
-    return `<text class="report-graph__series-label report-graph__series-label--${series.className}" x="${point.x}" y="${point.y}">I<tspan class="report-graph__series-label-sub" dx="1">${series.labelIndex}</tspan></text>`
-  }).join('')
-
-  return `
-    <svg
-      class="report-graph__svg"
-      role="img"
-      aria-label="Line graph of branch currents against applied voltage"
-      viewBox="0 0 ${GRAPH_VIEWBOX.width} ${GRAPH_VIEWBOX.height}"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <defs>
-        <style>
-          <![CDATA[
-            .report-graph__plot-bg { fill: #fffdf8; stroke: #d7cbbd; stroke-width: 1; }
-            .report-graph__band { fill: rgba(51, 124, 102, 0.025); }
-            .report-graph__axis { fill: none; stroke: #563927; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.4; }
-            .report-graph__grid { stroke: rgba(117, 88, 62, 0.2); stroke-width: 0.8; }
-            .report-graph__grid--horizontal { stroke-dasharray: 4 8; }
-            .report-graph__tick { stroke: rgba(74, 43, 31, 0.38); stroke-linecap: round; stroke-width: 1; }
-            .report-graph__tick-label { fill: #6a4b34; font-size: 13px; font-weight: 700; }
-            .report-graph__tick-label--y { font-size: 12px; }
-            .report-graph__axis-title { fill: #38271c; font-size: 15px; font-weight: 800; }
-            .report-graph__line { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.2; }
-            .report-graph__line--i1, .report-graph__point--i1 { stroke: #c83f35; }
-            .report-graph__line--i2, .report-graph__point--i2 { stroke: #1579a8; }
-            .report-graph__line--i3, .report-graph__point--i3 { stroke: #3f8f43; }
-            .report-graph__point { fill: #ffffff; stroke-width: 1.6; }
-            .report-graph__series-label { dominant-baseline: middle; font-size: 13px; font-weight: 800; paint-order: stroke; stroke: #fffdf8; stroke-linejoin: round; stroke-width: 5px; }
-            .report-graph__series-label--i1 { fill: #c83f35; }
-            .report-graph__series-label--i2 { fill: #1579a8; }
-            .report-graph__series-label--i3 { fill: #3f8f43; }
-            .report-graph__series-label-sub { baseline-shift: sub; font-size: 72%; }
-          ]]>
-        </style>
-        <marker id="report-graph-axis-arrow" markerHeight="7" markerWidth="8" orient="auto" refX="7" refY="3.5">
-          <path d="M0 0 7 3.5 0 7z" />
-        </marker>
-        <clipPath id="report-graph-plot-clip">
-          <rect height="${GRAPH_CHART.height}" width="${GRAPH_CHART.width}" x="${GRAPH_CHART.left}" y="${GRAPH_CHART.top}" />
-        </clipPath>
-      </defs>
-
-      <rect class="report-graph__plot-bg" height="${GRAPH_CHART.height}" width="${GRAPH_CHART.width}" x="${GRAPH_CHART.left}" y="${GRAPH_CHART.top}" />
-      ${bandMarkup}
-      ${xTickMarkup}
-      ${yTickMarkup}
-
-      <path class="report-graph__axis" d="M${GRAPH_CHART.left} ${chartBottom}H${chartRight + 18}" marker-end="url(#report-graph-axis-arrow)" />
-      <path class="report-graph__axis" d="M${GRAPH_CHART.left} ${chartBottom}V${GRAPH_CHART.top - 16}" marker-end="url(#report-graph-axis-arrow)" />
-
-      <text class="report-graph__axis-title" text-anchor="middle" x="${GRAPH_CHART.left + GRAPH_CHART.width / 2}" y="${GRAPH_VIEWBOX.height - 20}">
-        Voltage (V)
-      </text>
-      <text
-        class="report-graph__axis-title report-graph__axis-title--y"
-        text-anchor="middle"
-        transform="rotate(-90 ${yAxisTitleX} ${yAxisTitleY})"
-        x="${yAxisTitleX}"
-        y="${yAxisTitleY}"
-      >
-        Current (A)
-      </text>
-
-      <g clip-path="url(#report-graph-plot-clip)">
-        ${lineMarkup}
-      </g>
-      ${pointMarkup}
-      ${labelMarkup}
-    </svg>
-  `
-}
-
-const getKclStats = (observations) => {
-  const errors = observations.map((row) => Math.abs(toNumber(row.i1) - (toNumber(row.i2) + toNumber(row.i3))))
-  const totalError = errors.reduce((sum, error) => sum + error, 0)
-
-  return {
-    averageError: errors.length ? totalError / errors.length : 0,
-    maxError: errors.length ? Math.max(...errors) : 0,
-  }
+  return value.toFixed(1).replace(/\.0$/, '')
 }
 
 const getSessionDurationText = (sessionStart, sessionEnd) => {
@@ -262,25 +55,238 @@ const getSessionDurationText = (sessionStart, sessionEnd) => {
   return `${durationMinutes} min ${String(durationSeconds).padStart(2, '0')} sec`
 }
 
-const createObservationRows = (observations) => (
-  observations.map((row, index) => {
+const getNiceStep = (roughStep) => {
+  if (roughStep <= 0) {
+    return 1
+  }
+
+  const magnitude = 10 ** Math.floor(Math.log10(roughStep))
+  const normalizedStep = roughStep / magnitude
+  const niceStep = (
+    normalizedStep <= 1 ? 1
+      : normalizedStep <= 2 ? 2
+        : normalizedStep <= 2.5 ? 2.5
+          : normalizedStep <= 5 ? 5
+            : 10
+  )
+
+  return niceStep * magnitude
+}
+
+const getNiceMaximum = (values) => {
+  const maxValue = Math.max(0, ...values)
+  const paddedMax = maxValue > 0 ? maxValue * 1.08 : 1
+  const step = getNiceStep(paddedMax / (GRAPH_TICK_COUNT - 1))
+
+  return step * (GRAPH_TICK_COUNT - 1)
+}
+
+const getTicks = (maxValue) => (
+  Array.from({ length: GRAPH_TICK_COUNT }, (_, index) => (
+    (maxValue / (GRAPH_TICK_COUNT - 1)) * index
+  ))
+)
+
+const getGraphData = (observations, valueKey) => (
+  observations
+    .map((row) => {
+      const outputPower = toOptionalNumber(row.secondaryPower)
+      const value = toOptionalNumber(row[valueKey])
+
+      if (!Number.isFinite(outputPower) || !Number.isFinite(value)) {
+        return null
+      }
+
+      return { outputPower, value }
+    })
+    .filter(Boolean)
+    .sort((current, next) => current.outputPower - next.outputPower)
+)
+
+const getChartPoint = (point, xMax, yMax) => ({
+  ...point,
+  x: GRAPH_PLOT.left + (point.outputPower / xMax) * GRAPH_PLOT.width,
+  y: GRAPH_PLOT.top + GRAPH_PLOT.height - (point.value / yMax) * GRAPH_PLOT.height,
+})
+
+const getSmoothPath = (points) => {
+  if (points.length === 0) {
+    return ''
+  }
+
+  if (points.length === 1) {
+    return `M${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`
+  }
+
+  return points.slice(0, -1).reduce((path, point, index) => {
+    const previous = points[index - 1] ?? point
+    const next = points[index + 1]
+    const afterNext = points[index + 2] ?? next
+    const controlOneX = point.x + (next.x - previous.x) / 6
+    const controlOneY = point.y + (next.y - previous.y) / 6
+    const controlTwoX = next.x - (afterNext.x - point.x) / 6
+    const controlTwoY = next.y - (afterNext.y - point.y) / 6
+
+    return `${path} C${controlOneX.toFixed(1)} ${controlOneY.toFixed(1)}, ${controlTwoX.toFixed(1)} ${controlTwoY.toFixed(1)}, ${next.x.toFixed(1)} ${next.y.toFixed(1)}`
+  }, `M${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`)
+}
+
+const createReportGraphSvg = ({
+  ariaLabel,
+  color,
+  points,
+  title,
+  yAxisLabel,
+}) => {
+  if (!points.length) {
+    return '<em>No valid readings available to plot.</em>'
+  }
+
+  const chartRight = GRAPH_PLOT.left + GRAPH_PLOT.width
+  const chartBottom = GRAPH_PLOT.top + GRAPH_PLOT.height
+  const xMax = getNiceMaximum(points.map((point) => point.outputPower))
+  const yMax = getNiceMaximum(points.map((point) => point.value))
+  const xTicks = getTicks(xMax)
+  const yTicks = getTicks(yMax)
+  const chartPoints = points.map((point) => getChartPoint(point, xMax, yMax))
+  const linePath = getSmoothPath(chartPoints)
+  const chartId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  const clipId = `${chartId}-clip`
+
+  const xTickMarkup = xTicks.map((tick) => {
+    const x = GRAPH_PLOT.left + (tick / xMax) * GRAPH_PLOT.width
+
     return `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${formatNumber(row.voltage, 1)}</td>
-        <td>${formatNumber(row.i1)}</td>
-        <td>${formatNumber(row.i2)}</td>
-        <td>${formatNumber(row.i3)}</td>
-      </tr>
+      <g>
+        <line class="report-graph__grid" x1="${x}" x2="${x}" y1="${GRAPH_PLOT.top}" y2="${chartBottom}" />
+        <line class="report-graph__tick" x1="${x}" x2="${x}" y1="${chartBottom}" y2="${chartBottom + 6}" />
+        <text class="report-graph__tick-label" text-anchor="middle" x="${x}" y="${chartBottom + 24}">${formatTick(tick)}</text>
+      </g>
     `
   }).join('')
+
+  const yTickMarkup = yTicks.map((tick) => {
+    const y = GRAPH_PLOT.top + GRAPH_PLOT.height - (tick / yMax) * GRAPH_PLOT.height
+
+    return `
+      <g>
+        <line class="report-graph__grid report-graph__grid--horizontal" x1="${GRAPH_PLOT.left}" x2="${chartRight}" y1="${y}" y2="${y}" />
+        <line class="report-graph__tick" x1="${GRAPH_PLOT.left - 6}" x2="${GRAPH_PLOT.left}" y1="${y}" y2="${y}" />
+        <text class="report-graph__tick-label report-graph__tick-label--y" text-anchor="end" x="${GRAPH_PLOT.left - 12}" y="${y + 4}">${formatTick(tick)}</text>
+      </g>
+    `
+  }).join('')
+
+  const pointMarkup = chartPoints.map((point) => (
+    `<circle class="report-graph__point" cx="${point.x}" cy="${point.y}" r="4.5">
+      <title>Output Power: ${formatNumber(point.outputPower, 1)} W; ${escapeHtml(yAxisLabel)}: ${formatNumber(point.value, 1)}</title>
+    </circle>`
+  )).join('')
+
+  return `
+    <svg
+      class="report-graph__svg"
+      role="img"
+      aria-label="${escapeHtml(ariaLabel)}"
+      viewBox="0 0 ${GRAPH_VIEWBOX.width} ${GRAPH_VIEWBOX.height}"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <style>
+          <![CDATA[
+            .report-graph__plot-bg { fill: #fffdf8; stroke: rgba(112, 82, 55, 0.28); stroke-width: 1; }
+            .report-graph__grid { stroke: rgba(117, 88, 62, 0.2); stroke-width: 0.8; }
+            .report-graph__grid--horizontal { stroke-dasharray: 4 8; }
+            .report-graph__axis { fill: none; stroke: #563927; stroke-linecap: round; stroke-width: 1.25; }
+            .report-graph__tick { stroke: rgba(74, 43, 31, 0.38); stroke-linecap: round; stroke-width: 1; }
+            .report-graph__tick-label { fill: #6a4b34; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 800; }
+            .report-graph__tick-label--y { font-size: 11px; }
+            .report-graph__axis-title { fill: #38271c; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 900; }
+            .report-graph__line { fill: none; stroke: ${color}; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.6; }
+            .report-graph__point { fill: #ffffff; stroke: ${color}; stroke-width: 2; }
+          ]]>
+        </style>
+        <clipPath id="${clipId}">
+          <rect height="${GRAPH_PLOT.height}" width="${GRAPH_PLOT.width}" x="${GRAPH_PLOT.left}" y="${GRAPH_PLOT.top}" />
+        </clipPath>
+      </defs>
+
+      <rect class="report-graph__plot-bg" height="${GRAPH_PLOT.height}" width="${GRAPH_PLOT.width}" x="${GRAPH_PLOT.left}" y="${GRAPH_PLOT.top}" />
+      ${xTickMarkup}
+      ${yTickMarkup}
+
+      <path class="report-graph__axis" d="M${GRAPH_PLOT.left} ${chartBottom}H${chartRight}" />
+      <path class="report-graph__axis" d="M${GRAPH_PLOT.left} ${chartBottom}V${GRAPH_PLOT.top}" />
+
+      <text class="report-graph__axis-title" text-anchor="middle" x="${GRAPH_PLOT.left + GRAPH_PLOT.width / 2}" y="${GRAPH_VIEWBOX.height - 10}">
+        Output Power (W)
+      </text>
+      <text
+        class="report-graph__axis-title"
+        text-anchor="middle"
+        transform="rotate(-90 24 ${GRAPH_PLOT.top + GRAPH_PLOT.height / 2})"
+        x="24"
+        y="${GRAPH_PLOT.top + GRAPH_PLOT.height / 2}"
+      >
+        ${escapeHtml(yAxisLabel)}
+      </text>
+
+      <g clip-path="url(#${clipId})">
+        <path class="report-graph__line" d="${linePath}" />
+      </g>
+      <g>
+        ${pointMarkup}
+      </g>
+    </svg>
+  `
+}
+
+const createObservationRows = (observations) => (
+  observations.map((row, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${formatNumber(row.primaryVoltage, 1)}</td>
+      <td>${formatNumber(row.primaryCurrent, 3)}</td>
+      <td>${formatNumber(row.primaryPower, 1)}</td>
+      <td>${formatNumber(row.secondaryVoltage, 1)}</td>
+      <td>${formatNumber(row.secondaryCurrent, 3)}</td>
+      <td>${formatNumber(row.secondaryPower, 1)}</td>
+      <td>${formatNumber(row.voltageRegulation, 1)}</td>
+      <td>${formatNumber(row.efficiency, 1)}</td>
+    </tr>
+  `).join('')
 )
+
+const getBestObservation = (observations, key) => (
+  observations.reduce((best, row) => (
+    toNumber(row[key]) > toNumber(best?.[key]) ? row : best
+  ), observations[0])
+)
+
+const getFullLoadObservation = (observations) => (
+  [...observations].sort((current, next) => toNumber(next.secondaryPower) - toNumber(current.secondaryPower))[0]
+)
+
+const createSummaryRows = (observations) => {
+  const highestEfficiencyRow = getBestObservation(observations, 'efficiency')
+  const fullLoadRow = getFullLoadObservation(observations)
+  const maxOutputPower = Math.max(0, ...observations.map((row) => toNumber(row.secondaryPower)))
+
+  return `
+    <tr><th>Readings Recorded</th><td>${observations.length}</td></tr>
+    <tr><th>Rated Primary Voltage Used</th><td>${formatNumber(AUTOTRANSFORMER_OUTPUT_VOLTAGE, 1)} V</td></tr>
+    <tr><th>No-load Secondary Voltage</th><td>${formatNumber(NO_LOAD_SECONDARY_VOLTAGE, 1)} V</td></tr>
+    <tr><th>Maximum Output Power</th><td>${formatNumber(maxOutputPower, 1)} W</td></tr>
+    <tr><th>Maximum Efficiency</th><td>${formatNumber(highestEfficiencyRow?.efficiency, 1)}% at ${formatNumber(highestEfficiencyRow?.secondaryPower, 1)} W</td></tr>
+    <tr><th>Full-load Efficiency</th><td>${formatNumber(fullLoadRow?.efficiency, 1)}%</td></tr>
+    <tr><th>Full-load Voltage Regulation</th><td>${formatNumber(fullLoadRow?.voltageRegulation, 1)}%</td></tr>
+  `
+}
 
 const createReportHtml = ({
   baseHref,
   iitLogoSrc,
   observations,
-  resistances,
   sessionStart,
   virtualLabsLogoSrc,
 }) => {
@@ -294,22 +300,31 @@ const createReportHtml = ({
   const startTimeText = new Date(sessionStart).toLocaleTimeString()
   const endTimeText = reportDate.toLocaleTimeString()
   const durationText = getSessionDurationText(sessionStart, sessionEnd)
-  const firstObservation = observations[0] ?? {}
-  const r1 = toNumber(firstObservation.r1 ?? resistances?.r1)
-  const r2 = toNumber(firstObservation.r2 ?? resistances?.r2)
-  const r3 = toNumber(firstObservation.r3 ?? resistances?.r3)
-  const totalResistance = toNumber(firstObservation.totalResistance)
-  const { averageError, maxError } = getKclStats(observations)
+  const fullLoadRow = getFullLoadObservation(observations)
   const observationRows = createObservationRows(observations)
-  const graphSvg = createReportGraphSvg(observations)
+  const summaryRows = createSummaryRows(observations)
+  const efficiencyGraphSvg = createReportGraphSvg({
+    ariaLabel: 'Efficiency versus output power graph',
+    color: '#0f766e',
+    points: getGraphData(observations, 'efficiency'),
+    title: 'Efficiency vs Output Power',
+    yAxisLabel: 'Efficiency (%)',
+  })
+  const regulationGraphSvg = createReportGraphSvg({
+    ariaLabel: 'Voltage regulation versus output power graph',
+    color: '#b45309',
+    points: getGraphData(observations, 'voltageRegulation'),
+    title: 'Voltage Regulation vs Output Power',
+    yAxisLabel: 'Voltage Regulation (%)',
+  })
 
   const css = `
 body {
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  background: linear-gradient(180deg, #eef4fb 0%, #f7f9fc 100%);
-  color: #1f2d3d;
   margin: 0;
   padding: 18px 14px 30px;
+  background: linear-gradient(180deg, #eef4fb 0%, #f7f9fc 100%);
+  color: #1f2d3d;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   line-height: 1.42;
   overflow-wrap: break-word;
@@ -320,51 +335,46 @@ body {
   box-sizing: border-box;
 }
 .report-page {
-  width: min(100%, 960px);
+  width: min(100%, 980px);
   margin: 0 auto 18px;
   padding: 22px 26px;
-  background-color: #ffffff;
-  border-radius: 16px;
+  overflow: visible;
   border: 1px solid #d3ddea;
+  border-radius: 16px;
+  background-color: #ffffff;
   box-shadow: 0 12px 28px rgba(23, 50, 77, 0.1);
   break-inside: avoid-page;
   page-break-inside: avoid;
-  overflow: visible;
-  background-clip: padding-box;
 }
 .report-page:last-of-type {
   margin-bottom: 0;
 }
-.report-page--results {
-  break-before: page;
-  page-break-before: always;
-}
-.report-page--graph {
+.report-page--results,
+.report-page--graphs {
   break-before: page;
   page-break-before: always;
 }
 h1,
 h2,
 h3 {
-  color: #1f2d3d;
   margin-top: 0;
+  color: #1f2d3d;
   font-weight: 700;
 }
 h1 {
-  font-size: 28px;
   margin: 0;
-  padding: 0;
+  font-size: 25px;
   line-height: 1.15;
 }
 h2 {
-  font-size: 20px;
   margin-bottom: 12px;
   color: #243b53;
+  font-size: 20px;
 }
 h3 {
-  font-size: 15px;
   margin-bottom: 7px;
   color: #2d4b68;
+  font-size: 15px;
 }
 p {
   margin: 0 0 8px;
@@ -372,16 +382,16 @@ p {
 li {
   margin-bottom: 4px;
 }
+ul,
+ol {
+  margin: 7px 0 0;
+  padding-left: 20px;
+}
 .section {
-  background: linear-gradient(180deg, #f9fbfe 0%, #f4f7fb 100%);
-  padding: 16px 18px;
   margin-bottom: 14px;
+  padding: 16px 18px;
   border-radius: 12px;
-  border: none;
-  box-shadow: none;
-  break-inside: auto;
-  page-break-inside: auto;
-  background-clip: padding-box;
+  background: linear-gradient(180deg, #f9fbfe 0%, #f4f7fb 100%);
 }
 .section:last-child {
   margin-bottom: 0;
@@ -391,52 +401,81 @@ li {
   padding-bottom: 8px;
   border-bottom: 1px solid #e1e9f3;
 }
-.label {
-  font-weight: 600;
-  color: #1f2d3d;
+.header-row {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 108px;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  break-inside: avoid-page;
+  page-break-inside: avoid;
 }
-ul {
-  padding-left: 20px;
-  margin: 7px 0 0;
+.report-title-block {
+  min-width: 0;
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #2f7bfa;
+  text-align: center;
 }
-.two-column-list {
-  column-count: 2;
-  column-gap: 32px;
-  list-style-position: inside;
-  margin-top: 10px;
+.report-subtitle {
+  margin: 6px 0 0;
+  color: #5c6f84;
+  font-size: 13px;
+}
+.report-logo {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  justify-self: center;
+}
+.report-logo--virtual-labs {
+  max-width: 190px;
+  max-height: 86px;
+  justify-self: start;
+}
+.report-logo--iit {
+  max-width: 88px;
+  max-height: 88px;
+  justify-self: end;
 }
 .report-overview-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 10px;
 }
+.badge,
 .report-stamp {
   margin: 0;
-  padding: 7px 11px;
-  border-radius: 999px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: #e8f1ff;
+  color: #1f62d0;
+  font-size: 12px;
+  font-weight: 700;
+}
+.report-stamp {
   background: #ffffff;
-  border: none;
   color: #50657c;
   font-size: 13px;
-  font-weight: 600;
 }
 .report-experiment-label {
   margin: 0 0 6px;
+  color: #60778f;
   font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
-  color: #60778f;
-  font-weight: 700;
 }
 .report-experiment-title {
   margin: 0 0 14px;
-  font-size: 22px;
-  line-height: 1.3;
-  font-weight: 700;
   color: #16324b;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 .info-grid {
   display: grid;
@@ -445,54 +484,57 @@ ul {
   margin-top: 10px;
 }
 .info-card {
-  background: #fff;
-  border: none;
-  border-radius: 9px;
-  padding: 10px 12px;
-  box-shadow: none;
-  font-size: 13px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   gap: 4px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #fff;
+  font-size: 13px;
+}
+.label {
+  color: #1f2d3d;
+  font-weight: 700;
+}
+.two-column-list {
+  column-count: 2;
+  column-gap: 32px;
+  list-style-position: inside;
+  margin-top: 10px;
 }
 .table-shell {
   display: block;
   width: 100%;
-  align-self: stretch;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: visible;
-  border: none;
   border-radius: 12px;
-  max-width: 100%;
   background: #ffffff;
-  box-shadow: none;
 }
 table {
   width: 100%;
-  border-collapse: collapse;
   margin-top: 0;
-  box-shadow: none;
+  border-collapse: collapse;
   background-color: white;
   table-layout: auto;
 }
 th,
 td {
+  padding: 8px 9px;
   border: 1px solid #d9e2ec;
-  padding: 9px 10px;
+  font-size: 12.5px;
   text-align: center;
-  font-size: 13px;
   vertical-align: middle;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 th {
-  background: linear-gradient(135deg, #2f7bfa 0%, #1f62d0 100%);
   border-color: #c6d7ec;
   border-bottom-color: #b4cae5;
   color: white;
+  background: linear-gradient(135deg, #2f7bfa 0%, #1f62d0 100%);
   font-weight: 700;
-  letter-spacing: 0;
 }
 thead {
   display: table-header-group;
@@ -514,103 +556,66 @@ tr:nth-child(even) {
   align-items: start;
 }
 .results-card {
-  background: #ffffff;
-  border: none;
-  border-radius: 12px;
-  padding: 14px;
-  box-shadow: none;
+  display: flex;
   width: 100%;
   max-width: 100%;
-  display: flex;
   flex-direction: column;
   gap: 9px;
+  padding: 14px;
   overflow: visible;
-  background-clip: padding-box;
+  border-radius: 12px;
+  background: #ffffff;
 }
 .results-card h3 {
   margin: 0;
   text-align: left;
-  padding-bottom: 0;
-  border-bottom: none;
 }
-.results-card--table {
-  break-inside: auto;
-  page-break-inside: auto;
+.summary-table th {
+  width: 35%;
 }
-.results-card--graph {
+.graphs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.report-graph-card {
   break-inside: avoid-page;
   page-break-inside: avoid;
 }
-.compact-table {
-  margin-top: 0;
-}
-.compact-table th,
-.compact-table td {
-  padding: 8px 10px;
-  font-size: 13px;
-}
-.graph {
-  text-align: center;
-  margin-top: 0;
-}
-.report-graph-card {
-  padding: 14px;
-}
-.report-graph-card #report-graph {
+.report-graph {
   display: flex;
+  min-height: 310px;
   align-items: flex-start;
   justify-content: center;
-  position: relative;
-  width: 100%;
-  min-height: 340px;
   padding: 8px 0 0;
-  background: linear-gradient(180deg, #f8fbfe 0%, #eef5fb 100%);
-  border: none;
-  border-radius: 12px;
   overflow: visible;
-  background-clip: padding-box;
-  box-shadow: none;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8fbfe 0%, #eef5fb 100%);
 }
-.report-graph-card #report-graph > * {
+.report-graph > * {
   max-width: 100%;
 }
-.report-graph-card #report-graph em {
+.report-graph em {
   color: #5e738c;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 700;
 }
-.report-graph__image {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-}
+.report-graph__image,
 .report-graph__svg {
   display: block;
   width: 100%;
   max-width: 100%;
   height: auto;
 }
+.report-graph__svg {
+  font-family: Arial, Helvetica, sans-serif;
+  shape-rendering: geometricPrecision;
+  text-rendering: optimizeLegibility;
+}
 .report-graph__plot-bg {
   fill: #fffdf8;
   stroke: rgba(112, 82, 55, 0.28);
   stroke-width: 1;
-}
-.report-graph__band:nth-of-type(odd) {
-  fill: rgba(51, 124, 102, 0.035);
-}
-.report-graph__band:nth-of-type(even) {
-  fill: rgba(210, 78, 58, 0.025);
-}
-.report-graph__axis {
-  fill: none;
-  stroke: #563927;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.4;
-}
-.report-graph__svg marker path {
-  fill: #563927;
 }
 .report-graph__grid {
   stroke: rgba(117, 88, 62, 0.2);
@@ -619,6 +624,12 @@ tr:nth-child(even) {
 .report-graph__grid--horizontal {
   stroke-dasharray: 4 8;
 }
+.report-graph__axis {
+  fill: none;
+  stroke: #563927;
+  stroke-linecap: round;
+  stroke-width: 1.25;
+}
 .report-graph__tick {
   stroke: rgba(74, 43, 31, 0.38);
   stroke-linecap: round;
@@ -626,129 +637,44 @@ tr:nth-child(even) {
 }
 .report-graph__tick-label {
   fill: #6a4b34;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
 }
 .report-graph__tick-label--y {
-  font-size: 12px;
+  font-size: 11px;
 }
 .report-graph__axis-title {
   fill: #38271c;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 900;
 }
 .report-graph__line {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 2.2;
-}
-.report-graph__line--i1,
-.report-graph__point--i1 {
-  stroke: #c83f35;
-}
-.report-graph__line--i2,
-.report-graph__point--i2 {
-  stroke: #1579a8;
-}
-.report-graph__line--i3,
-.report-graph__point--i3 {
-  stroke: #3f8f43;
+  stroke-width: 2.6;
 }
 .report-graph__point {
   fill: #ffffff;
-  stroke-width: 1.6;
-}
-.report-graph__series-label {
-  dominant-baseline: middle;
-  font-size: 13px;
-  font-weight: 800;
-  paint-order: stroke;
-  stroke: #fffdf8;
-  stroke-linejoin: round;
-  stroke-width: 5px;
-}
-.report-graph__series-label--i1 {
-  fill: #c83f35;
-}
-.report-graph__series-label--i2 {
-  fill: #1579a8;
-}
-.report-graph__series-label--i3 {
-  fill: #3f8f43;
-}
-.report-graph__series-label-sub {
-  baseline-shift: sub;
-  font-size: 72%;
-}
-.header-row {
-  display: grid;
-  grid-template-columns: 190px minmax(0, 1fr) 108px;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-  break-inside: avoid-page;
-  page-break-inside: avoid;
-}
-.report-title-block {
-  text-align: center;
-  margin: 0;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #2f7bfa;
-  min-width: 0;
-}
-.report-title-block h1 {
-  font-size: 25px;
-}
-.report-subtitle {
-  margin: 6px 0 0;
-  font-size: 13px;
-  color: #5c6f84;
-}
-.badge {
-  margin: 0;
-  padding: 7px 12px;
-  border-radius: 20px;
-  background: #e8f1ff;
-  color: #1f62d0;
-  font-weight: 600;
-  font-size: 12px;
-}
-.report-logo {
-  height: auto;
-  width: auto;
-  max-width: 108px;
-  max-height: 84px;
-  object-fit: contain;
-  flex-shrink: 0;
-  justify-self: center;
-}
-.report-logo--virtual-labs {
-  max-width: 190px;
-  max-height: 86px;
-  justify-self: start;
-}
-.report-logo--iit {
-  max-width: 88px;
-  max-height: 88px;
-  justify-self: end;
+  stroke: var(--report-graph-color);
+  stroke-width: 2;
 }
 .report-actions {
   display: flex;
+  width: min(100%, 980px);
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 12px;
-  width: min(100%, 960px);
   margin: 20px auto 0;
 }
 .print-btn,
 .download-btn {
   padding: 12px 24px;
-  font-size: 15px;
   border: none;
   border-radius: 30px;
   color: white;
   cursor: pointer;
+  font-size: 15px;
   transition: all 0.25s ease;
 }
 .print-btn {
@@ -759,18 +685,18 @@ tr:nth-child(even) {
 }
 .print-btn:hover,
 .download-btn:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(31, 45, 61, 0.12);
+  transform: translateY(-2px);
 }
 .pdf-exporting .report-page {
+  margin-bottom: 0 !important;
   border-color: transparent !important;
   box-shadow: none !important;
-  margin-bottom: 0 !important;
 }
 .pdf-exporting .section,
 .pdf-exporting .results-card,
 .pdf-exporting .table-shell,
-.pdf-exporting .report-graph-card #report-graph {
+.pdf-exporting .report-graph {
   overflow: visible !important;
 }
 .pdf-exporting .report-page--overview,
@@ -792,9 +718,6 @@ tr:nth-child(even) {
     gap: 14px;
     text-align: center;
   }
-  .report-title-block {
-    padding-bottom: 12px;
-  }
   .report-logo,
   .report-logo--virtual-labs,
   .report-logo--iit {
@@ -805,16 +728,16 @@ tr:nth-child(even) {
     column-count: 1;
     column-gap: 0;
   }
-  .compact-table th,
-  .compact-table td {
-    padding: 9px 8px;
-    font-size: 13px;
+  .graphs-grid {
+    grid-template-columns: 1fr;
+  }
+  th,
+  td {
+    padding: 8px;
+    font-size: 12px;
   }
   .report-actions {
     justify-content: center;
-  }
-  .report-graph-card #report-graph {
-    min-height: 300px;
   }
 }
 @media print {
@@ -837,8 +760,8 @@ tr:nth-child(even) {
     margin: 0;
     padding: 16px 18px;
     border: none;
-    box-shadow: none;
     border-radius: 0;
+    box-shadow: none;
   }
   .header-row {
     grid-template-columns: 150px minmax(0, 1fr) 86px;
@@ -847,18 +770,18 @@ tr:nth-child(even) {
   .report-experiment-title {
     font-size: 22px;
   }
-  .report-graph-card #report-graph {
-    min-height: 320px;
-  }
   .section,
   .header-row,
   .info-grid,
   .report-graph-card,
-  .graph,
+  .report-graph,
   thead,
   tr {
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+  .graphs-grid {
+    grid-template-columns: 1fr;
   }
 }
   `
@@ -869,124 +792,129 @@ tr:nth-child(even) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kirchhoff Current Law Simulation Report</title>
+  <title>Transformer Load Test Simulation Report</title>
   <base href="${escapeHtml(baseHref)}">
   <style>${css}</style>
 </head>
 <body id="report-root">
   <main class="report-document" id="report-document">
-  <div class="report-page report-page--overview">
-    <div class="header-row">
-      <img src="${escapeHtml(virtualLabsLogoSrc)}" class="report-logo report-logo--virtual-labs" alt="Virtual Labs logo">
-      <div class="report-title-block">
-        <h1>Virtual Labs Simulation Report</h1>
-        <p class="report-subtitle">Basic Electrical Science Lab</p>
-      </div>
-      <img src="${escapeHtml(iitLogoSrc)}" class="report-logo report-logo--iit" alt="Indian Institute of Technology Roorkee logo">
-    </div>
-
-    <div class="section report-overview">
-      <div class="report-overview-top">
-        <p class="badge">Basic Electrical Science Lab</p>
-        <p class="report-stamp">Generated on ${escapeHtml(reportDateText)}</p>
-      </div>
-      <p class="report-experiment-label">Experiment Title</p>
-      <p class="report-experiment-title">To Study the efficiency of single phase transformer by load test</p>
-      <div class="info-grid">
-        <div class="info-card"><span class="label">Start Time:</span>${escapeHtml(startTimeText)}</div>
-        <div class="info-card"><span class="label">End Time:</span>${escapeHtml(endTimeText)}</div>
-        <div class="info-card"><span class="label">Total Time Spent:</span>${escapeHtml(durationText)}</div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Summary</h2>
-      <h3>Aim</h3>
-      <p style="text-align: justify;">To verify Kirchhoff's Current Law by measuring the total current entering a junction and the branch currents leaving the junction in a resistive DC network.</p>
-
-      <h3>Theory</h3>
-      <p style="text-align: justify;">Kirchhoff's Current Law states that the algebraic sum of currents at a node is zero. For this experiment, the current through R<sub>1</sub> is the incoming current I<sub>1</sub>, and it divides into branch currents I<sub>2</sub> and I<sub>3</sub>. The verification condition is I<sub>1</sub> = I<sub>2</sub> + I<sub>3</sub>.</p>
-
-      <h3>Simulation Summary</h3>
-      <p style="text-align: justify;">The circuit was connected and verified, the resistance values were fixed, the DC supply voltage was varied, ammeter readings were recorded, and the current versus voltage graph was plotted after collecting the required readings.</p>
-
-      <h3>Components and Key Parameters</h3>
-      <ul class="two-column-list">
-        <li>DC power supply: 0-10 V</li>
-        <li>Ammeter A<sub>1</sub> for total current I<sub>1</sub></li>
-        <li>Ammeter A<sub>2</sub> for branch current I<sub>2</sub></li>
-        <li>Ammeter A<sub>3</sub> for branch current I<sub>3</sub></li>
-        <li>Resistor R<sub>1</sub>: ${formatNumber(r1, 0)} &Omega;</li>
-        <li>Resistor R<sub>2</sub>: ${formatNumber(r2, 0)} &Omega;</li>
-        <li>Resistor R<sub>3</sub>: ${formatNumber(r3, 0)} &Omega;</li>
-        <li>Connecting leads</li>
-      </ul>
-
-      <h3>Calculation Formulae</h3>
-      <ul>
-        <li>Total resistance: R = R<sub>1</sub> + (R<sub>2</sub> x R<sub>3</sub>) / (R<sub>2</sub> + R<sub>3</sub>)</li>
-        <li>Total current: I<sub>1</sub> = V / R</li>
-        <li>KCL check at the junction: I<sub>1</sub> = I<sub>2</sub> + I<sub>3</sub></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="report-page report-page--results">
-    <div class="section results-section">
-      <h2>Results</h2>
-      <div class="results-stack">
-        <div class="results-card results-card--table">
-          <h3>Observation Table</h3>
-          <div class="table-shell">
-            <table class="compact-table">
-              <thead>
-                <tr>
-                  <th>S.No.</th>
-                  <th>Voltage (V)</th>
-                  <th>I<sub>1</sub> (A)</th>
-                  <th>I<sub>2</sub> (A)</th>
-                  <th>I<sub>3</sub> (A)</th>
-                </tr>
-              </thead>
-              <tbody>${observationRows}</tbody>
-            </table>
-          </div>
+    <div class="report-page report-page--overview">
+      <div class="header-row">
+        <img src="${escapeHtml(virtualLabsLogoSrc)}" class="report-logo report-logo--virtual-labs" alt="Virtual Labs logo">
+        <div class="report-title-block">
+          <h1>Virtual Labs Simulation Report</h1>
+          <p class="report-subtitle">Basic Electrical Science Lab</p>
         </div>
+        <img src="${escapeHtml(iitLogoSrc)}" class="report-logo report-logo--iit" alt="Indian Institute of Technology Roorkee logo">
+      </div>
 
-        <div class="results-card">
-          <h3>KCL Verification Summary</h3>
-          <div class="table-shell">
-            <table class="compact-table">
-              <tbody>
-                <tr><th>Readings Plotted</th><td>${observations.length}</td></tr>
-                <tr><th>Configured Resistance</th><td>R<sub>1</sub> = ${formatNumber(r1, 0)} &Omega;, R<sub>2</sub> = ${formatNumber(r2, 0)} &Omega;, R<sub>3</sub> = ${formatNumber(r3, 0)} &Omega;</td></tr>
-                <tr><th>Calculated Total Resistance</th><td>${formatNumber(totalResistance)} &Omega;</td></tr>
-                <tr><th>Maximum KCL Error</th><td>${formatNumber(maxError, 4)} A</td></tr>
-                <tr><th>Average KCL Error</th><td>${formatNumber(averageError, 4)} A</td></tr>
-              </tbody>
-            </table>
-          </div>
+      <div class="section report-overview">
+        <div class="report-overview-top">
+          <p class="badge">Basic Electrical Science Lab</p>
+          <p class="report-stamp">Generated on ${escapeHtml(reportDateText)}</p>
+        </div>
+        <p class="report-experiment-label">Experiment Title</p>
+        <p class="report-experiment-title">To Study the Efficiency of Single Phase Transformer by Load Test</p>
+        <div class="info-grid">
+          <div class="info-card"><span class="label">Start Time:</span>${escapeHtml(startTimeText)}</div>
+          <div class="info-card"><span class="label">End Time:</span>${escapeHtml(endTimeText)}</div>
+          <div class="info-card"><span class="label">Total Time Spent:</span>${escapeHtml(durationText)}</div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="report-page report-page--graph">
-    <div class="section results-section">
-      <h2>Graph and Conclusion</h2>
-      <div class="results-stack">
-        <div class="graph report-graph-card results-card results-card--graph">
-          <h3>Current versus Voltage Graph</h3>
-          <div id="report-graph">${graphSvg}</div>
+      <div class="section">
+        <h2>Experiment Summary</h2>
+        <h3>Aim</h3>
+        <p style="text-align: justify;">To determine the efficiency and voltage regulation of a single phase transformer by performing a load test at different lamp-load conditions.</p>
+
+        <h3>Theory</h3>
+        <p style="text-align: justify;">In a transformer load test, the primary side input power and the secondary side output power are measured for increasing load. The secondary output power is obtained from W = VA for the lamp load. Efficiency is the ratio of output power to input power, expressed as a percentage. Voltage regulation indicates the change in secondary terminal voltage from no-load to load condition.</p>
+
+        <h3>Apparatus and Parameters</h3>
+        <ul class="two-column-list">
+          <li>Single phase transformer</li>
+          <li>Autotransformer set to ${formatNumber(AUTOTRANSFORMER_OUTPUT_VOLTAGE, 1)} V</li>
+          <li>AC voltmeters for primary and secondary voltage</li>
+          <li>AC ammeters for primary and secondary current</li>
+          <li>Wattmeter on primary side</li>
+          <li>Lamp load bank</li>
+          <li>No-load secondary voltage: ${formatNumber(NO_LOAD_SECONDARY_VOLTAGE, 1)} V</li>
+          <li>Connecting leads</li>
+        </ul>
+
+        <h3>Calculation Formulae</h3>
+        <ul>
+          <li>Input power, W<sub>in</sub> = wattmeter reading x 2</li>
+          <li>Output power, W<sub>out</sub> = V<sub>2</sub> x I<sub>2</sub></li>
+          <li>Efficiency, eta = (W<sub>out</sub> / W<sub>in</sub>) x 100%</li>
+          <li>Voltage regulation = ((V<sub>no-load</sub> - V<sub>load</sub>) / V<sub>load</sub>) x 100%</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="report-page report-page--results">
+      <div class="section results-section">
+        <h2>Observations and Results</h2>
+        <div class="results-stack">
+          <div class="results-card results-card--table">
+            <h3>Observation Table</h3>
+            <div class="table-shell">
+              <table>
+                <thead>
+                  <tr>
+                    <th rowspan="2">S.No.</th>
+                    <th colspan="3">Primary Side Readings</th>
+                    <th colspan="3">Secondary Side Readings</th>
+                    <th colspan="2">Results</th>
+                  </tr>
+                  <tr>
+                    <th>V</th>
+                    <th>A</th>
+                    <th>W x 2</th>
+                    <th>V</th>
+                    <th>A</th>
+                    <th>W = VA</th>
+                    <th>VR%</th>
+                    <th>Eff%</th>
+                  </tr>
+                </thead>
+                <tbody>${observationRows}</tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="results-card">
+            <h3>Result Summary</h3>
+            <div class="table-shell">
+              <table class="summary-table">
+                <tbody>${summaryRows}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-page report-page--graphs">
+      <div class="section results-section">
+        <h2>Graphs and Conclusion</h2>
+        <div class="graphs-grid">
+          <div class="results-card report-graph-card">
+            <h3>Efficiency vs Output Power</h3>
+            <div class="report-graph">${efficiencyGraphSvg}</div>
+          </div>
+          <div class="results-card report-graph-card">
+            <h3>Voltage Regulation vs Output Power</h3>
+            <div class="report-graph">${regulationGraphSvg}</div>
+          </div>
         </div>
 
         <div class="results-card">
           <h3>Conclusion</h3>
-          <p style="text-align: justify;">For every recorded voltage level, the total current I<sub>1</sub> is equal to the sum of branch currents I<sub>2</sub> and I<sub>3</sub> within simulation precision. Hence Kirchhoff's Current Law is verified for the given resistive network.</p>
+          <p style="text-align: justify;">The transformer load-test observations show how efficiency and voltage regulation vary with output power. At the highest recorded load of ${formatNumber(fullLoadRow?.secondaryPower, 1)} W, the simulated transformer efficiency is ${formatNumber(fullLoadRow?.efficiency, 1)}% and the voltage regulation is ${formatNumber(fullLoadRow?.voltageRegulation, 1)}%.</p>
         </div>
       </div>
     </div>
-  </div>
   </main>
 
   <div class="report-actions" data-html2canvas-ignore="true">
@@ -1006,62 +934,65 @@ tr:nth-child(even) {
       });
     }
 
-    function prepareReportGraphImage() {
-      return new Promise(function(resolve) {
-        var graphContainer = document.getElementById('report-graph');
-        var svg = graphContainer && graphContainer.querySelector('svg');
+    function prepareReportGraphImages() {
+      var graphContainers = Array.from(document.querySelectorAll('.report-graph'));
 
-        if (!graphContainer || !svg) return resolve();
+      return Promise.all(graphContainers.map(function(graphContainer) {
+        return new Promise(function(resolve) {
+          var svg = graphContainer.querySelector('svg');
 
-        try {
-          var viewBox = svg.viewBox && svg.viewBox.baseVal;
-          var width = viewBox && viewBox.width ? viewBox.width : 960;
-          var height = viewBox && viewBox.height ? viewBox.height : 320;
-          var svgText = new XMLSerializer().serializeToString(svg);
-          var svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
-          var svgUrl = URL.createObjectURL(svgBlob);
-          var image = new Image();
+          if (!svg) return resolve();
 
-          image.onload = function() {
-            var canvas = document.createElement('canvas');
-            var scale = 2;
-            canvas.width = width * scale;
-            canvas.height = height * scale;
+          try {
+            var viewBox = svg.viewBox && svg.viewBox.baseVal;
+            var width = viewBox && viewBox.width ? viewBox.width : 650;
+            var height = viewBox && viewBox.height ? viewBox.height : 286;
+            var svgText = new XMLSerializer().serializeToString(svg);
+            var svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+            var svgUrl = URL.createObjectURL(svgBlob);
+            var image = new Image();
 
-            var context = canvas.getContext('2d');
-            context.fillStyle = '#f8fbfe';
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+            image.onload = function() {
+              var canvas = document.createElement('canvas');
+              var scale = 2;
+              canvas.width = width * scale;
+              canvas.height = height * scale;
 
-            var png = new Image();
-            png.className = 'report-graph__image';
-            png.alt = 'Current versus voltage graph';
-            png.src = canvas.toDataURL('image/png');
-            graphContainer.innerHTML = '';
-            graphContainer.appendChild(png);
+              var context = canvas.getContext('2d');
+              context.fillStyle = '#f8fbfe';
+              context.fillRect(0, 0, canvas.width, canvas.height);
+              context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-            URL.revokeObjectURL(svgUrl);
+              var png = new Image();
+              png.className = 'report-graph__image';
+              png.alt = svg.getAttribute('aria-label') || 'Transformer load-test result graph';
+              png.src = canvas.toDataURL('image/png');
+              graphContainer.innerHTML = '';
+              graphContainer.appendChild(png);
+
+              URL.revokeObjectURL(svgUrl);
+              resolve();
+            };
+
+            image.onerror = function() {
+              URL.revokeObjectURL(svgUrl);
+              resolve();
+            };
+
+            image.src = svgUrl;
+          } catch {
             resolve();
-          };
-
-          image.onerror = function() {
-            URL.revokeObjectURL(svgUrl);
-            resolve();
-          };
-
-          image.src = svgUrl;
-        } catch {
-          resolve();
-        }
-      });
+          }
+        });
+      }));
     }
 
     function downloadReport() {
-      prepareReportGraphImage().then(ensureHtml2Pdf).then(function() {
+      prepareReportGraphImages().then(ensureHtml2Pdf).then(function() {
         var element = document.getElementById('report-document') || document.body;
         var opts = {
           margin: [0.18, 0.18, 0.18, 0.18],
-          filename: 'kcl-simulation-report.pdf',
+          filename: 'transformer-load-test-report.pdf',
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
             scale: 2,
@@ -1075,7 +1006,7 @@ tr:nth-child(even) {
           jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
           pagebreak: {
             mode: ['css', 'legacy'],
-            before: ['.report-page--results', '.report-page--graph'],
+            before: ['.report-page--results', '.report-page--graphs'],
             avoid: ['.report-page', '.header-row', '.report-overview', '.info-grid', '.report-graph-card', 'thead', 'tr']
           }
         };
@@ -1090,7 +1021,7 @@ tr:nth-child(even) {
   `
 }
 
-export const generateKclReport = ({ observations, resistances, sessionStart }) => {
+export const generateTransformerReport = ({ observations, sessionStart }) => {
   const baseHref = new URL(import.meta.env.BASE_URL, window.location.origin).href
   const iitLogoSrc = new URL('../assets/IIT Logo.png', import.meta.url).href
   const virtualLabsLogoSrc = new URL('../assets/image.png', import.meta.url).href
@@ -1098,7 +1029,6 @@ export const generateKclReport = ({ observations, resistances, sessionStart }) =
     baseHref,
     iitLogoSrc,
     observations,
-    resistances,
     sessionStart,
     virtualLabsLogoSrc,
   })
