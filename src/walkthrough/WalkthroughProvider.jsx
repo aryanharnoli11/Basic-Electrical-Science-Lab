@@ -99,6 +99,10 @@ const WalkthroughProvider = ({
     moveToStep(currentStepIndex - 1)
   }, [currentStepIndex, moveToStep])
 
+  const skipToLastStep = useCallback(() => {
+    moveToStep(totalSteps - 1)
+  }, [moveToStep, totalSteps])
+
   const goToStep = useCallback((stepIndex) => {
     moveToStep(stepIndex)
   }, [moveToStep])
@@ -184,12 +188,6 @@ const WalkthroughProvider = ({
     }
 
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        close()
-        return
-      }
-
       if (event.key === 'ArrowRight' && canGoNext) {
         event.preventDefault()
         next()
@@ -205,7 +203,7 @@ const WalkthroughProvider = ({
     window.addEventListener('keydown', handleKeyDown)
 
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [canGoNext, canGoPrevious, close, isOpen, next, previous])
+  }, [canGoNext, canGoPrevious, isOpen, next, previous])
 
   const contextValue = useMemo(() => ({
     activeStep,
@@ -223,6 +221,7 @@ const WalkthroughProvider = ({
     locale: walkthroughConfig.locale,
     next,
     previous,
+    skipToLastStep,
     start,
     targetRect,
     totalSteps,
@@ -239,6 +238,7 @@ const WalkthroughProvider = ({
     isPositioningTarget,
     next,
     previous,
+    skipToLastStep,
     start,
     targetRect,
     totalSteps,

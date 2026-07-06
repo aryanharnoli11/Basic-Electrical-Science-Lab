@@ -94,9 +94,10 @@ const WalkthroughPopup = ({
   canGoNext,
   canGoPrevious,
   currentStep,
-  onClose,
+  onExit,
   onNext,
   onPrevious,
+  onSkip,
   targetRect,
   totalSteps,
 }) => {
@@ -108,8 +109,8 @@ const WalkthroughPopup = ({
   const titleId = `walkthrough-title-${activeStep.id}`
   const descriptionId = `walkthrough-description-${activeStep.id}`
   const progressPercent = (currentStep / totalSteps) * 100
-  const primaryActionLabel = canGoNext ? 'Next' : 'Finish'
-  const handlePrimaryAction = canGoNext ? onNext : onClose
+  const secondaryActionLabel = canGoNext ? 'Skip' : 'Exit'
+  const handleSecondaryAction = canGoNext ? onSkip : onExit
 
   useFocusTrap(popupRef, true)
 
@@ -205,15 +206,6 @@ const WalkthroughPopup = ({
           <p className="walkthrough-popup__eyebrow">Guided Walkthrough</p>
           <h2 id={titleId}>{activeStep.title}</h2>
         </div>
-
-        <button
-          aria-label="Exit walkthrough"
-          className="walkthrough-popup__icon-button"
-          onClick={onClose}
-          type="button"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
       </div>
 
       <p className="walkthrough-popup__description" id={descriptionId}>
@@ -241,7 +233,7 @@ const WalkthroughPopup = ({
         </button>
       </div>
 
-      <div className="walkthrough-popup__actions">
+      <div className={`walkthrough-popup__actions ${canGoNext ? '' : 'walkthrough-popup__actions--final'}`}>
         <button
           className="walkthrough-popup__button walkthrough-popup__button--secondary"
           disabled={!canGoPrevious}
@@ -252,19 +244,22 @@ const WalkthroughPopup = ({
         </button>
         <button
           className="walkthrough-popup__button walkthrough-popup__button--secondary"
-          onClick={onClose}
+          data-autofocus={canGoNext ? undefined : true}
+          onClick={handleSecondaryAction}
           type="button"
         >
-          Exit
+          {secondaryActionLabel}
         </button>
-        <button
-          className="walkthrough-popup__button walkthrough-popup__button--primary"
-          data-autofocus
-          onClick={handlePrimaryAction}
-          type="button"
-        >
-          {primaryActionLabel}
-        </button>
+        {canGoNext ? (
+          <button
+            className="walkthrough-popup__button walkthrough-popup__button--primary"
+            data-autofocus
+            onClick={onNext}
+            type="button"
+          >
+            Next
+          </button>
+        ) : null}
       </div>
     </motion.aside>
   )

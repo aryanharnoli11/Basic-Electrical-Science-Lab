@@ -235,18 +235,6 @@
       "placement": "right"
     },
     {
-      "id": 20,
-      "target": "#generate-report-button",
-      "title": {
-        "en": "Generate Report Button"
-      },
-      "description": {
-        "en": "After all readings are recorded and the graph is plotted, use this button to generate the report."
-      },
-      "audio": "#",
-      "placement": "right"
-    },
-    {
       "id": 21,
       "target": "#efficiency-graph-card",
       "title": {
@@ -269,6 +257,18 @@
       },
       "audio": "#",
       "placement": "top"
+    },
+    {
+      "id": 20,
+      "target": "#generate-report-button",
+      "title": {
+        "en": "Generate Report Button"
+      },
+      "description": {
+        "en": "After all readings are recorded and the graph is plotted, use this button to generate the report."
+      },
+      "audio": "#",
+      "placement": "right"
     }
   ]
 }
