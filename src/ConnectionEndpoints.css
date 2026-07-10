@@ -502,7 +502,7 @@
 }
 
 .endpoint-3 {
-  --terminal-base-top: 156px;
+  --terminal-base-top: 153px;
   --terminal-base-left: 28px;
 }
 
@@ -517,7 +517,7 @@
 }
 
 .endpoint-4 {
-  --terminal-base-top: 156px;
+  --terminal-base-top: 153px;
   --terminal-base-left: 104px;
 }
 
@@ -532,8 +532,8 @@
 }
 
 .endpoint-5 {
-  --terminal-base-top: 154px;
-  --terminal-base-left: 31px;
+  --terminal-base-top: 148px;
+  --terminal-base-left: 33px;
 }
 
 #label-5 {
@@ -547,8 +547,8 @@
 }
 
 .endpoint-6 {
-  --terminal-base-top: 154px;
-  --terminal-base-left: 105px;
+  --terminal-base-top: 148px;
+  --terminal-base-left: 100px;
 }
 
 #label-6 {
@@ -752,7 +752,7 @@
 }
 
 .endpoint-19 {
-  --terminal-base-top: 119px;
+  --terminal-base-top: 117px;
   --terminal-base-left: 39.5px;
 }
 
@@ -767,8 +767,8 @@
 }
 
 .endpoint-20 {
-  --terminal-base-top: 119px;
-  --terminal-base-left: 98px;
+  --terminal-base-top: 117px;
+  --terminal-base-left: 96px;
 }
 
 #label-20 {
