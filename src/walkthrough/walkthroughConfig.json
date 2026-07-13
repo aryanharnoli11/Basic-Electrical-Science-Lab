@@ -13,7 +13,7 @@
         "en": "Experiment Goal"
       },
       "description": {
-        "en": "The aim of the experiment is to Study the efficiency of single phase transformer by load test"
+        "en": "The aim of the experiment is to perform a load test on a single-phase transformer and determine its efficiency and voltage regulation."
       },
       "audio": "#",
       "placement": "bottom"
@@ -25,7 +25,7 @@
         "en": "Instruction Button"
       },
       "description": {
-        "en": "The Instructions provide step-by-step guidance on how to perform the simulation"
+        "en": "The Instructions provide step-by-step guidance on how to perform the simulation."
       },
       "audio": "#",
       "placement": "right"
@@ -73,7 +73,7 @@
         "en": "Add Button"
       },
       "description": {
-        "en": "The ADD button adds the readings to the observation table."
+        "en": " The ADD button adds the readings to the observation table."
       },
       "audio": "#",
       "placement": "right"
@@ -133,7 +133,7 @@
         "en": "Primary AC Voltmeter"
       },
       "description": {
-        "en": "The primary AC voltmeter measures the voltage applied to the transformer's primary winding. It helps ensure that the transformer operates at its rated input voltage throughout the load test."
+        "en": "This voltmeter is used to measure the output voltage received from the autotransformer, which is adjusted to 230 V for the experiment."
       },
       "audio": "#",
       "placement": "top"
@@ -145,7 +145,7 @@
         "en": "A1 Ammeter"
       },
       "description": {
-        "en": "The primary ammeter measures the current drawn by the transformer from the AC supply. Its readings increase with the applied load and help monitor the transformer's input current during the experiment."
+        "en": "This ammeter measures the current flowing through the primary winding of the transformer. During the first reading, it displays the no-load current drawn by the transformer. From the second reading onward, as the load is gradually applied, it displays the primary current corresponding to each load condition."
       },
       "audio": "#",
       "placement": "top"
@@ -157,7 +157,7 @@
         "en": "Wattmeter"
       },
       "description": {
-        "en": "The AC wattmeter measures the real power consumed by the transformer at the input side. It provides the input power reading, which is used along with the output power to determine the transformer's efficiency."
+        "en": "An AC wattmeter measures the input power drawn by the transformer. During the first reading, it displays the no-load power drawn by the transformer, which mainly represents the core losses. From the second reading onward, as the load is gradually applied, it displays the input power drawn by the transformer under different load conditions. These readings are used to calculate the transformer's efficiency. "
       },
       "audio": "#",
       "placement": "top"
@@ -169,7 +169,7 @@
         "en": "Autotransformer"
       },
       "description": {
-        "en": "The autotransformer is used to provide a smooth and adjustable AC voltage to the primary winding of the transformer. It allows the input voltage to be increased gradually up to the rated value, preventing sudden voltage surges and enabling accurate testing."
+        "en": " The autotransformer is used to obtain a variable AC output voltage from the 230 V input supply. During the experiment, the input voltage is increased gradually until the required voltage is reached and maintained throughout the load test."
       },
       "audio": "#",
       "placement": "left"
@@ -181,7 +181,7 @@
         "en": "Single Phase Transformer"
       },
       "description": {
-        "en": "The single-phase transformer is the main device under test, responsible for transferring electrical energy from the primary to the secondary winding through electromagnetic induction. Its performance under different loading conditions is analyzed to determine efficiency and voltage regulation."
+        "en": "The single-phase transformer is the main equipment under test. It is tested under different loading conditions to determine its efficiency and voltage regulation."
       },
       "audio": "#",
       "placement": "left"
@@ -193,7 +193,7 @@
         "en": "Lamp Load"
       },
       "description": {
-        "en": "The lamp load acts as a variable resistive load connected to the transformer's secondary side. By switching different lamps ON or OFF, the load is increased in steps, allowing the transformer to be tested under various operating conditions."
+        "en": " A lamp load is connected to the secondary side of the transformer to provide a variable resistive load. The load can be increased or decreased by operating the switches, which connect or disconnect a set of lamps. This allows the transformer to be tested under different load conditions."
       },
       "audio": "#",
       "placement": "left"
@@ -205,7 +205,7 @@
         "en": "Secondary Voltmeter"
       },
       "description": {
-        "en": "The secondary AC voltmeter measures the output voltage of the transformer. It is used to observe the voltage variation as the load changes, which is essential for calculating voltage regulation."
+        "en": " This voltmeter measures the voltage across the secondary winding of the transformer. During the first reading, it displays the no-load output voltage. From the second reading onward, as the load is gradually applied, it displays the output voltage corresponding to each load condition. These readings are used to determine the voltage regulation of the transformer."
       },
       "audio": "#",
       "placement": "left"
@@ -217,7 +217,7 @@
         "en": "A2 Ammeter"
       },
       "description": {
-        "en": "The secondary ammeter measures the current supplied by the transformer to the load. It indicates the output current at different load conditions and is required for calculating the output power."
+        "en": "This ammeter measures the current flowing through the secondary winding of the transformer. Since it is connected in series with the lamp load, it also indicates the load current. During the first reading, it reads zero under no-load conditions. From the second reading onward, it displays the load current corresponding to each load condition."
       },
       "audio": "#",
       "placement": "left"
@@ -229,7 +229,7 @@
         "en": "Observation Table"
       },
       "description": {
-        "en": "Every ADD action records one row here. Add the no-load row first, then one row after each lamp-load switch."
+        "en": "The readings obtained from the voltmeters, ammeters, and wattmeter will be recorded in the observation table. These measurements will then be used to calculate the efficiency and voltage regulation of the single-phase transformer."
       },
       "audio": "#",
       "placement": "right"
@@ -241,7 +241,7 @@
         "en": "Efficiency vs Output Power Graph"
       },
       "description": {
-        "en": "This graph shows how the transformer's efficiency varies with output power. The efficiency increases with load and gradually reaches a high value near the rated output, indicating efficient operation."
+        "en": "The Graphs section displays the variation of transformer efficiency and voltage regulation with output power. These graphs will be generated from the recorded readings and help analyze the transformer's performance under different loading conditions."
       },
       "audio": "#",
       "placement": "top"

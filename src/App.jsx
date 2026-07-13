@@ -4,6 +4,7 @@ import './ConnectionEndpoints.css'
 import ConnectionLab from './components/ConnectionLab.jsx'
 import ActionButtons from './components/ActionButtons.jsx'
 import ControlPanel from './components/ControlPanel.jsx'
+import FormulaSection from './components/FormulaSection.jsx'
 import HeaderBoard from './components/HeaderBoard.jsx'
 import ReportControls from './components/ReportControls.jsx'
 import ResultsGraphs from './components/ResultsGraphs.jsx'
@@ -536,6 +537,8 @@ const App = () => {
                     setR2={setR2}
                     setR3={setR3}
                   />
+
+                  <FormulaSection />
 
                   <ReportControls
                     minReadings={MIN_GRAPH_READINGS}
