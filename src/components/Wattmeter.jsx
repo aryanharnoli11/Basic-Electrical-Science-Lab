@@ -38,6 +38,13 @@ const LAMP_LOAD_SWITCHES = [
   { id: 'switch-4', row: 4 },
 ]
 
+const WATTMETER_TERMINAL_LABELS = [
+  { id: 'main', label: 'M' },
+  { id: 'line', label: 'L' },
+  { id: 'common', label: 'C' },
+  { id: 'voltage', label: 'V' },
+]
+
 const formatCssLength = (value, unit) => (
   typeof value === 'number' ? `${value}${unit}` : value
 )
@@ -89,6 +96,13 @@ const Wattmeter = ({
       <span className="lab-meter__image-frame">
         <img alt="AC wattmeter" className="lab-meter__image" src={wattmeterImg} />
       </span>
+      <div className="wattmeter-terminal-labels" aria-hidden="true">
+        {WATTMETER_TERMINAL_LABELS.map(({ id, label }) => (
+          <span className={`wattmeter-terminal-label wattmeter-terminal-label--${id}`} key={id}>
+            {label}
+          </span>
+        ))}
+      </div>
       <div className="lamp-load" id="lamp-load" role="img" aria-label="Lamp load with 16 bulbs">
         <img alt="" className="lamp-load__image" src={lampLoadImg} aria-hidden="true" />
         {LAMP_LOAD_BULBS.map((bulb) => (

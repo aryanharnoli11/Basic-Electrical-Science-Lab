@@ -2,10 +2,9 @@ import { useEffect, useRef } from 'react'
 
 import EquipmentPanel from './EquipmentPanel.jsx'
 import {
-  DEFAULT_WIRE_CURVINESS,
+  DEFAULT_WIRE_CONNECTOR_OPTIONS,
   WIRE_CONNECTOR_TYPE,
   WIRE_CURVINESS_CONFIG_SIGNATURE,
-  WIRE_PROXIMITY_LIMIT,
   addAllEndpoints,
   applyAllWireCurviness,
   autoConnectDefaultCircuit,
@@ -63,10 +62,7 @@ const ConnectionLab = ({
         ConnectionsDetachable: true,
         Connector: [
           WIRE_CONNECTOR_TYPE,
-          {
-            curviness: DEFAULT_WIRE_CURVINESS,
-            proximityLimit: WIRE_PROXIMITY_LIMIT,
-          },
+          DEFAULT_WIRE_CONNECTOR_OPTIONS,
         ],
         Container: labRef.current,
         Endpoint: ['Dot', { radius: 5 }],

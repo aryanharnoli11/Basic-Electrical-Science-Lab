@@ -2004,6 +2004,48 @@ input:focus-visible {
   --meter-needle-size: 84px;
 }
 
+.wattmeter-terminal-labels {
+  position: absolute;
+  top: 150px;
+  left: 0;
+  z-index: 4;
+  width: 100%;
+  height: 18px;
+  pointer-events: none;
+}
+
+.wattmeter-terminal-label {
+  position: absolute;
+  width: 20px;
+  color: #141414;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  transform: translateX(-50%);
+}
+
+.wattmeter-terminal-label--main {
+  left: 18.5%;
+  top: -10px;
+}
+
+.wattmeter-terminal-label--line {
+  left: 39.5%;
+  top: -10px;
+}
+
+.wattmeter-terminal-label--common {
+  left: 61.5%;
+  top: -10px;
+}
+
+.wattmeter-terminal-label--voltage {
+  left: 82.5%;
+  top: -10px;
+}
+
 .meter-needle--under-voltmeter {
   --meter-needle-top: 85px;
   --meter-needle-left: 76px;

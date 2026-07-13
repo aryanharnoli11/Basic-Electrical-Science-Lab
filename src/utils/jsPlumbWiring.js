@@ -33,9 +33,16 @@ export const CIRCUIT_POSITIVE_TERMINALS = []
 export const CIRCUIT_NEGATIVE_TERMINALS = []
 
 const WIRE_ANCHOR_SIZE = 28
-export const WIRE_CONNECTOR_TYPE = 'StateMachine'
-export const DEFAULT_WIRE_CURVINESS = 58
+export const WIRE_CONNECTOR_TYPE = 'Bezier'
+export const DEFAULT_WIRE_CURVINESS = 135
+export const WIRE_MARGIN = 0
 export const WIRE_PROXIMITY_LIMIT = 0
+export const WIRE_ANCHOR = ['Bottom']
+export const DEFAULT_WIRE_CONNECTOR_OPTIONS = {
+  curviness: DEFAULT_WIRE_CURVINESS,
+  margin: WIRE_MARGIN,
+  proximityLimit: WIRE_PROXIMITY_LIMIT,
+}
 
 export const REQUIRED_CONNECTIONS = [
   ['1-endpoint', '11-endpoint'],
@@ -59,30 +66,29 @@ export const VALID_CONNECTION_SEQUENCE = REQUIRED_CONNECTIONS.flat()
 
 export const DEFAULT_AUTO_CONNECTIONS = REQUIRED_CONNECTIONS
 
-// Edit these values to tune each wire curve. Higher values bend more; missing pairs use the default.
+// Edit these values to tune each wire's U-shaped sag. Higher values make deeper U bends.
 export const WIRE_CURVINESS_BY_CONNECTION = {
-  '1-11': -64,
-  '2-12': -64,
-  '3-13': -58,
-  '4-14': -58,
-  '3-5': -42,
-  '6-7': -36,
-  '7-9': -44,
-  '8-15': -72,
-  '10-17': -76,
-  '14-17': -66,
-  '16-19': -54,
-  '18-20': -54,
-  '19-21':- 46,
-  '22-23': -78,
-  '20-24': -102,
+  '1-11': 145,
+  '2-12': 145,
+  '3-13': 135,
+  '4-14': 135,
+  '3-5': 105,
+  '6-7': 105,
+  '7-9': 115,
+  '8-15': 160,
+  '10-17': 160,
+  '14-17': 145,
+  '16-19': 130,
+  '18-20': 130,
+  '19-21': 110,
+  '22-23': 175,
+  '20-24': 190,
 }
 
 export const WIRE_CURVINESS_CONFIG_SIGNATURE = JSON.stringify({
+  connectorOptions: DEFAULT_WIRE_CONNECTOR_OPTIONS,
   connectorType: WIRE_CONNECTOR_TYPE,
   curvinessByConnection: WIRE_CURVINESS_BY_CONNECTION,
-  defaultCurviness: DEFAULT_WIRE_CURVINESS,
-  proximityLimit: WIRE_PROXIMITY_LIMIT,
 })
 
 export const DEFAULT_AMMETER_CURRENT_KEYS = {
@@ -322,8 +328,8 @@ export const getWireCurviness = (firstTerminal, secondTerminal) => {
 export const getWireConnectorSpec = (firstTerminal, secondTerminal) => [
   WIRE_CONNECTOR_TYPE,
   {
+    ...DEFAULT_WIRE_CONNECTOR_OPTIONS,
     curviness: getWireCurviness(firstTerminal, secondTerminal),
-    proximityLimit: WIRE_PROXIMITY_LIMIT,
   },
 ]
 
@@ -336,14 +342,19 @@ export const applyWireCurviness = (connection) => {
   }
 
   const curviness = getWireCurviness(sourceId, targetId)
-  const curvinessKey = `${WIRE_CONNECTOR_TYPE}:${curviness}:${WIRE_PROXIMITY_LIMIT}`
+  const wireRouteKey = [
+    WIRE_CONNECTOR_TYPE,
+    curviness,
+    WIRE_MARGIN,
+    WIRE_PROXIMITY_LIMIT,
+  ].join(':')
 
-  if (connection.getParameter?.('wireCurvinessKey') === curvinessKey) {
+  if (connection.getParameter?.('wireRouteKey') === wireRouteKey) {
     return
   }
 
   connection.setConnector(getWireConnectorSpec(sourceId, targetId), true)
-  connection.setParameter?.('wireCurvinessKey', curvinessKey)
+  connection.setParameter?.('wireRouteKey', wireRouteKey)
 }
 
 export const applyAllWireCurviness = (instance) => {
@@ -494,7 +505,7 @@ export const addTerminalEndpoint = (instance, terminalId, type) => {
     uuid: terminalId,
     endpoint: ['Dot', { radius: getEndpointRadius(element) }],
     cssClass: getEndpointCssClass(terminalId, type),
-    anchor: ['Center'],
+    anchor: WIRE_ANCHOR,
     isSource: true,
     isTarget: true,
     connectionType: type,
