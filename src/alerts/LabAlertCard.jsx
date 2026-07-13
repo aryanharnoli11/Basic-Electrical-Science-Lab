@@ -27,9 +27,7 @@ const LabAlertCard = ({ alert, onDismiss }) => {
     onPrevious,
     placement,
     requiresConfirmation,
-    stepNumber,
     title,
-    totalSteps,
     tutorialMode,
     type,
   } = alert
@@ -60,11 +58,10 @@ const LabAlertCard = ({ alert, onDismiss }) => {
     dispatchLabAlertEvent('lab-alert:sound', {
       id,
       sound: alert.sound ?? type,
-      stepNumber,
       title,
       type,
     })
-  }, [alert.sound, id, stepNumber, title, type])
+  }, [alert.sound, id, title, type])
 
   useEffect(() => {
     if (!hasProgressTimer) {
@@ -98,7 +95,6 @@ const LabAlertCard = ({ alert, onDismiss }) => {
     dispatchLabAlertEvent('lab-alert:narration', {
       id,
       narration: alert.narration ?? `${title}. ${description ?? ''}`.trim(),
-      stepNumber,
       title,
       type,
     })
@@ -120,7 +116,6 @@ const LabAlertCard = ({ alert, onDismiss }) => {
 
         <div className="lab-alert-card__content">
           <div className="lab-alert-card__meta">
-            {stepNumber ? <span>STEP {stepNumber}</span> : null}
             <span>{type.toUpperCase()}</span>
           </div>
           <h2 id={titleId}>{title}</h2>
@@ -186,9 +181,6 @@ const LabAlertCard = ({ alert, onDismiss }) => {
         </div>
       ) : null}
 
-      {totalSteps ? (
-        <span className="sr-only">Step {stepNumber} of {totalSteps}</span>
-      ) : null}
     </article>
   )
 }

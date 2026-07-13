@@ -32,9 +32,9 @@
 }
 
 .lab-alert-card {
-  --alert-accent: #4db8ff;
-  --alert-accent-soft: rgba(77, 184, 255, 0.24);
-  --alert-accent-strong: rgba(77, 184, 255, 0.72);
+  --alert-accent: #55e17a;
+  --alert-accent-soft: rgba(85, 225, 122, 0.25);
+  --alert-accent-strong: rgba(85, 225, 122, 0.72);
   position: relative;
   width: 100%;
   overflow: hidden;
@@ -68,54 +68,13 @@
   animation: lab-alert-out 180ms ease forwards;
 }
 
-.lab-alert-card--success {
+.lab-alert-card--success,
+.lab-alert-card--warning,
+.lab-alert-card--error,
+.lab-alert-card--info {
   --alert-accent: #55e17a;
   --alert-accent-soft: rgba(85, 225, 122, 0.25);
   --alert-accent-strong: rgba(85, 225, 122, 0.72);
-}
-
-.lab-alert-card--warning {
-  --alert-accent: #ffb339;
-  --alert-accent-soft: rgba(255, 179, 57, 0.3);
-  --alert-accent-strong: rgba(255, 179, 57, 0.78);
-  animation: lab-alert-warning-pulse 1450ms ease-in-out infinite alternate;
-}
-
-.lab-alert-card--error {
-  --alert-accent: #ff5d50;
-  --alert-accent-soft: rgba(255, 93, 80, 0.32);
-  --alert-accent-strong: rgba(255, 93, 80, 0.78);
-  animation: lab-alert-error-pulse 1250ms ease-in-out infinite alternate;
-}
-
-.lab-alert-card--info {
-  --alert-accent: #4db8ff;
-  --alert-accent-soft: rgba(77, 184, 255, 0.25);
-  --alert-accent-strong: rgba(77, 184, 255, 0.74);
-}
-
-.lab-alert-card--warning[data-placement="top-right"] {
-  animation:
-    lab-alert-toast-in 230ms cubic-bezier(0.2, 0.85, 0.25, 1.12) both,
-    lab-alert-warning-pulse 1450ms ease-in-out 260ms infinite alternate;
-}
-
-.lab-alert-card--warning[data-placement="center"] {
-  animation:
-    lab-alert-center-in 240ms cubic-bezier(0.2, 0.85, 0.25, 1.12) both,
-    lab-alert-warning-pulse 1450ms ease-in-out 270ms infinite alternate;
-}
-
-.lab-alert-card--error[data-placement="top-right"] {
-  animation:
-    lab-alert-toast-in 230ms cubic-bezier(0.2, 0.85, 0.25, 1.12) both,
-    lab-alert-error-pulse 1250ms ease-in-out 260ms infinite alternate;
-}
-
-.lab-alert-card--error[data-placement="center"] {
-  animation:
-    lab-alert-center-in 240ms cubic-bezier(0.2, 0.85, 0.25, 1.12) both,
-    lab-alert-error-pulse 1250ms ease-in-out 270ms infinite alternate;
 }
 
 .lab-alert-card--closing[data-placement="top-right"],
@@ -163,6 +122,8 @@
 
 .lab-alert-card__content {
   min-width: 0;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .lab-alert-card__meta {
@@ -194,6 +155,8 @@
   font-weight: 900;
   line-height: 1.15;
   letter-spacing: 0;
+  text-align: justify;
+  text-justify: inter-word;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.42);
 }
 
@@ -203,6 +166,8 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1.35;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .lab-alert-card__tools {
@@ -326,20 +291,11 @@
   animation: lab-alert-spotlight-pulse 1500ms ease-in-out infinite;
 }
 
-.lab-alert-spotlight--success {
-  --alert-spotlight-color: #55e17a;
-}
-
-.lab-alert-spotlight--warning {
-  --alert-spotlight-color: #ffb339;
-}
-
-.lab-alert-spotlight--error {
-  --alert-spotlight-color: #ff5d50;
-}
-
+.lab-alert-spotlight--success,
+.lab-alert-spotlight--warning,
+.lab-alert-spotlight--error,
 .lab-alert-spotlight--info {
-  --alert-spotlight-color: #4db8ff;
+  --alert-spotlight-color: #55e17a;
 }
 
 @keyframes lab-alert-toast-in {
@@ -374,44 +330,6 @@
 @keyframes lab-alert-timer {
   to {
     transform: scaleX(0);
-  }
-}
-
-@keyframes lab-alert-warning-pulse {
-  from {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 241, 204, 0.28),
-      inset 0 -16px 24px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(255, 228, 174, 0.12),
-      0 0 20px rgba(255, 179, 57, 0.2),
-      0 18px 46px rgba(21, 10, 4, 0.45);
-  }
-  to {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 241, 204, 0.3),
-      inset 0 -16px 24px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(255, 228, 174, 0.14),
-      0 0 34px rgba(255, 179, 57, 0.38),
-      0 18px 46px rgba(21, 10, 4, 0.45);
-  }
-}
-
-@keyframes lab-alert-error-pulse {
-  from {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 241, 204, 0.28),
-      inset 0 -16px 24px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(255, 228, 174, 0.12),
-      0 0 22px rgba(255, 93, 80, 0.22),
-      0 18px 46px rgba(21, 10, 4, 0.45);
-  }
-  to {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 241, 204, 0.3),
-      inset 0 -16px 24px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(255, 228, 174, 0.14),
-      0 0 38px rgba(255, 93, 80, 0.42),
-      0 18px 46px rgba(21, 10, 4, 0.45);
   }
 }
 

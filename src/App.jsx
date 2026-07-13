@@ -37,6 +37,21 @@ const MAX_OBSERVATIONS = MAX_LAMP_LOAD_LEVEL + 1
 const MIN_GRAPH_READINGS = MAX_OBSERVATIONS
 const VOLTAGE_SAFETY_LIMIT = 240
 const VOLTAGE_SAFETY_RESET = 220
+const READING_ADDED_ALERTS = [
+  null,
+  EXPERIMENT_ALERTS.firstReadingAdded,
+  EXPERIMENT_ALERTS.secondReadingAdded,
+  EXPERIMENT_ALERTS.thirdReadingAdded,
+  EXPERIMENT_ALERTS.fourthReadingAdded,
+  EXPERIMENT_ALERTS.fifthReadingAdded,
+]
+const LOAD_SWITCH_ALERTS = [
+  null,
+  EXPERIMENT_ALERTS.firstSwitchOn,
+  EXPERIMENT_ALERTS.secondSwitchOn,
+  EXPERIMENT_ALERTS.thirdSwitchOn,
+  EXPERIMENT_ALERTS.fourthSwitchOn,
+]
 
 const formatConnectionList = (connections) => (
   connections.map((connection) => connection.label).join(', ')
@@ -173,7 +188,6 @@ const App = () => {
       setStatus('Check the circuit connections before adding readings.')
       showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
         description: 'Verify the wiring before storing current readings.',
-        stepNumber: 6,
         target: '#check-button',
         type: 'warning',
       })
@@ -184,7 +198,6 @@ const App = () => {
       setStatus('Switch on the power supply before adding readings.')
       showStepAlert(EXPERIMENT_ALERTS.cannotStartPower, {
         description: 'Switch on the verified power supply before adding readings.',
-        stepNumber: 6,
         target: '#power-toggle-button',
       })
       return
@@ -206,11 +219,8 @@ const App = () => {
     }
 
     if (hasDuplicateReading) {
-      setStatus('Duplicate reading cannot be added to the observation table.')
-      showStepAlert(EXPERIMENT_ALERTS.readingAlreadyExists, {
-        description: 'This lamp-load reading already exists in the observation table. Turn ON the next enabled switch before adding another reading.',
-        title: 'Duplicate Reading Not Allowed',
-      })
+      setStatus('This reading already exists in the observation table. Turn ON the next enabled switch before adding the readings.')
+      showStepAlert(EXPERIMENT_ALERTS.readingAlreadyExists)
       return
     }
 
@@ -226,15 +236,13 @@ const App = () => {
       totalResistance: readings.totalResistance,
     }
     const nextObservationCount = readingCount + 1
+    const readingAddedAlert = READING_ADDED_ALERTS[nextObservationCount] ?? EXPERIMENT_ALERTS.readingAdded
 
     setObservations([...observations, nextObservation])
     setGraphGenerated(false)
     setReportGenerated(false)
-    setStatus('Reading added to the observation table.')
-
-    if (nextObservationCount === MIN_GRAPH_READINGS) {
-      showStepAlert(EXPERIMENT_ALERTS.sufficientData)
-    }
+    setStatus(readingAddedAlert.description ?? 'Reading added to the observation table.')
+    showStepAlert(readingAddedAlert)
   }
 
   const resetSimulation = useCallback(() => {
@@ -300,23 +308,23 @@ const App = () => {
       return
     }
 
-    const generated = generateTransformerReport({
-      observations,
-      sessionStart,
-    })
+    setStatus('Your report has been generated successfully. Click OK to view your report.')
+    showStepAlert(EXPERIMENT_ALERTS.reportGenerated, {
+      onConfirm: () => {
+        const generated = generateTransformerReport({
+          observations,
+          sessionStart,
+        })
 
-    if (!generated) {
-      setStatus('Unable to open the report window.')
-      window.alert('Unable to open the report window. Please allow pop-ups and try again.')
-      return
-    }
+        if (!generated) {
+          setStatus('Unable to open the report window.')
+          window.alert('Unable to open the report window. Please allow pop-ups and try again.')
+          return
+        }
 
-    setReportGenerated(true)
-    setStatus('Transformer load-test report generated from the current observations.')
-    showStepAlert(EXPERIMENT_ALERTS.printLayoutGenerated, {
-      description: 'The transformer load-test report was generated from the current observations.',
-      target: '#generate-report-button',
-      title: 'Report Generated Successfully',
+        setReportGenerated(true)
+        setStatus('Your report has been generated successfully.')
+      },
     })
   }
 
@@ -442,8 +450,13 @@ const App = () => {
     setActiveLoadLevel(nextLoadLevel)
     setGraphGenerated(false)
     setReportGenerated(false)
-    setStatus(`Lamp load switch ${nextLoadLevel} turned ON. Click ADD to record the reading.`)
-  }, [nextEnabledLoadLevel])
+    const loadSwitchAlert = LOAD_SWITCH_ALERTS[nextLoadLevel]
+    setStatus(loadSwitchAlert?.description ?? `Lamp load switch ${nextLoadLevel} turned ON. Click ADD to record the reading.`)
+
+    if (loadSwitchAlert) {
+      showStepAlert(loadSwitchAlert)
+    }
+  }, [nextEnabledLoadLevel, showStepAlert])
 
   const handleVoltageChange = useCallback((nextVoltage) => {
     setVoltage(nextVoltage)

@@ -640,7 +640,7 @@
   display: grid;
   min-height: 32px;
   align-items: center;
-  grid-template-columns: 104px 14px minmax(112px, 1fr) 46px;
+  grid-template-columns: 142px 14px minmax(112px, 1fr) 46px;
   gap: 6px;
   font-size: 12px;
   font-weight: 800;
@@ -676,7 +676,7 @@
 }
 
 .formula-fraction__bar {
-  width: 100%;
+  width: 72%;
   height: 1px;
   margin: 2px 0;
   background: rgba(45, 27, 17, 0.78);
