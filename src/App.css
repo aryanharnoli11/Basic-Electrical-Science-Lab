@@ -1683,6 +1683,10 @@ input:focus-visible {
   cursor: pointer;
 }
 
+.mcb-device__button:disabled {
+  cursor: not-allowed;
+}
+
 .variac-device {
   position: relative;
   z-index: 1;

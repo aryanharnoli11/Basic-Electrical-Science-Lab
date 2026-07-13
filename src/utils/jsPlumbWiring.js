@@ -68,21 +68,21 @@ export const DEFAULT_AUTO_CONNECTIONS = REQUIRED_CONNECTIONS
 
 // Edit these values to tune each wire's U-shaped sag. Higher values make deeper U bends.
 export const WIRE_CURVINESS_BY_CONNECTION = {
-  '1-11': 145,
-  '2-12': 145,
-  '3-13': 135,
-  '4-14': 135,
-  '3-5': 105,
-  '6-7': 105,
-  '7-9': 115,
-  '8-15': 160,
-  '10-17': 160,
-  '14-17': 145,
-  '16-19': 130,
-  '18-20': 130,
-  '19-21': 110,
-  '22-23': 175,
-  '20-24': 190,
+  '1-11': 35,
+  '2-12': 45,
+  '3-13': 35,
+  '4-14': 45,
+  '3-5': 60,
+  '6-7': 60,
+  '7-9': 70,
+  '8-15': 70,
+  '10-17': 70,
+  '14-17': 65,
+  '16-19': 75,
+  '18-20': 75,
+  '19-21': 65,
+  '22-23': 75,
+  '20-24': 75,
 }
 
 export const WIRE_CURVINESS_CONFIG_SIGNATURE = JSON.stringify({

@@ -142,6 +142,11 @@ const App = () => {
   ))
   const readingCount = observations.length
   const canPlotGraph = readingCount >= MIN_GRAPH_READINGS
+  const canAddReading = (
+    connectionsVerified
+    && powerOn
+    && normalizedVoltage >= AUTOTRANSFORMER_OUTPUT_VOLTAGE
+  )
   const nextEnabledLoadLevel = (
     powerOn
     && normalizedVoltage >= AUTOTRANSFORMER_OUTPUT_VOLTAGE
@@ -308,6 +313,16 @@ const App = () => {
       return
     }
 
+    if (!graphGenerated) {
+      setStatus('Plot the graph before generating the report.')
+      showStepAlert(EXPERIMENT_ALERTS.minimumReadingsRequired, {
+        description: 'Click the Plot button to generate the graphs before generating a report.',
+        target: '#plot-button',
+        title: 'Plot Graph Before Report',
+      })
+      return
+    }
+
     setStatus('Your report has been generated successfully. Click OK to view your report.')
     showStepAlert(EXPERIMENT_ALERTS.reportGenerated, {
       onConfirm: () => {
@@ -402,13 +417,6 @@ const App = () => {
     }
 
     if (powerOn) {
-      setPowerOn(false)
-      setVoltage(0)
-      setActiveLoadLevel(0)
-      autotransformerReadyAlertShownRef.current = false
-      voltageLimitWarningShownRef.current = false
-      setStatus('You turned off the MCB. Turn it back ON to continue the simulation.')
-      showStepAlert(EXPERIMENT_ALERTS.mcbTurnedOffDuringExperiment)
       return
     }
 
@@ -526,6 +534,7 @@ const App = () => {
                       onAiGuide: aiGuidePlaying,
                     }}
                     disabledButtons={{
+                      onAdd: !canAddReading,
                       onAutoConnect: connectionsVerified || powerOn,
                       onCheck: connectionsVerified,
                       onPlot: false,
@@ -554,6 +563,7 @@ const App = () => {
                   <FormulaSection />
 
                   <ReportControls
+                    graphGenerated={graphGenerated}
                     minReadings={MIN_GRAPH_READINGS}
                     onGenerateReport={handleGenerateReport}
                     readingCount={readingCount}

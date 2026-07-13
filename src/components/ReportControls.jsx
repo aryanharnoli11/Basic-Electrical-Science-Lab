@@ -1,16 +1,20 @@
 import { PdfIcon } from './Icons.jsx'
 
 const ReportControls = ({
+  graphGenerated,
   minReadings,
   onGenerateReport,
   readingCount,
   reportGenerated,
 }) => {
   const readingsReady = readingCount >= minReadings
+  const reportReady = readingsReady && graphGenerated
   const buttonTitle = reportGenerated
     ? 'Report generated. Click to regenerate the report.'
-    : readingsReady
+    : reportReady
       ? 'Generate report from the current observations.'
+      : readingsReady
+        ? 'Generate report after plotting the graph.'
       : `Generate report after ${minReadings} readings.`
 
   return (
@@ -18,7 +22,7 @@ const ReportControls = ({
       id="generate-report-button"
       type="button"
       className="report-button"
-      disabled={!readingsReady}
+      disabled={!reportReady}
       title={buttonTitle}
       aria-label="Generate Report"
       data-report-generated={reportGenerated ? 'true' : 'false'}

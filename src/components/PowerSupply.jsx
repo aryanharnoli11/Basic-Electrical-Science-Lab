@@ -18,9 +18,10 @@ const PowerSupply = ({ onTogglePower, powerOn }) => {
 
       <button
         id="power-toggle-button"
-        aria-label={powerOn ? 'Switch MCB off' : 'Switch MCB on'}
+        aria-label={powerOn ? 'MCB is locked on' : 'Switch MCB on'}
         aria-pressed={powerOn}
         className="mcb-device__button"
+        disabled={powerOn}
         onClick={onTogglePower}
         type="button"
       />

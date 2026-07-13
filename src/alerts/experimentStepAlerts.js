@@ -22,11 +22,6 @@ export const EXPERIMENT_ALERTS = {
     title: 'Power Supply Turned ON',
     type: 'success',
   },
-  mcbTurnedOffDuringExperiment: {
-    target: '#power-toggle-button',
-    title: 'You turned off the MCB. Turn it back ON to continue the simulation',
-    type: 'warning',
-  },
   makeConnectionsBeforeMcb: {
     target: '#connection-lab',
     title: 'Make and check the connections before turning on the MCB',
