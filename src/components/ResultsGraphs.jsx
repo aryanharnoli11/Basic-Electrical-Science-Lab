@@ -255,7 +255,7 @@ const ResultsGraphs = ({ minReadings = 0, observations = [], plotted = false }) 
   )
 
   return (
-    <section className="results-graphs-panel" aria-label="Experiment result graphs">
+    <section className="results-graphs-panel" id="results-graphs-panel" aria-label="Experiment result graphs">
       <div className="results-graphs-panel__heading">
         <h2>RESULT GRAPHS</h2>
       </div>

@@ -14,6 +14,14 @@ const isValidAudioSource = (audio) => Boolean(audio && audio !== '#')
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 
+const renderFormattedDescription = (description) => (
+  String(description).split(/(\*\*.*?\*\*)/g).map((part, index) => (
+    part.startsWith('**') && part.endsWith('**')
+      ? <strong key={index}>{part.slice(2, -2)}</strong>
+      : part
+  ))
+)
+
 const getPlacementOrder = (placement) => {
   const fallbackPlacements = ['bottom', 'right', 'left', 'top']
 
@@ -109,7 +117,10 @@ const WalkthroughPopup = ({
   const titleId = `walkthrough-title-${activeStep.id}`
   const descriptionId = `walkthrough-description-${activeStep.id}`
   const progressPercent = (currentStep / totalSteps) * 100
-  const secondaryActionLabel = canGoNext ? 'Skip' : 'Exit'
+  const secondaryActionLabel = canGoNext ? 'Skip' : 'Finish'
+  const secondaryActionClassName = canGoNext
+    ? 'walkthrough-popup__button walkthrough-popup__button--secondary'
+    : 'walkthrough-popup__button walkthrough-popup__button--primary walkthrough-popup__button--finish'
   const handleSecondaryAction = canGoNext ? onSkip : onExit
 
   useFocusTrap(popupRef, true)
@@ -209,7 +220,7 @@ const WalkthroughPopup = ({
       </div>
 
       <p className="walkthrough-popup__description" id={descriptionId}>
-        {activeStep.description}
+        {renderFormattedDescription(activeStep.description)}
       </p>
 
       <div className="walkthrough-popup__progress" aria-hidden="true">
@@ -243,7 +254,7 @@ const WalkthroughPopup = ({
           Previous
         </button>
         <button
-          className="walkthrough-popup__button walkthrough-popup__button--secondary"
+          className={secondaryActionClassName}
           data-autofocus={canGoNext ? undefined : true}
           onClick={handleSecondaryAction}
           type="button"

@@ -10,7 +10,7 @@
       "id": 1,
       "target": "#experiment-title-board",
       "title": {
-        "en": "Experiment Goal"
+        "en": "AIM"
       },
       "description": {
         "en": "The aim of the experiment is to perform a load test on a single-phase transformer and determine its efficiency and voltage regulation."
@@ -121,70 +121,70 @@
         "en": "MCB"
       },
       "description": {
-        "en": " The MCB acts as the main power switch for the experiment. It also protects the circuit by automatically disconnecting the power supply in case of an overload or short circuit. When turned ON, it supplies electrical power to the circuit."
+        "en": " The MCB acts as the main power switch for the experiment. It also protects the circuit by automatically disconnecting the power supply in case of an overload or short circuit. When turned ON, it supplies electrical power to the circuit.\n\n**Rating:** 16A, DP, 240 V AC\n**Input Supply:** 230 V AC, 50 Hz"
       },
       "audio": "#",
       "placement": "left"
     },
     {
       "id": 11,
-      "target": "#voltmeter-meter",
+      "target": "#autotransformer-device",
       "title": {
-        "en": "Primary AC Voltmeter"
+        "en": "Autotransformer"
       },
       "description": {
-        "en": "This voltmeter is used to measure the output voltage received from the autotransformer, which is adjusted to 230 V for the experiment."
+        "en": " The autotransformer is used to obtain a variable AC output voltage from the 230 V input supply. During the experiment, the input voltage is increased gradually until the required voltage is reached and maintained throughout the load test.\n\n**Ratings:**\n**Max. kVA:** 4.05,    **Max. Load:** 15 A \n**Input Voltage:** 240 V, 50Hz\n**Output Voltage:** 0 - 240 V AC"
       },
       "audio": "#",
-      "placement": "top"
+      "placement": "left"
     },
     {
       "id": 12,
-      "target": "#ammeter-meter",
+      "target": "#transformer-device",
       "title": {
-        "en": "A1 Ammeter"
+        "en": "Single-Phase Transformer"
       },
       "description": {
-        "en": "This ammeter measures the current flowing through the primary winding of the transformer. During the first reading, it displays the no-load current drawn by the transformer. From the second reading onward, as the load is gradually applied, it displays the primary current corresponding to each load condition."
+        "en": "The single-phase transformer is the main equipment under test. It is tested under different loading conditions to determine its efficiency and voltage regulation.\n\n**Ratings:**\n**Primary Voltage:** 230 V, \n**Secondary Voltage:** 110 V\n**kVA:**  1"
       },
       "audio": "#",
-      "placement": "top"
+      "placement": "left"
     },
     {
       "id": 13,
-      "target": "#wattmeter-meter",
+      "target": "#voltmeter-meter",
       "title": {
-        "en": "Wattmeter"
+        "en": "AC Voltmeter V1"
       },
       "description": {
-        "en": "An AC wattmeter measures the input power drawn by the transformer. During the first reading, it displays the no-load power drawn by the transformer, which mainly represents the core losses. From the second reading onward, as the load is gradually applied, it displays the input power drawn by the transformer under different load conditions. These readings are used to calculate the transformer's efficiency. "
+        "en": "This voltmeter is used to measure the output voltage received from the autotransformer, which is adjusted to 230 V for the experiment. \n\n**Rating:** 0 - 240 V "
       },
       "audio": "#",
       "placement": "top"
     },
     {
       "id": 14,
-      "target": "#autotransformer-device",
+      "target": "#ammeter-meter",
       "title": {
-        "en": "Autotransformer"
+        "en": "AC Ammeter A1"
       },
       "description": {
-        "en": " The autotransformer is used to obtain a variable AC output voltage from the 230 V input supply. During the experiment, the input voltage is increased gradually until the required voltage is reached and maintained throughout the load test."
+        "en": "This ammeter measures the current flowing through the primary winding of the transformer. During the first reading, it displays the no-load current drawn by the transformer. From the second reading onward, as the load is gradually applied, it displays the primary current corresponding to each load condition.\n\n**Rating:**  0 - 10 A "
       },
       "audio": "#",
-      "placement": "left"
+      "placement": "top"
     },
     {
       "id": 15,
-      "target": "#transformer-device",
+      "target": "#wattmeter-meter",
       "title": {
-        "en": "Single Phase Transformer"
+        "en": "AC Wattmeter"
       },
       "description": {
-        "en": "The single-phase transformer is the main equipment under test. It is tested under different loading conditions to determine its efficiency and voltage regulation."
+        "en": "An AC wattmeter measures the input power drawn by the transformer. During the first reading, it displays the no-load power drawn by the transformer, which mainly represents the core losses. From the second reading onward, as the load is gradually applied, it displays the input power drawn by the transformer under different load conditions. These readings are used to calculate the transformer's efficiency.\n\n**Rating:** 0 - 600 W, 5A, M.F: 2"
       },
       "audio": "#",
-      "placement": "left"
+      "placement": "top"
     },
     {
       "id": 16,
@@ -193,7 +193,7 @@
         "en": "Lamp Load"
       },
       "description": {
-        "en": " A lamp load is connected to the secondary side of the transformer to provide a variable resistive load. The load can be increased or decreased by operating the switches, which connect or disconnect a set of lamps. This allows the transformer to be tested under different load conditions."
+        "en": " A lamp load is connected to the secondary side of the transformer to provide a variable resistive load. The load can be increased or decreased by operating the switches, which connect or disconnect a set of lamps. This allows the transformer to be tested under different load conditions.\n\n**Ratings:**  200 W per lamp"
       },
       "audio": "#",
       "placement": "left"
@@ -202,10 +202,10 @@
       "id": 17,
       "target": "#V2",
       "title": {
-        "en": "Secondary Voltmeter"
+        "en": "AC Voltmeter V2"
       },
       "description": {
-        "en": " This voltmeter measures the voltage across the secondary winding of the transformer. During the first reading, it displays the no-load output voltage. From the second reading onward, as the load is gradually applied, it displays the output voltage corresponding to each load condition. These readings are used to determine the voltage regulation of the transformer."
+        "en": " This voltmeter measures the voltage across the secondary winding of the transformer. During the first reading, it displays the no-load output voltage. From the second reading onward, as the load is gradually applied, it displays the output voltage corresponding to each load condition. These readings are used to determine the voltage regulation of the transformer.\n\n**Rating:** 0 - 240 V"
       },
       "audio": "#",
       "placement": "left"
@@ -214,10 +214,10 @@
       "id": 18,
       "target": "#A2",
       "title": {
-        "en": "A2 Ammeter"
+        "en": "AC Ammeter A2"
       },
       "description": {
-        "en": "This ammeter measures the current flowing through the secondary winding of the transformer. Since it is connected in series with the lamp load, it also indicates the load current. During the first reading, it reads zero under no-load conditions. From the second reading onward, it displays the load current corresponding to each load condition."
+        "en": "This ammeter measures the current flowing through the secondary winding of the transformer. Since it is connected in series with the lamp load, it also indicates the load current. During the first reading, it reads zero under no-load conditions. From the second reading onward, it displays the load current corresponding to each load condition. \n\n**Rating:** 0 - 10 A"
       },
       "audio": "#",
       "placement": "left"
@@ -235,10 +235,10 @@
       "placement": "right"
     },
     {
-      "id": 21,
-      "target": "#efficiency-graph-card",
+      "id": 20,
+      "target": "#results-graphs-panel",
       "title": {
-        "en": "Efficiency vs Output Power Graph"
+        "en": "Graphs"
       },
       "description": {
         "en": "The Graphs section displays the variation of transformer efficiency and voltage regulation with output power. These graphs will be generated from the recorded readings and help analyze the transformer's performance under different loading conditions."
@@ -247,22 +247,22 @@
       "placement": "top"
     },
     {
-      "id": 22,
-      "target": "#voltage-regulation-graph-card",
+      "id": 21,
+      "target": "#formula-section-panel",
       "title": {
-        "en": "Voltage Regulation vs Output Power Graph"
+        "en": "Formulas"
       },
       "description": {
-        "en": "This graph shows the variation of voltage regulation with output power. As the load increases, the voltage regulation also increases due to the voltage drop in the transformer windings."
+        "en": "This is the Formulas section, where the formulas for calculating transformer efficiency and voltage regulation from the observed readings are provided for reference. "
       },
       "audio": "#",
-      "placement": "top"
+      "placement": "right"
     },
     {
-      "id": 20,
+      "id": 22,
       "target": "#generate-report-button",
       "title": {
-        "en": "Generate Report Button"
+        "en": "Generate Report"
       },
       "description": {
         "en": "After all readings are recorded and the graph is plotted, use this button to generate the report."

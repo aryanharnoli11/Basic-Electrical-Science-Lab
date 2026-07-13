@@ -206,6 +206,12 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 1.55;
+  white-space: pre-line;
+}
+
+.walkthrough-popup__description strong {
+  color: #0f172a;
+  font-weight: 900;
 }
 
 .walkthrough-popup__progress {
@@ -281,6 +287,16 @@
   border: 1px solid rgba(37, 99, 235, 0.28);
   color: #fff;
   background: linear-gradient(135deg, #0f766e, #2563eb);
+}
+
+.walkthrough-popup__button--finish {
+  min-height: 48px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #147f8c 0%, #2869dc 100%);
+  box-shadow: none;
+  font-size: 15px;
+  letter-spacing: 0;
 }
 
 .walkthrough-popup__button:disabled {
