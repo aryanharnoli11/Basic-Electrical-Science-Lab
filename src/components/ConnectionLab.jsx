@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import EquipmentPanel from './EquipmentPanel.jsx'
 import {
@@ -9,6 +9,7 @@ import {
   applyAllWireCurviness,
   autoConnectDefaultCircuit,
   deleteConnectionsForTerminal,
+  hasConnectionBetween,
   resolveJsPlumb,
   syncWireAnchors,
   updateTerminalConnectionStates,
@@ -19,11 +20,14 @@ import {
 
 const ConnectionLab = ({
   activeLoadLevel,
+  activeGuideConnection,
   autoConnectRequest,
   checkRequest,
+  highlightedTerminalIds = [],
   nextEnabledLoadLevel,
   onCheckConnections,
   onConnectionRemovalBlocked,
+  onGuideConnectionComplete,
   onLoadLevelChange,
   powerOn,
   readings,
@@ -36,17 +40,69 @@ const ConnectionLab = ({
 }) => {
   const labRef = useRef(null)
   const instanceRef = useRef(null)
+  const activeGuideConnectionRef = useRef(activeGuideConnection)
   const onConnectionRemovalBlockedRef = useRef(onConnectionRemovalBlocked)
+  const onGuideConnectionCompleteRef = useRef(onGuideConnectionComplete)
   const powerOnRef = useRef(powerOn)
   const wireCurvinessConfigSignatureRef = useRef(WIRE_CURVINESS_CONFIG_SIGNATURE)
+
+  const notifyGuideConnectionIfMatched = useCallback(() => {
+    const instance = instanceRef.current
+    const guideConnection = activeGuideConnectionRef.current
+
+    if (!instance || !guideConnection?.length) {
+      return
+    }
+
+    if (hasConnectionBetween(instance, guideConnection[0], guideConnection[1])) {
+      onGuideConnectionCompleteRef.current?.(guideConnection)
+    }
+  }, [])
 
   useEffect(() => {
     onConnectionRemovalBlockedRef.current = onConnectionRemovalBlocked
   }, [onConnectionRemovalBlocked])
 
   useEffect(() => {
+    onGuideConnectionCompleteRef.current = onGuideConnectionComplete
+  }, [onGuideConnectionComplete])
+
+  useEffect(() => {
+    activeGuideConnectionRef.current = activeGuideConnection
+
+    window.requestAnimationFrame(notifyGuideConnectionIfMatched)
+  }, [activeGuideConnection, notifyGuideConnectionIfMatched])
+
+  useEffect(() => {
     powerOnRef.current = powerOn
   }, [powerOn])
+
+  useEffect(() => {
+    const labElement = labRef.current
+
+    if (!labElement) {
+      return undefined
+    }
+
+    const highlightedIds = new Set(highlightedTerminalIds)
+    const terminalElements = Array.from(
+      labElement.querySelectorAll(
+        '.connection-terminal[data-terminal-id], .terminal-number-label[data-terminal-id], .wire-anchor[data-terminal-id]',
+      ),
+    )
+
+    terminalElements.forEach((terminalElement) => {
+      const isHighlighted = highlightedIds.has(terminalElement.dataset.terminalId)
+
+      terminalElement.classList.toggle('simulation-guide-highlight', isHighlighted)
+    })
+
+    return () => {
+      terminalElements.forEach((terminalElement) => {
+        terminalElement.classList.remove('simulation-guide-highlight')
+      })
+    }
+  }, [highlightedTerminalIds])
 
   useEffect(() => {
     let disposed = false
@@ -91,6 +147,7 @@ const ConnectionLab = ({
         applyAllWireCurviness(activeInstance)
         activeInstance.repaintEverything?.()
         updateTerminalConnectionStates(activeInstance)
+        notifyGuideConnectionIfMatched()
       }
 
       activeInstance.bind('beforeDrop', ({ sourceId, targetId }) => {
@@ -162,7 +219,7 @@ const ConnectionLab = ({
       activeInstance?.deleteEveryEndpoint?.()
       activeInstance?.reset?.()
     }
-  }, [resetRequest])
+  }, [notifyGuideConnectionIfMatched, resetRequest])
 
   useEffect(() => {
     const instance = instanceRef.current

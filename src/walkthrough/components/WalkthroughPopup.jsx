@@ -1,6 +1,7 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
+import { registerExclusiveAudio } from '../../audio/exclusiveAudio.js'
 import { useFocusTrap } from '../hooks/useFocusTrap.js'
 
 const EDGE_GAP = 16
@@ -111,6 +112,7 @@ const WalkthroughPopup = ({
 }) => {
   const popupRef = useRef(null)
   const audioRef = useRef(null)
+  const exclusivePlaybackRef = useRef(null)
   const [popupSize, setPopupSize] = useState(DEFAULT_POPUP_SIZE)
   const [isPlaying, setIsPlaying] = useState(false)
   const audioSource = isValidAudioSource(activeStep.audio) ? activeStep.audio : null
@@ -124,6 +126,36 @@ const WalkthroughPopup = ({
   const handleSecondaryAction = canGoNext ? onSkip : onExit
 
   useFocusTrap(popupRef, true)
+
+  const releaseExclusivePlayback = useCallback(() => {
+    exclusivePlaybackRef.current?.release()
+    exclusivePlaybackRef.current = null
+  }, [])
+
+  const stopPopupAudio = useCallback((audio, reset = true) => {
+    audio.pause()
+
+    if (reset) {
+      audio.currentTime = 0
+    }
+
+    releaseExclusivePlayback()
+    setIsPlaying(false)
+  }, [releaseExclusivePlayback])
+
+  const startPopupAudio = useCallback((audio) => {
+    releaseExclusivePlayback()
+    exclusivePlaybackRef.current = registerExclusiveAudio(() => {
+      stopPopupAudio(audio)
+    })
+
+    audio.play()
+      .then(() => setIsPlaying(true))
+      .catch(() => {
+        releaseExclusivePlayback()
+        setIsPlaying(false)
+      })
+  }, [releaseExclusivePlayback, stopPopupAudio])
 
   useLayoutEffect(() => {
     if (!popupRef.current) {
@@ -149,23 +181,35 @@ const WalkthroughPopup = ({
     const audio = new Audio(audioSource)
     audioRef.current = audio
 
-    const handleEnded = () => setIsPlaying(false)
+    const handleEnded = () => {
+      releaseExclusivePlayback()
+      setIsPlaying(false)
+    }
+    const handleError = () => {
+      releaseExclusivePlayback()
+      setIsPlaying(false)
+    }
+    const handlePause = () => {
+      releaseExclusivePlayback()
+      setIsPlaying(false)
+    }
 
     audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('error', handleError)
+    audio.addEventListener('pause', handlePause)
 
     if (autoPlayAudio) {
-      audio.play()
-        .then(() => setIsPlaying(true))
-        .catch(() => setIsPlaying(false))
+      startPopupAudio(audio)
     }
 
     return () => {
       window.clearTimeout(resetPlayingTimer)
-      audio.pause()
-      audio.currentTime = 0
+      stopPopupAudio(audio)
       audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('error', handleError)
+      audio.removeEventListener('pause', handlePause)
     }
-  }, [activeStep.id, audioSource, autoPlayAudio])
+  }, [activeStep.id, audioSource, autoPlayAudio, releaseExclusivePlayback, startPopupAudio, stopPopupAudio])
 
   const popupPosition = useMemo(
     () => getPopupPosition(targetRect, popupSize, activeStep.placement),
@@ -181,13 +225,12 @@ const WalkthroughPopup = ({
 
     if (isPlaying) {
       audio.pause()
+      releaseExclusivePlayback()
       setIsPlaying(false)
       return
     }
 
-    audio.play()
-      .then(() => setIsPlaying(true))
-      .catch(() => setIsPlaying(false))
+    startPopupAudio(audio)
   }
 
   return (

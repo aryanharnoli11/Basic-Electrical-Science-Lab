@@ -73,6 +73,106 @@ const buttons = [
  
 ]
 
+const connectionGroups = [
+  {
+    pairs: ['1-11'],
+  },
+  {
+    pairs: ['2-12'],
+  },
+  {
+    pairs: ['3-13'],
+  },
+  {
+    pairs: ['4-14'],
+  },
+  {
+    pairs: ['3-5'],
+  },
+  {
+    pairs: ['6-7'],
+  },
+  {
+    pairs: ['7-9'],
+  },
+  {
+    pairs: ['8-15'],
+  },
+  {
+    pairs: ['10-17'],
+  },
+  {
+    pairs: ['14-17'],
+  },
+  {
+    pairs: ['16-19'],
+  },
+  {
+    pairs: ['18-20'],
+  },
+  {
+    pairs: ['19-21'],
+  },
+  {
+    pairs: ['22-23'],
+  },
+  {
+    pairs: ['20-24'],
+  },
+]
+
+const instructionSteps = [
+  {
+    title: 'STEP 1:',
+    content: 'Make connections as per the instructions given below:',
+    groups: connectionGroups,
+  },
+  {
+    title: 'STEP 2:',
+    content: 'Click CHECK to verify the wiring. If any connection is invalid or missing, correct the highlighted wiring and check again.',
+  },
+  {
+    title: 'STEP 3:',
+    content: 'After the connections are correct, turn ON the MCB.',
+  },
+  {
+    title: 'STEP 4:',
+    content: 'Click the autotransformer knob once. It automatically sets the primary voltage to 230 V.',
+  },
+  {
+    title: 'STEP 5:',
+    content: 'Click ADD to record the no-load reading in the observation table.',
+  },
+  {
+    title: 'STEP 6:',
+    content: 'Turn ON lamp-load switch 1, then click ADD to record the first load reading.',
+  },
+  {
+    title: 'STEP 7:',
+    content: 'Turn ON lamp-load switch 2, then click ADD to record the second load reading.',
+  },
+  {
+    title: 'STEP 8:',
+    content: 'Turn ON lamp-load switch 3, then click ADD to record the third load reading.',
+  },
+  {
+    title: 'STEP 9:',
+    content: 'Turn ON lamp-load switch 4, then click ADD to record the fourth load reading.',
+  },
+  {
+    title: 'STEP 10:',
+    content: 'Click PLOT to generate the efficiency and voltage-regulation graphs.',
+  },
+  {
+    title: 'STEP 11:',
+    content: 'Click Generate Report after plotting the graphs to create the experiment report.',
+  },
+  {
+    title: 'STEP 12:',
+    content: 'Use PRINT to print the webpage, or RESET to clear the simulation and start again.',
+  },
+]
+
 const ActionButtons = ({
   activeButtons = {},
   disabledButtons = {},
@@ -151,11 +251,24 @@ const ActionButtons = ({
 
           <div className="action-instructions-panel__body">
             <ol className="action-instructions-panel__steps">
+              {instructionSteps.map((step) => (
+                <li key={step.title}>
+                  <strong>{step.title}</strong> {step.content}
+                  {step.groups ? (
+                    <ul className="action-instructions-panel__substeps">
+                      {step.groups.map((group) => (
+                        <li key={group.label}>
+                          <strong>{group.label}</strong>{' '}
+                          <code>({group.pairs.join(', ')})</code>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </li>
+              ))}
               <li>
-                <strong>STEP 1:</strong> The previous apparatus, circuit diagram, wiring nodes, and resistance sliders have been cleared from the workspace.
+                <strong>NOTE:</strong> Click a terminal number label to delete the connection attached to that node before the MCB is turned ON.
               </li>
-              <li><strong>STEP 2:</strong> Add the replacement apparatus images before continuing the experiment flow.</li>
-              <li><strong>STEP 3:</strong> Use the observation table, graph, report, print, and reset controls after the new setup is complete.</li>
             </ol>
           </div>
         </div>

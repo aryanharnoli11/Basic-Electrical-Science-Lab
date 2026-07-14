@@ -425,7 +425,16 @@
   display: grid;
   gap: 6px;
   margin: 8px 0 0 18px;
-  padding: 0;
+  padding: 0 0 0 12px;
+  list-style: disc;
+}
+
+.action-instructions-panel__substeps code {
+  color: #2e2119;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
 }
 
 .resistance-slider {
