@@ -114,7 +114,7 @@ const AMMETER_BRANCH_CONNECTIONS = {
       circuitNegativeTerminal: '18-endpoint',
       circuitPositiveTerminal: '16-endpoint',
     },
-  ],
+  ], 
 }
 
 export const resolveJsPlumb = (module) => (

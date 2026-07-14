@@ -47,12 +47,27 @@ const READING_ADDED_ALERTS = [
   EXPERIMENT_ALERTS.fourthReadingAdded,
   EXPERIMENT_ALERTS.fifthReadingAdded,
 ]
+const READING_ADDED_AUDIO = [
+  null,
+  SIMULATION_AUDIO.firstReadingAdded,
+  SIMULATION_AUDIO.secondReadingAdded,
+  SIMULATION_AUDIO.thirdReadingAdded,
+  SIMULATION_AUDIO.fourthReadingAdded,
+  SIMULATION_AUDIO.fifthReadingAdded,
+]
 const LOAD_SWITCH_ALERTS = [
   null,
   EXPERIMENT_ALERTS.firstSwitchOn,
   EXPERIMENT_ALERTS.secondSwitchOn,
   EXPERIMENT_ALERTS.thirdSwitchOn,
   EXPERIMENT_ALERTS.fourthSwitchOn,
+]
+const LOAD_SWITCH_AUDIO = [
+  null,
+  SIMULATION_AUDIO.firstSwitchOn,
+  SIMULATION_AUDIO.secondSwitchOn,
+  SIMULATION_AUDIO.thirdSwitchOn,
+  SIMULATION_AUDIO.fourthSwitchOn,
 ]
 
 const formatConnectionList = (connections) => (
@@ -250,6 +265,7 @@ const App = () => {
     }
 
     if (hasDuplicateReading) {
+      playSimulationAudio(SIMULATION_AUDIO.duplicateReading)
       setStatus('This reading already exists in the observation table. Turn ON the next enabled switch before adding the readings.')
       showStepAlert(EXPERIMENT_ALERTS.readingAlreadyExists)
       return
@@ -268,10 +284,9 @@ const App = () => {
     }
     const nextObservationCount = readingCount + 1
     const readingAddedAlert = READING_ADDED_ALERTS[nextObservationCount] ?? EXPERIMENT_ALERTS.readingAdded
+    const readingAddedAudio = READING_ADDED_AUDIO[nextObservationCount]
 
-    if (nextObservationCount === 1) {
-      playSimulationAudio(SIMULATION_AUDIO.firstReadingAdded)
-    }
+    playSimulationAudio(readingAddedAudio)
 
     setObservations([...observations, nextObservation])
     setGraphGenerated(false)
@@ -306,6 +321,7 @@ const App = () => {
   const handleReset = () => {
     clearAlerts()
     resetSimulation()
+    playSimulationAudio(SIMULATION_AUDIO.reset)
   }
 
   const handlePlot = () => {
@@ -323,11 +339,13 @@ const App = () => {
 
     setGraphGenerated(true)
     setReportGenerated(false)
+    playSimulationAudio(SIMULATION_AUDIO.graphPlotted)
     setStatus('Observation graph plotted from the table readings.')
     showStepAlert(EXPERIMENT_ALERTS.graphPlotted)
   }
 
   const handlePrint = () => {
+    playSimulationAudio(SIMULATION_AUDIO.print)
     window.print()
   }
 
@@ -354,6 +372,7 @@ const App = () => {
       return
     }
 
+    playSimulationAudio(SIMULATION_AUDIO.generateReportClick)
     setStatus('Your report has been generated successfully. Click OK to view your report.')
     showStepAlert(EXPERIMENT_ALERTS.reportGenerated, {
       onConfirm: () => {
@@ -468,12 +487,23 @@ const App = () => {
     })
   }
   const handleAutoConnect = () => {
+    const wasAiGuidePlaying = aiGuidePlaying
+
+    if (wasAiGuidePlaying) {
+      stopAiGuide()
+    }
+
     setAutoConnectRequest((current) => current + 1)
     setConnectionsVerified(false)
-    playSimulationAudioSequence([
-      SIMULATION_AUDIO.autoConnect,
-      SIMULATION_AUDIO.forCorrectConnectionsCheckClick,
-    ])
+
+    if (wasAiGuidePlaying) {
+      playSimulationAudio(SIMULATION_AUDIO.autoConnect)
+    } else {
+      playSimulationAudioSequence([
+        SIMULATION_AUDIO.autoConnect,
+        SIMULATION_AUDIO.forCorrectConnectionsCheckClick,
+      ])
+    }
 
     setStatus('Autoconnect Completed. Click on the check button to verify the connections.')
     showStepAlert(EXPERIMENT_ALERTS.circuitConnectionsCompleted, {
@@ -503,12 +533,14 @@ const App = () => {
     setGraphGenerated(false)
     setReportGenerated(false)
     const loadSwitchAlert = LOAD_SWITCH_ALERTS[nextLoadLevel]
+    const loadSwitchAudio = LOAD_SWITCH_AUDIO[nextLoadLevel]
     setStatus(loadSwitchAlert?.description ?? `Lamp load switch ${nextLoadLevel} turned ON. Click ADD to record the reading.`)
+    playSimulationAudio(loadSwitchAudio)
 
     if (loadSwitchAlert) {
       showStepAlert(loadSwitchAlert)
     }
-  }, [nextEnabledLoadLevel, showStepAlert])
+  }, [nextEnabledLoadLevel, playSimulationAudio, showStepAlert])
 
   const handleVoltageChange = useCallback((nextVoltage) => {
     setVoltage(nextVoltage)
