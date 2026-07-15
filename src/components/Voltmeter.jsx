@@ -1,4 +1,4 @@
-import voltmeterImg from '../assets/AC_voltmeter_equal.png'
+import voltmeterImg from '../assets/voltmeter_1.png'
 import useMeterDisplay from '../hooks/useMeterDisplay.js'
 import ApparatusTerminal from './ApparatusTerminal.jsx'
 import MeterNeedle from './MeterNeedle.jsx'

@@ -7,7 +7,7 @@ import Voltmeter from './Voltmeter.jsx'
 import Wattmeter from './Wattmeter.jsx'
 import useMeterDisplay from '../hooks/useMeterDisplay.js'
 import a2MeterImg from '../assets/A2.png'
-import acVoltmeterImg from '../assets/AC_voltmeter_equal.png'
+import lowerVoltmeterImg from '../assets/voltmeter_2.png'
 import transformerImg from '../assets/transformer.png'
 import {
   AUTOTRANSFORMER_OUTPUT_VOLTAGE,
@@ -55,11 +55,13 @@ const EquipmentPanel = ({
           voltage={voltage}
         />
         <article className="under-variac-meter under-variac-meter--voltmeter" id="V2" aria-label="AC voltmeter under variac">
-          <img
-            alt="AC voltmeter"
-            className="under-variac-meter__image"
-            src={acVoltmeterImg}
-          />
+          <span className="under-variac-meter__image-frame">
+            <img
+              alt="AC voltmeter"
+              className="under-variac-meter__image"
+              src={lowerVoltmeterImg}
+            />
+          </span>
           <MeterNeedle className="meter-needle--under-voltmeter" rotation={lowerVoltmeterDisplay.rotation} />
           <ApparatusTerminal number={19} owner="Lower AC voltmeter" polarity="plus" variant="under-voltmeter" />
           <ApparatusTerminal number={20} owner="Lower AC voltmeter" polarity="minus" variant="under-voltmeter" />

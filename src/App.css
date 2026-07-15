@@ -1807,6 +1807,25 @@ input:focus-visible {
   pointer-events: none;
 }
 
+.under-variac-meter__image-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.under-variac-meter--voltmeter .under-variac-meter__image {
+  position: absolute;
+  top: -34.25px;
+  left: 4.8px;
+  width: 152.1px;
+  height: auto;
+  max-width: none;
+  object-fit: unset;
+}
+
 #A2 {
   --under-meter-scale: 1.37;
   top: 460px;
@@ -1969,6 +1988,12 @@ input:focus-visible {
   pointer-events: none;
   transform: translateX(-50%);
   user-select: none;
+}
+
+.lab-meter--voltmeter .lab-meter__image-frame .lab-meter__image {
+  top: -45.5px;
+  width: 205.3px;
+  height: auto;
 }
 
 .lab-meter__image {
