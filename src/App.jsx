@@ -28,9 +28,11 @@ const BASE_WIDTH = 1440
 const BASE_HEIGHT = 960
 const GRAPH_SECTION_GAP = 28
 const RESULTS_GRAPH_SECTION_HEIGHT = 430
+const FOOTER_HEIGHT = 32
 const CONTENT_HEIGHT = BASE_HEIGHT
   + GRAPH_SECTION_GAP
   + RESULTS_GRAPH_SECTION_HEIGHT
+  + FOOTER_HEIGHT
 const PANEL_MAX_SCALE = 1
 const PANEL_VIEWPORT_MARGIN = 32
 const MIN_RENDER_SCALE = 2
@@ -686,6 +688,9 @@ const App = () => {
               observations={observations}
               plotted={graphGenerated}
             />
+            <footer className="simulation-footer">
+              &copy; 2026 Virtual Labs IIT Roorkee
+            </footer>
           </div>
         </div>
       </div>
