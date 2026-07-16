@@ -66,9 +66,9 @@ const EquipmentPanel = ({
           <ApparatusTerminal number={19} owner="Lower AC voltmeter" polarity="plus" variant="under-voltmeter" />
           <ApparatusTerminal number={20} owner="Lower AC voltmeter" polarity="minus" variant="under-voltmeter" />
         </article>
-        <article className="under-variac-meter under-variac-meter--ammeter" id="A2" aria-label="A2 ammeter">
+        <article className="under-variac-meter under-variac-meter--ammeter" id="A2" aria-label="AC Ammeter A2">
           <img
-            alt="A2 meter"
+            alt="AC Ammeter A2"
             className="under-variac-meter__image"
             src={a2MeterImg}
           />

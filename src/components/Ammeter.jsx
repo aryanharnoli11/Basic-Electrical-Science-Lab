@@ -10,9 +10,9 @@ const Ammeter = ({ value = 0 }) => {
   const meterDisplay = useMeterDisplay(numericValue, AMMETER_MAX)
 
   return (
-    <article className="lab-meter lab-meter--image lab-meter--ammeter" id="ammeter-meter" aria-label="A1 ammeter">
+    <article className="lab-meter lab-meter--image lab-meter--ammeter" id="A1" aria-label="AC Ammeter A1">
       <span className="lab-meter__image-frame">
-        <img alt="A1 ammeter" className="lab-meter__image" src={ammeterImg} />
+        <img alt="AC Ammeter A1" className="lab-meter__image" src={ammeterImg} />
       </span>
 
       <MeterNeedle className="meter-needle--ammeter" rotation={meterDisplay.rotation} />

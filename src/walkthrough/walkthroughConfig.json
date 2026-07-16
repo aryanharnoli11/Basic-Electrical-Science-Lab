@@ -164,7 +164,7 @@
     },
     {
       "id": 14,
-      "target": "#ammeter-meter",
+      "target": "#A1",
       "title": {
         "en": "AC Ammeter A1"
       },
