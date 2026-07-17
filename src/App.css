@@ -1869,6 +1869,12 @@ input:focus-visible {
   box-shadow: none;
 }
 
+.lab-meter--wattmeter {
+  top: 5px;
+  width: 150px;
+  height: 190px;
+}
+
 .lab-meter--voltmeter {
   transform: scale(1.02);
   transform-origin: top center;
@@ -1936,7 +1942,7 @@ input:focus-visible {
 }
 
 .meter-needle--voltmeter {
-  --meter-needle-top: 111px;
+  --meter-needle-top: 110px;
   --meter-needle-left: 77px;
   --meter-needle-size: 88px;
 }
@@ -1948,8 +1954,8 @@ input:focus-visible {
 }
 
 .meter-needle--wattmeter {
-  --meter-needle-top: 111px;
-  --meter-needle-left: 79px;
+  --meter-needle-top: 100px;
+  --meter-needle-left: 77px;
   --meter-needle-size: 84px;
 }
 
@@ -1976,35 +1982,35 @@ input:focus-visible {
 }
 
 .wattmeter-terminal-label--main {
-  left: 18.5%;
-  top: -10px;
+  left: 16.5%;
+  top: -20px;
 }
 
 .wattmeter-terminal-label--line {
-  left: 39.5%;
-  top: -10px;
+  left: 38.5%;
+  top: -20px;
 }
 
 .wattmeter-terminal-label--common {
-  left: 61.5%;
-  top: -10px;
+  left: 60.5%;
+  top: -20px;
 }
 
 .wattmeter-terminal-label--voltage {
   left: 82.5%;
-  top: -10px;
+  top: -20px;
 }
 
 .meter-needle--under-voltmeter {
-  --meter-needle-top: 85px;
-  --meter-needle-left: 76px;
-  --meter-needle-size: 70px;
+  --meter-needle-top: 82px;
+  --meter-needle-left: 79px;
+  --meter-needle-size: 68px;
 }
 
 .meter-needle--under-ammeter {
-  --meter-needle-top: 78px;
+  --meter-needle-top: 77px;
   --meter-needle-left: 78px;
-  --meter-needle-size: 60px;
+  --meter-needle-size: 68px;
 }
 
 .lamp-load {

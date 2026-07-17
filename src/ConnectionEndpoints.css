@@ -574,12 +574,12 @@
 
 .endpoint-3 {
   --terminal-base-top: 153px;
-  --terminal-base-left: 28px;
+  --terminal-base-left: 26px;
 }
 
 #label-3 {
   top: 186px;
-  left: 40px;
+  left: 36px;
 }
 
 .endpoint-4 {
@@ -589,12 +589,12 @@
 
 .endpoint-4 {
   --terminal-base-top: 153px;
-  --terminal-base-left: 104px;
+  --terminal-base-left: 106px;
 }
 
 #label-4 {
   top: 186px;
-  left: 114px;
+  left: 116px;
 }
 
 .endpoint-5 {
@@ -608,7 +608,7 @@
 }
 
 #label-5 {
-  top: 186px;
+  top: 188px;
   left: 41px;
 }
 
@@ -619,12 +619,12 @@
 
 .endpoint-6 {
   --terminal-base-top: 148px;
-  --terminal-base-left: 100px;
+  --terminal-base-left: 102px;
 }
 
 #label-6 {
-  top: 186px;
-  left: 115px;
+  top: 188px;
+  left: 113px;
 }
 
 .endpoint-7 {
@@ -633,13 +633,13 @@
 }
 
 .endpoint-7 {
-  --terminal-base-top: 157px;
-  --terminal-base-left: 16px;
+  --terminal-base-top: 146px;
+  --terminal-base-left: 15px;
 }
 
 #label-7 {
   top: 185px;
-  left: 25px;
+  left: 23px;
 }
 
 .endpoint-8 {
@@ -648,13 +648,13 @@
 }
 
 .endpoint-8 {
-  --terminal-base-top: 157px;
-  --terminal-base-left: 50px;
+  --terminal-base-top: 146px;
+  --terminal-base-left: 48px;
 }
 
 #label-8 {
   top: 185px;
-  left: 60px;
+  left: 58px;
 }
 
 .endpoint-9 {
@@ -663,13 +663,13 @@
 }
 
 .endpoint-9 {
-  --terminal-base-top: 157px;
-  --terminal-base-left: 86px;
+  --terminal-base-top: 146px;
+  --terminal-base-left: 81px;
 }
 
 #label-9 {
   top: 185px;
-  left: 97px;
+  left: 92px;
 }
 
 .endpoint-10 {
@@ -678,13 +678,13 @@
 }
 
 .endpoint-10 {
-  --terminal-base-top: 157px;
-  --terminal-base-left: 121px;
+  --terminal-base-top: 146px;
+  --terminal-base-left: 114px;
 }
 
 #label-10 {
   top: 185px;
-  left: 133px;
+  left: 126px;
 }
 
 #label-11,
@@ -823,8 +823,8 @@
 }
 
 .endpoint-19 {
-  --terminal-base-top: 117px;
-  --terminal-base-left: 39.5px;
+  --terminal-base-top: 114px;
+  --terminal-base-left: 41.5px;
 }
 
 #label-19 {
@@ -838,13 +838,13 @@
 }
 
 .endpoint-20 {
-  --terminal-base-top: 117px;
-  --terminal-base-left: 96px;
+  --terminal-base-top: 114px;
+  --terminal-base-left: 101.5px;
 }
 
 #label-20 {
   top: 143px;
-  left: 103px;
+  left: 108px;
 }
 
 .endpoint-21 {
@@ -853,13 +853,13 @@
 }
 
 .endpoint-21 {
-  --terminal-base-top: 112px;
-  --terminal-base-left: 47px;
+  --terminal-base-top: 113px;
+  --terminal-base-left: 43px;
 }
 
 #label-21 {
   top: 138px;
-  left: 52px;
+  left: 50px;
 }
 
 .endpoint-22 {
@@ -868,13 +868,13 @@
 }
 
 .endpoint-22 {
-  --terminal-base-top: 112px;
-  --terminal-base-left: 92.5px;
+  --terminal-base-top: 112.5px;
+  --terminal-base-left: 95.5px;
 }
 
 #label-22 {
   top: 138px;
-  left: 100px;
+  left: 102px;
 }
 
 .endpoint-23 {
