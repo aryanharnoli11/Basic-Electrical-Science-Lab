@@ -83,7 +83,7 @@ const formatAxisTick = (value) => {
   return value.toFixed(1).replace(/\.0$/, '')
 }
 
-const formatTooltipValue = (value) => value.toFixed(1)
+const formatTooltipValue = (value) => value.toFixed(2).replace(/0$/, '')
 
 const getChartPoint = (point, xMax, yMax) => ({
   ...point,
@@ -257,7 +257,7 @@ const ResultsGraphs = ({ minReadings = 0, observations = [], plotted = false }) 
   return (
     <section className="results-graphs-panel" id="results-graphs-panel" aria-label="Experiment result graphs">
       <div className="results-graphs-panel__heading">
-        <h2>RESULT GRAPHS</h2>
+        <h2>GRAPHS</h2>
       </div>
       <div className="results-graphs-grid">
         {drawEfficiencyGraph(graphData.efficiency)}

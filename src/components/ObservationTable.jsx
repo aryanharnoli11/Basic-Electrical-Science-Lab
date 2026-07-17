@@ -7,6 +7,10 @@ const formatNumber = (value, digits) => (
   Number.isFinite(value) ? value.toFixed(digits) : ''
 )
 
+const formatResultNumber = (value) => (
+  Number.isFinite(value) ? value.toFixed(2).replace(/0$/, '') : ''
+)
+
 const getNumber = (...values) => {
   const value = values.find((currentValue) => Number.isFinite(currentValue))
 
@@ -62,8 +66,8 @@ const ObservationTable = ({ observations }) => (
                 <td>{formatNumber(secondaryVoltage, 1)}</td>
                 <td>{formatNumber(secondaryCurrent, 3)}</td>
                 <td>{formatNumber(secondaryPower, 1)}</td>
-                <td>{formatNumber(voltageRegulation, 1)}</td>
-                <td>{formatNumber(efficiency, 1)}</td>
+                <td>{formatResultNumber(voltageRegulation)}</td>
+                <td>{formatResultNumber(efficiency)}</td>
               </tr>
             )
           })}

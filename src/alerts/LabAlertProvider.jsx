@@ -79,6 +79,15 @@ const alertReducer = (state, action) => {
         ...state,
         queue: [...state.queue, action.alert],
       })
+    case 'replace-center':
+      return pumpAlertQueue({
+        ...state,
+        centerAlert: null,
+        queue: [
+          action.alert,
+          ...state.queue.filter((alert) => alert.placement !== 'center'),
+        ],
+      })
     default:
       return state
   }
@@ -146,10 +155,24 @@ const LabAlertProvider = ({ children }) => {
       recentAlertsRef.current.set(dedupeKey, now)
     }
 
-    dispatchAlert({ alert: nextAlert, type: 'enqueue' })
+    const replacesCenterAlert = nextAlert.placement === 'center' && nextAlert.replaceCurrent !== false
+
+    if (replacesCenterAlert) {
+      const currentState = alertStateRef.current
+
+      releaseDedupeKey(currentState.centerAlert)
+      currentState.queue
+        .filter((queuedAlert) => queuedAlert.placement === 'center')
+        .forEach(releaseDedupeKey)
+    }
+
+    dispatchAlert({
+      alert: nextAlert,
+      type: replacesCenterAlert ? 'replace-center' : 'enqueue',
+    })
 
     return nextAlert.id
-  }, [normalizeAlert])
+  }, [normalizeAlert, releaseDedupeKey])
 
   const showStepAlert = useCallback((preset, overrides = {}) => (
     showAlert({ ...preset, ...overrides })

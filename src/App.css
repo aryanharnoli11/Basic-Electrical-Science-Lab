@@ -1641,10 +1641,10 @@ input:focus-visible {
 .variac-device__knob {
   position: absolute;
   top: 48px;
-  left: 50px;
+  left: 48.5px;
   z-index: 2;
-  width: 40px;
-  height: 40px;
+  width: 43px;
+  height: 41px;
   object-fit: contain;
   pointer-events: none;
   transform-origin: center center;

@@ -1,7 +1,7 @@
 import SectionCard from './SectionCard.jsx'
 
 const FormulaSection = () => (
-  <SectionCard className="formula-section-card" id="formula-section-panel" title="FORMULAS">
+  <SectionCard className="formula-section-card" icon="formula" id="formula-section-panel" title="FORMULAS">
     <div className="formula-section" aria-label="Formula section">
       <div className="formula-section__list">
         <div className="formula-section__item">

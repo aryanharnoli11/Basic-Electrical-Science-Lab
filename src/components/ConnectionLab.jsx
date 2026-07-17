@@ -10,6 +10,7 @@ import {
   autoConnectDefaultCircuit,
   deleteConnectionsForTerminal,
   hasConnectionBetween,
+  isWrongConnection,
   resolveJsPlumb,
   syncWireAnchors,
   updateTerminalConnectionStates,
@@ -26,9 +27,12 @@ const ConnectionLab = ({
   highlightedTerminalIds = [],
   nextEnabledLoadLevel,
   onCheckConnections,
+  onAutoConnectReady,
   onConnectionRemovalBlocked,
   onGuideConnectionComplete,
   onLoadLevelChange,
+  onValidateConnectionsReady,
+  onWrongConnectionMade,
   powerOn,
   readings,
   resetRequest,
@@ -41,8 +45,11 @@ const ConnectionLab = ({
   const labRef = useRef(null)
   const instanceRef = useRef(null)
   const activeGuideConnectionRef = useRef(activeGuideConnection)
+  const onAutoConnectReadyRef = useRef(onAutoConnectReady)
   const onConnectionRemovalBlockedRef = useRef(onConnectionRemovalBlocked)
   const onGuideConnectionCompleteRef = useRef(onGuideConnectionComplete)
+  const onValidateConnectionsReadyRef = useRef(onValidateConnectionsReady)
+  const onWrongConnectionMadeRef = useRef(onWrongConnectionMade)
   const powerOnRef = useRef(powerOn)
   const wireCurvinessConfigSignatureRef = useRef(WIRE_CURVINESS_CONFIG_SIGNATURE)
 
@@ -60,12 +67,24 @@ const ConnectionLab = ({
   }, [])
 
   useEffect(() => {
+    onAutoConnectReadyRef.current = onAutoConnectReady
+  }, [onAutoConnectReady])
+
+  useEffect(() => {
     onConnectionRemovalBlockedRef.current = onConnectionRemovalBlocked
   }, [onConnectionRemovalBlocked])
 
   useEffect(() => {
     onGuideConnectionCompleteRef.current = onGuideConnectionComplete
   }, [onGuideConnectionComplete])
+
+  useEffect(() => {
+    onValidateConnectionsReadyRef.current = onValidateConnectionsReady
+  }, [onValidateConnectionsReady])
+
+  useEffect(() => {
+    onWrongConnectionMadeRef.current = onWrongConnectionMade
+  }, [onWrongConnectionMade])
 
   useEffect(() => {
     activeGuideConnectionRef.current = activeGuideConnection
@@ -150,6 +169,13 @@ const ConnectionLab = ({
         notifyGuideConnectionIfMatched()
       }
 
+      const autoConnectCircuit = () => {
+        syncWireAnchors(labRef.current, activeInstance)
+        autoConnectDefaultCircuit(activeInstance)
+        activeInstance.repaintEverything?.()
+        updateTerminalConnectionStates(activeInstance)
+      }
+
       activeInstance.bind('beforeDrop', ({ sourceId, targetId }) => {
         return sourceId !== targetId
       })
@@ -161,13 +187,23 @@ const ConnectionLab = ({
         onConnectionRemovalBlockedRef.current?.()
         return false
       })
-      activeInstance.bind('connection', refreshWiring)
+      activeInstance.bind('connection', (connectionInfo) => {
+        refreshWiring()
+
+        const connection = connectionInfo?.connection ?? connectionInfo
+
+        if (isWrongConnection(activeInstance, connection)) {
+          onWrongConnectionMadeRef.current?.()
+        }
+      })
       activeInstance.bind('connectionDetached', refreshWiring)
       activeInstance.bind('connectionMoved', refreshWiring)
 
       syncWireAnchors(labRef.current)
       addAllEndpoints(activeInstance)
       instanceRef.current = activeInstance
+      onAutoConnectReadyRef.current?.(autoConnectCircuit)
+      onValidateConnectionsReadyRef.current?.(() => validateOldExperimentConnections(activeInstance))
 
       const scheduleRefresh = () => {
         window.requestAnimationFrame(refreshWiring)
@@ -218,6 +254,8 @@ const ConnectionLab = ({
       activeInstance?.deleteEveryConnection?.()
       activeInstance?.deleteEveryEndpoint?.()
       activeInstance?.reset?.()
+      onAutoConnectReadyRef.current?.(null)
+      onValidateConnectionsReadyRef.current?.(null)
     }
   }, [notifyGuideConnectionIfMatched, resetRequest])
 
@@ -262,7 +300,11 @@ const ConnectionLab = ({
       return
     }
 
-    onCheckConnections(validateOldExperimentConnections(instance))
+    const frameId = window.requestAnimationFrame(() => {
+      onCheckConnections(validateOldExperimentConnections(instance))
+    })
+
+    return () => window.cancelAnimationFrame(frameId)
   }, [checkRequest, onCheckConnections])
 
   useEffect(() => {

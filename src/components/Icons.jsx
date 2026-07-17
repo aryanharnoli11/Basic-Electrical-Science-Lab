@@ -88,6 +88,22 @@ export const TableIcon = () => (
   </svg>
 )
 
+export const FormulaIcon = () => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+  >
+    <path d="M3 12h2l3 9 5-17h8" />
+    <path d="M15 11l4 5" />
+    <path d="M19 11l-4 5" />
+  </svg>
+)
+
 export const ActionButtonsIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 32 32">
     <circle cx="14.7" cy="8.7" fill="currentColor" r="6.7" />

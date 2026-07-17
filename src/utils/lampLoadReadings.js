@@ -10,6 +10,14 @@ export const LAMP_LOAD_READING_BY_LEVEL = {
   4: { a1Current: 3.37, a2Current: 8.2, lowerVoltage: 112, wattmeterPower: 495 },
 }
 
+const OBSERVATION_RESULT_BY_LEVEL = {
+  0: { voltageRegulation: 0.0, efficiency: 0.0 },
+  1: { voltageRegulation: 1.72, efficiency: 75.65 },
+  2: { voltageRegulation: 3.05, efficiency: 86.46 },
+  3: { voltageRegulation: 5.53, efficiency: 90.18 },
+  4: { voltageRegulation: 5.53, efficiency: 92.76 },
+}
+
 const clampLoadLevel = (loadLevel) => (
   Math.min(Math.max(Math.trunc(Number(loadLevel) || 0), 0), MAX_LAMP_LOAD_LEVEL)
 )
@@ -28,10 +36,7 @@ export const createTransformerObservation = ({ id, loadLevel }) => {
   const secondaryVoltage = reading.lowerVoltage
   const secondaryCurrent = reading.a2Current
   const secondaryPower = secondaryVoltage * secondaryCurrent
-  const voltageRegulation = secondaryCurrent > 0
-    ? ((NO_LOAD_SECONDARY_VOLTAGE - secondaryVoltage) / secondaryVoltage) * 100
-    : 0
-  const efficiency = primaryPower > 0 ? (secondaryPower / primaryPower) * 100 : 0
+  const { efficiency, voltageRegulation } = OBSERVATION_RESULT_BY_LEVEL[normalizedLoadLevel]
 
   return {
     efficiency,

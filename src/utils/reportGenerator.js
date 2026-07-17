@@ -38,6 +38,10 @@ const formatNumber = (value, fractionDigits = 1) => (
   toNumber(value).toFixed(fractionDigits)
 )
 
+const formatResultNumber = (value) => (
+  toNumber(value).toFixed(2).replace(/0$/, '')
+)
+
 const formatTick = (value) => {
   if (Math.abs(value) >= 100) {
     return value.toFixed(0)
@@ -179,7 +183,7 @@ const createReportGraphSvg = ({
 
   const pointMarkup = chartPoints.map((point) => (
     `<circle class="report-graph__point" cx="${point.x}" cy="${point.y}" r="4.5">
-      <title>Output Power: ${formatNumber(point.outputPower, 1)} W; ${escapeHtml(yAxisLabel)}: ${formatNumber(point.value, 1)}</title>
+      <title>Output Power: ${formatNumber(point.outputPower, 1)} W; ${escapeHtml(yAxisLabel)}: ${formatResultNumber(point.value)}</title>
     </circle>`
   )).join('')
 
@@ -251,8 +255,8 @@ const createObservationRows = (observations) => (
       <td>${formatNumber(row.secondaryVoltage, 1)}</td>
       <td>${formatNumber(row.secondaryCurrent, 3)}</td>
       <td>${formatNumber(row.secondaryPower, 1)}</td>
-      <td>${formatNumber(row.voltageRegulation, 1)}</td>
-      <td>${formatNumber(row.efficiency, 1)}</td>
+      <td>${formatResultNumber(row.voltageRegulation)}</td>
+      <td>${formatResultNumber(row.efficiency)}</td>
     </tr>
   `).join('')
 )
@@ -277,9 +281,9 @@ const createSummaryRows = (observations) => {
     <tr><th>Rated Primary Voltage Used</th><td>${formatNumber(AUTOTRANSFORMER_OUTPUT_VOLTAGE, 1)} V</td></tr>
     <tr><th>No-load Secondary Voltage</th><td>${formatNumber(NO_LOAD_SECONDARY_VOLTAGE, 1)} V</td></tr>
     <tr><th>Maximum Output Power</th><td>${formatNumber(maxOutputPower, 1)} W</td></tr>
-    <tr><th>Maximum Efficiency</th><td>${formatNumber(highestEfficiencyRow?.efficiency, 1)}% at ${formatNumber(highestEfficiencyRow?.secondaryPower, 1)} W</td></tr>
-    <tr><th>Full-load Efficiency</th><td>${formatNumber(fullLoadRow?.efficiency, 1)}%</td></tr>
-    <tr><th>Full-load Voltage Regulation</th><td>${formatNumber(fullLoadRow?.voltageRegulation, 1)}%</td></tr>
+    <tr><th>Maximum Efficiency</th><td>${formatResultNumber(highestEfficiencyRow?.efficiency)}% at ${formatNumber(highestEfficiencyRow?.secondaryPower, 1)} W</td></tr>
+    <tr><th>Full-load Efficiency</th><td>${formatResultNumber(fullLoadRow?.efficiency)}%</td></tr>
+    <tr><th>Full-load Voltage Regulation</th><td>${formatResultNumber(fullLoadRow?.voltageRegulation)}%</td></tr>
   `
 }
 
@@ -911,7 +915,7 @@ tr:nth-child(even) {
 
         <div class="results-card">
           <h3>Conclusion</h3>
-          <p style="text-align: justify;">The transformer load-test observations show how efficiency and voltage regulation vary with output power. At the highest recorded load of ${formatNumber(fullLoadRow?.secondaryPower, 1)} W, the simulated transformer efficiency is ${formatNumber(fullLoadRow?.efficiency, 1)}% and the voltage regulation is ${formatNumber(fullLoadRow?.voltageRegulation, 1)}%.</p>
+          <p style="text-align: justify;">The transformer load-test observations show how efficiency and voltage regulation vary with output power. At the highest recorded load of ${formatNumber(fullLoadRow?.secondaryPower, 1)} W, the simulated transformer efficiency is ${formatResultNumber(fullLoadRow?.efficiency)}% and the voltage regulation is ${formatResultNumber(fullLoadRow?.voltageRegulation)}%.</p>
         </div>
       </div>
     </div>

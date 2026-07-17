@@ -37,7 +37,7 @@ export const WIRE_CONNECTOR_TYPE = 'Bezier'
 export const DEFAULT_WIRE_CURVINESS = 135
 export const WIRE_MARGIN = 0
 export const WIRE_PROXIMITY_LIMIT = 0
-export const WIRE_ANCHOR = ['Bottom']
+export const WIRE_ANCHOR = [0.5, 0.5, 0, 1]
 export const DEFAULT_WIRE_CONNECTOR_OPTIONS = {
   curviness: DEFAULT_WIRE_CURVINESS,
   margin: WIRE_MARGIN,
@@ -306,6 +306,38 @@ const getTerminalNumber = (terminalId) => terminalId.replace('-endpoint', '')
 const getConnectionKey = (firstTerminal, secondTerminal) => (
   [firstTerminal, secondTerminal].sort().join('|')
 )
+
+export const isRequiredConnection = (firstTerminal, secondTerminal) => (
+  REQUIRED_CONNECTIONS.some(([requiredFirst, requiredSecond]) => (
+    getConnectionKey(requiredFirst, requiredSecond) === getConnectionKey(firstTerminal, secondTerminal)
+  ))
+)
+
+export const isWrongConnection = (instance, connection) => {
+  const sourceId = connection?.sourceId || connection?.source?.id
+  const targetId = connection?.targetId || connection?.target?.id
+
+  if (!sourceId || !targetId) {
+    return false
+  }
+
+  const connectionKey = getConnectionKey(sourceId, targetId)
+
+  if (!isRequiredConnection(sourceId, targetId)) {
+    return true
+  }
+
+  return getAllConnections(instance).filter((currentConnection) => {
+    const currentSourceId = currentConnection.sourceId || currentConnection.source?.id
+    const currentTargetId = currentConnection.targetId || currentConnection.target?.id
+
+    if (!currentSourceId || !currentTargetId) {
+      return false
+    }
+
+    return getConnectionKey(currentSourceId, currentTargetId) === connectionKey
+  }).length > 1
+}
 
 const getConnectionCurvinessKey = (firstTerminal, secondTerminal) => (
   [getTerminalNumber(firstTerminal), getTerminalNumber(secondTerminal)]

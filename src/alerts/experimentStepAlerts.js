@@ -45,7 +45,7 @@ export const EXPERIMENT_ALERTS = {
   },
   autotransformerReadingsReady: {
     target: '#add-reading-button',
-    title: 'The readings are now displayed on the meters. Now, click on the add button to add the readings to the observation table',
+    title: 'The voltage has been set to 230 volts. The readings are now displayed on the voltmeters, ammeter, and wattmeter. Now, click on the Add button to add the readings to the observation table.',
     type: 'info',
   },
   voltageSafetyLimit: {
