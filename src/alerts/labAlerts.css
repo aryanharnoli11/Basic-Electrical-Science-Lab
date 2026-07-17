@@ -168,6 +168,7 @@
   line-height: 1.35;
   text-align: justify;
   text-justify: inter-word;
+  white-space: pre-line;
 }
 
 .lab-alert-card__tools {

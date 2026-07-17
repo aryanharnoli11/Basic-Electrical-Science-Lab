@@ -1,7 +1,7 @@
 const SIMULATION_AUDIO_BASE_PATH = '/simulation-audios/'
 
 export const simulationAudioUrl = (fileName) => (
-  `${SIMULATION_AUDIO_BASE_PATH}${encodeURIComponent(fileName)}`
+  `${SIMULATION_AUDIO_BASE_PATH}${encodeURIComponent(fileName).replace(/%2C/gi, ',')}`
 )
 
 export const SIMULATION_AUDIO = {

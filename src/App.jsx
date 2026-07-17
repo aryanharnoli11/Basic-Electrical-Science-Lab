@@ -84,7 +84,7 @@ const getWrongConnectionDescription = ({ missingConnections = [], wrongConnectio
     alertParts.push(`Missing connections: ${formatConnectionList(missingConnections)}.`)
   }
 
-  return alertParts.join(' ')
+  return alertParts.join('\n\n')
 }
 
 const getMissingConnectionDescription = ({ missingConnections = [] }) => (
@@ -98,6 +98,24 @@ const getConnectionResultAudio = ({ missingConnections = [], wrongConnections = 
 
   if (totalErrors <= 1) {
     return SIMULATION_AUDIO.wrongConnection
+  }
+
+  return SIMULATION_AUDIO.multipleWrongConnections
+}
+
+const getCheckResultAudio = (result, checkedAfterAutoConnect) => {
+  if (result.isCorrect) {
+    return checkedAfterAutoConnect
+      ? SIMULATION_AUDIO.forCorrectConnectionsCheckClick
+      : SIMULATION_AUDIO.correctConnections
+  }
+
+  if (result.totalConnections === 0) {
+    return SIMULATION_AUDIO.multipleWrongConnections
+  }
+
+  if (result.wrongConnections?.length > 0 || result.missingConnections?.length > 0) {
+    return getConnectionResultAudio(result)
   }
 
   return SIMULATION_AUDIO.multipleWrongConnections
@@ -154,6 +172,7 @@ const App = () => {
   const [resetRequest, setResetRequest] = useState(0)
   const [connectionsVerified, setConnectionsVerified] = useState(false)
   const [sessionStart, setSessionStart] = useState(() => Date.now())
+  const autoConnectAwaitingCheckRef = useRef(false)
   const autotransformerReadyAlertShownRef = useRef(false)
   const autoConnectCircuitRef = useRef(null)
   const validateConnectionsRef = useRef(null)
@@ -317,6 +336,7 @@ const App = () => {
     setConnectionsVerified(false)
     setResetRequest((current) => current + 1)
     setSessionStart(Date.now())
+    autoConnectAwaitingCheckRef.current = false
     autotransformerReadyAlertShownRef.current = false
     voltageLimitWarningShownRef.current = false
     setStatus('The simulation has been reset. You can start again.')
@@ -401,8 +421,13 @@ const App = () => {
   const scaledWidth = Math.ceil(BASE_WIDTH * scale)
   const scaledHeight = Math.ceil(CONTENT_HEIGHT * scale)
   const handleCheckConnections = useCallback((result) => {
+    const checkedAfterAutoConnect = autoConnectAwaitingCheckRef.current
+    const checkResultAudio = getCheckResultAudio(result, checkedAfterAutoConnect)
+
+    autoConnectAwaitingCheckRef.current = false
+    playSimulationAudio(checkResultAudio)
+
     if (result.isCorrect) {
-      playSimulationAudio(SIMULATION_AUDIO.forCorrectConnectionsCheckClick)
       setConnectionsVerified(true)
 
       setStatus('Connections are correct, click on the MCB to turn it ON.')
@@ -418,7 +443,6 @@ const App = () => {
     setConnectionsVerified(false)
 
     if (result.totalConnections === 0) {
-      playSimulationAudio(SIMULATION_AUDIO.multipleWrongConnections)
       setStatus('Please make the connections first.')
       showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
         description: 'No circuit wires were found. Drag node connections before checking.',
@@ -428,7 +452,6 @@ const App = () => {
     }
 
     if (result.wrongConnections?.length > 0) {
-      playSimulationAudio(getConnectionResultAudio(result))
       const description = getWrongConnectionDescription(result)
       const title = result.wrongConnections.length === 1
         ? 'Wrong connection'
@@ -444,7 +467,6 @@ const App = () => {
     }
 
     if (result.missingConnections?.length > 0) {
-      playSimulationAudio(getConnectionResultAudio(result))
       const description = getMissingConnectionDescription(result)
 
       setStatus(description)
@@ -460,7 +482,6 @@ const App = () => {
     setStatus(
       `Invalid connections. Correct matched points: ${result.matchedCount}; total wires: ${result.totalConnections}.`,
     )
-    playSimulationAudio(SIMULATION_AUDIO.multipleWrongConnections)
     showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
       description: `Matched ${result.matchedCount} of 15 required wire pairs from ${result.totalConnections} total wires.`,
     })
@@ -526,6 +547,7 @@ const App = () => {
     }
 
     setConnectionsVerified(false)
+    autoConnectAwaitingCheckRef.current = true
 
     playSimulationAudio(SIMULATION_AUDIO.autoConnect)
 
