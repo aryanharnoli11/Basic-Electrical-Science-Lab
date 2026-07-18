@@ -39,6 +39,7 @@ const MIN_RENDER_SCALE = 2
 const MAX_RENDER_SCALE = 3
 const MAX_OBSERVATIONS = MAX_LAMP_LOAD_LEVEL + 1
 const MIN_GRAPH_READINGS = MAX_OBSERVATIONS
+const REQUIRED_CONNECTION_COUNT = 15
 const VOLTAGE_SAFETY_LIMIT = 240
 const VOLTAGE_SAFETY_RESET = 220
 const READING_ADDED_ALERTS = [
@@ -71,6 +72,98 @@ const LOAD_SWITCH_AUDIO = [
   SIMULATION_AUDIO.thirdSwitchOn,
   SIMULATION_AUDIO.fourthSwitchOn,
 ]
+
+const EMPTY_WIRING_PROGRESS = {
+  isCorrect: false,
+  matchedCount: 0,
+  missingConnections: [],
+  totalConnections: 0,
+  wrongConnections: [],
+}
+
+const getWiringProgressSignature = (progress = EMPTY_WIRING_PROGRESS) => (
+  [
+    progress.isCorrect ? 'correct' : 'pending',
+    progress.matchedCount ?? 0,
+    progress.totalConnections ?? 0,
+    progress.missingConnections?.map((connection) => connection.label).join(',') ?? '',
+    progress.wrongConnections?.map((connection) => connection.label).join(',') ?? '',
+  ].join('|')
+)
+
+const getActiveInstruction = ({
+  connectionsVerified,
+  graphGenerated,
+  normalizedVoltage,
+  powerOn,
+  readingCount,
+  reportGenerated,
+  wiringProgress,
+}) => {
+  if (!connectionsVerified) {
+    const totalConnections = wiringProgress?.totalConnections ?? 0
+    const activeConnectionPair = wiringProgress?.missingConnections?.[0]?.label ?? '1-11'
+
+    if (totalConnections >= REQUIRED_CONNECTION_COUNT || wiringProgress?.isCorrect) {
+      return {
+        connectionPair: null,
+        stepId: 'check',
+      }
+    }
+
+    return {
+      connectionPair: activeConnectionPair,
+      stepId: 'connections',
+    }
+  }
+
+  if (!powerOn) {
+    return {
+      connectionPair: null,
+      stepId: 'mcb',
+    }
+  }
+
+  if (normalizedVoltage < AUTOTRANSFORMER_OUTPUT_VOLTAGE) {
+    return {
+      connectionPair: null,
+      stepId: 'voltage',
+    }
+  }
+
+  if (readingCount === 0) {
+    return {
+      connectionPair: null,
+      stepId: 'noLoadReading',
+    }
+  }
+
+  if (readingCount <= MAX_LAMP_LOAD_LEVEL) {
+    return {
+      connectionPair: null,
+      stepId: `load${readingCount}`,
+    }
+  }
+
+  if (!graphGenerated) {
+    return {
+      connectionPair: null,
+      stepId: 'plot',
+    }
+  }
+
+  if (!reportGenerated) {
+    return {
+      connectionPair: null,
+      stepId: 'report',
+    }
+  }
+
+  return {
+    connectionPair: null,
+    stepId: 'finish',
+  }
+}
 
 const formatConnectionList = (connections) => (
   connections.map((connection) => connection.label).join(', ')
@@ -170,6 +263,7 @@ const App = () => {
   const [resetRequest, setResetRequest] = useState(0)
   const [connectionsVerified, setConnectionsVerified] = useState(false)
   const [sessionStart, setSessionStart] = useState(() => Date.now())
+  const [wiringProgress, setWiringProgress] = useState(EMPTY_WIRING_PROGRESS)
   const autotransformerReadyAlertShownRef = useRef(false)
   const autoConnectCircuitRef = useRef(null)
   const validateConnectionsRef = useRef(null)
@@ -208,6 +302,43 @@ const App = () => {
   )
     ? activeLoadLevel + 1
     : 0
+
+  const activeInstruction = useMemo(() => getActiveInstruction({
+    connectionsVerified,
+    graphGenerated,
+    normalizedVoltage,
+    powerOn,
+    readingCount,
+    reportGenerated,
+    wiringProgress,
+  }), [
+    connectionsVerified,
+    graphGenerated,
+    normalizedVoltage,
+    powerOn,
+    readingCount,
+    reportGenerated,
+    wiringProgress,
+  ])
+
+  const handleWiringChange = useCallback((nextProgress) => {
+    const normalizedProgress = nextProgress ?? EMPTY_WIRING_PROGRESS
+
+    setWiringProgress((currentProgress) => (
+      getWiringProgressSignature(currentProgress) === getWiringProgressSignature(normalizedProgress)
+        ? currentProgress
+        : normalizedProgress
+    ))
+
+    if (
+      connectionsVerified
+      && !powerOn
+      && normalizedProgress !== EMPTY_WIRING_PROGRESS
+      && !normalizedProgress.isCorrect
+    ) {
+      setConnectionsVerified(false)
+    }
+  }, [connectionsVerified, powerOn])
 
   const handleAiGuideStart = useCallback(() => {
     setStatus('AI Guide narration started.')
@@ -331,6 +462,7 @@ const App = () => {
     setAutoConnectRequest(0)
     setCheckRequest(0)
     setConnectionsVerified(false)
+    setWiringProgress(EMPTY_WIRING_PROGRESS)
     setResetRequest((current) => current + 1)
     setSessionStart(Date.now())
     autotransformerReadyAlertShownRef.current = false
@@ -641,9 +773,11 @@ const App = () => {
               <section className="workspace-grid">
                 <aside className="left-panel">
                   <ActionButtons
+                    activeConnectionPair={activeInstruction.connectionPair}
                     activeButtons={{
                       onAiGuide: aiGuidePlaying,
                     }}
+                    activeInstructionStepId={activeInstruction.stepId}
                     disabledButtons={{
                       onAdd: !canAddReading,
                       onAutoConnect: connectionsVerified || powerOn,
@@ -696,6 +830,7 @@ const App = () => {
                     onGuideConnectionComplete={handleAiGuideConnectionComplete}
                     onLoadLevelChange={handleLoadLevelChange}
                     onValidateConnectionsReady={handleValidateConnectionsReady}
+                    onWiringChange={handleWiringChange}
                     onWrongConnectionMade={handleWrongConnectionMade}
                     powerOn={powerOn}
                     r1={r1}

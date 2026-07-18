@@ -406,7 +406,7 @@
 
 .action-instructions-panel__steps {
   display: grid;
-  gap: 11px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -416,17 +416,56 @@
   line-height: 1.35;
 }
 
+.action-instructions-panel__step,
+.action-instructions-panel__note {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 7px 9px;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.action-instructions-panel__step--active {
+  border-color: rgba(21, 123, 92, 0.58);
+  color: #162f25;
+  background:
+    linear-gradient(180deg, rgba(224, 255, 241, 0.96), rgba(190, 242, 220, 0.9));
+  box-shadow:
+    inset 4px 0 0 #1c9a73,
+    0 4px 10px rgba(25, 100, 75, 0.16);
+}
+
 .action-instructions-panel__steps strong {
   color: #6d3d1c;
   font-weight: 900;
 }
 
+.action-instructions-panel__step--active > strong {
+  color: #126147;
+}
+
 .action-instructions-panel__substeps {
   display: grid;
-  gap: 6px;
-  margin: 8px 0 0 18px;
+  gap: 5px;
+  margin: 8px 0 0 10px;
   padding: 0 0 0 12px;
   list-style: disc;
+}
+
+.action-instructions-panel__substep {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 6px;
+}
+
+.action-instructions-panel__substep--active {
+  border-color: rgba(13, 93, 154, 0.44);
+  color: #173652;
+  background: rgba(219, 239, 255, 0.96);
+  box-shadow: inset 3px 0 0 #2878bd;
 }
 
 .action-instructions-panel__substeps code {

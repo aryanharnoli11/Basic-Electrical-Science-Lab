@@ -32,6 +32,7 @@ const ConnectionLab = ({
   onGuideConnectionComplete,
   onLoadLevelChange,
   onValidateConnectionsReady,
+  onWiringChange,
   onWrongConnectionMade,
   powerOn,
   readings,
@@ -49,6 +50,7 @@ const ConnectionLab = ({
   const onConnectionRemovalBlockedRef = useRef(onConnectionRemovalBlocked)
   const onGuideConnectionCompleteRef = useRef(onGuideConnectionComplete)
   const onValidateConnectionsReadyRef = useRef(onValidateConnectionsReady)
+  const onWiringChangeRef = useRef(onWiringChange)
   const onWrongConnectionMadeRef = useRef(onWrongConnectionMade)
   const powerOnRef = useRef(powerOn)
   const wireCurvinessConfigSignatureRef = useRef(WIRE_CURVINESS_CONFIG_SIGNATURE)
@@ -66,6 +68,14 @@ const ConnectionLab = ({
     }
   }, [])
 
+  const notifyWiringChange = useCallback(() => {
+    const instance = instanceRef.current
+
+    onWiringChangeRef.current?.(
+      instance ? validateOldExperimentConnections(instance) : null,
+    )
+  }, [])
+
   useEffect(() => {
     onAutoConnectReadyRef.current = onAutoConnectReady
   }, [onAutoConnectReady])
@@ -81,6 +91,10 @@ const ConnectionLab = ({
   useEffect(() => {
     onValidateConnectionsReadyRef.current = onValidateConnectionsReady
   }, [onValidateConnectionsReady])
+
+  useEffect(() => {
+    onWiringChangeRef.current = onWiringChange
+  }, [onWiringChange])
 
   useEffect(() => {
     onWrongConnectionMadeRef.current = onWrongConnectionMade
@@ -166,6 +180,7 @@ const ConnectionLab = ({
         applyAllWireCurviness(activeInstance)
         activeInstance.repaintEverything?.()
         updateTerminalConnectionStates(activeInstance)
+        notifyWiringChange()
         notifyGuideConnectionIfMatched()
       }
 
@@ -174,6 +189,7 @@ const ConnectionLab = ({
         autoConnectDefaultCircuit(activeInstance)
         activeInstance.repaintEverything?.()
         updateTerminalConnectionStates(activeInstance)
+        notifyWiringChange()
       }
 
       activeInstance.bind('beforeDrop', ({ sourceId, targetId }) => {
@@ -256,8 +272,9 @@ const ConnectionLab = ({
       activeInstance?.reset?.()
       onAutoConnectReadyRef.current?.(null)
       onValidateConnectionsReadyRef.current?.(null)
+      onWiringChangeRef.current?.(null)
     }
-  }, [notifyGuideConnectionIfMatched, resetRequest])
+  }, [notifyGuideConnectionIfMatched, notifyWiringChange, resetRequest])
 
   useEffect(() => {
     const instance = instanceRef.current
@@ -271,8 +288,9 @@ const ConnectionLab = ({
       autoConnectDefaultCircuit(instance)
       instance.repaintEverything?.()
       updateTerminalConnectionStates(instance)
+      notifyWiringChange()
     })
-  }, [autoConnectRequest])
+  }, [autoConnectRequest, notifyWiringChange])
 
   useEffect(() => {
     if (wireCurvinessConfigSignatureRef.current === WIRE_CURVINESS_CONFIG_SIGNATURE) {
@@ -318,8 +336,9 @@ const ConnectionLab = ({
       syncWireAnchors(labRef.current, instance)
       instance.repaintEverything?.()
       updateTerminalConnectionStates(instance)
+      notifyWiringChange()
     })
-  }, [scale])
+  }, [notifyWiringChange, scale])
 
   useEffect(() => {
     const labElement = labRef.current
@@ -346,6 +365,7 @@ const ConnectionLab = ({
         syncWireAnchors(labRef.current, instance)
         instance.repaintEverything?.()
         updateTerminalConnectionStates(instance)
+        notifyWiringChange()
       }
     }
 
@@ -401,7 +421,7 @@ const ConnectionLab = ({
       labElement.removeEventListener('click', handleLabelClick)
       labElement.removeEventListener('keydown', handleLabelKeyDown)
     }
-  }, [])
+  }, [notifyWiringChange])
 
   return (
     <div className="connection-lab" id="connection-lab" ref={labRef} aria-label="Experiment apparatus area">
