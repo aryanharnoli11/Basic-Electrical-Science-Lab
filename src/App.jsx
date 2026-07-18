@@ -103,11 +103,9 @@ const getConnectionResultAudio = ({ missingConnections = [], wrongConnections = 
   return SIMULATION_AUDIO.multipleWrongConnections
 }
 
-const getCheckResultAudio = (result, checkedAfterAutoConnect) => {
+const getCheckResultAudio = (result) => {
   if (result.isCorrect) {
-    return checkedAfterAutoConnect
-      ? SIMULATION_AUDIO.forCorrectConnectionsCheckClick
-      : SIMULATION_AUDIO.correctConnections
+    return SIMULATION_AUDIO.correctConnections
   }
 
   if (result.totalConnections === 0) {
@@ -172,7 +170,6 @@ const App = () => {
   const [resetRequest, setResetRequest] = useState(0)
   const [connectionsVerified, setConnectionsVerified] = useState(false)
   const [sessionStart, setSessionStart] = useState(() => Date.now())
-  const autoConnectAwaitingCheckRef = useRef(false)
   const autotransformerReadyAlertShownRef = useRef(false)
   const autoConnectCircuitRef = useRef(null)
   const validateConnectionsRef = useRef(null)
@@ -336,7 +333,6 @@ const App = () => {
     setConnectionsVerified(false)
     setResetRequest((current) => current + 1)
     setSessionStart(Date.now())
-    autoConnectAwaitingCheckRef.current = false
     autotransformerReadyAlertShownRef.current = false
     voltageLimitWarningShownRef.current = false
     setStatus('The simulation has been reset. You can start again.')
@@ -421,10 +417,8 @@ const App = () => {
   const scaledWidth = Math.ceil(BASE_WIDTH * scale)
   const scaledHeight = Math.ceil(CONTENT_HEIGHT * scale)
   const handleCheckConnections = useCallback((result) => {
-    const checkedAfterAutoConnect = autoConnectAwaitingCheckRef.current
-    const checkResultAudio = getCheckResultAudio(result, checkedAfterAutoConnect)
+    const checkResultAudio = getCheckResultAudio(result)
 
-    autoConnectAwaitingCheckRef.current = false
     playSimulationAudio(checkResultAudio)
 
     if (result.isCorrect) {
@@ -432,9 +426,9 @@ const App = () => {
 
       setStatus('Connections are correct, click on the MCB to turn it ON.')
       showStepAlert(EXPERIMENT_ALERTS.connectionsVerified, {
-        description: null,
+        description: 'Connections are correct, click on the MCB to turn it ON.',
         target: '#power-toggle-button',
-        title: 'Connections are correct, click on the MCB to turn it ON',
+        title: 'Connections Verified',
       })
 
       return
@@ -454,8 +448,8 @@ const App = () => {
     if (result.wrongConnections?.length > 0) {
       const description = getWrongConnectionDescription(result)
       const title = result.wrongConnections.length === 1
-        ? 'Wrong connection'
-        : 'Wrong connections'
+        ? 'Wrong Connection'
+        : 'Wrong Connections'
 
       setStatus(description)
       showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
@@ -473,7 +467,7 @@ const App = () => {
       showStepAlert(EXPERIMENT_ALERTS.connectionErrorFound, {
         description,
         target: '#connection-lab',
-        title: 'Missing connections',
+        title: 'Missing Connections',
         type: 'warning',
       })
       return
@@ -513,7 +507,7 @@ const App = () => {
   const handleTogglePower = () => {
     if (!powerOn && !connectionsVerified) {
       playSimulationAudio(SIMULATION_AUDIO.beforeConnectionMcbAlert)
-      setStatus('Make and check the connections before turning on the MCB.')
+      setStatus('MCB has been turned ON. Next, click on the autotransformer knob to set the desired voltage.')
       showStepAlert(EXPERIMENT_ALERTS.makeConnectionsBeforeMcb)
       return
     }
@@ -524,11 +518,11 @@ const App = () => {
 
     setPowerOn(true)
     playSimulationAudio(SIMULATION_AUDIO.mcbOn)
-    setStatus('MCB has been turned ON. Now click on the autotransformer knob.')
+    setStatus('MCB has been turned ON. Next, click on the autotransformer knob to set the desired voltage.')
     showStepAlert(EXPERIMENT_ALERTS.powerOn, {
-      description: null,
+      description: 'MCB has been turned ON. Next, click on the autotransformer knob to set the desired voltage.',
       target: '#voltage-control',
-      title: 'MCB has been turned ON. Now click on the autotransformer knob',
+      title: 'MCB Turned ON',
     })
   }
   const handleAutoConnect = () => {
@@ -546,15 +540,14 @@ const App = () => {
       setAutoConnectRequest((current) => current + 1)
     }
 
-    setConnectionsVerified(false)
-    autoConnectAwaitingCheckRef.current = true
+    setConnectionsVerified(true)
 
     playSimulationAudio(SIMULATION_AUDIO.autoConnect)
 
-    setStatus('Autoconnect Completed. Click on the check button to verify the connections.')
+    setStatus('Autoconnect Completed. Connections are verified, click on the MCB to turn it ON.')
     showStepAlert(EXPERIMENT_ALERTS.circuitConnectionsCompleted, {
-      description: 'Click on the check button to verify the connections.',
-      target: '#check-button',
+      description: 'Autoconnect completed. Now turn ON the MCB by clicking the MCB lever.',
+      target: '#power-toggle-button',
       title: 'Autoconnect Completed',
     })
   }
@@ -564,11 +557,6 @@ const App = () => {
     setStatus('Please complete the connections first and turn ON the MCB.')
     showStepAlert(EXPERIMENT_ALERTS.completeConnectionsBeforeAutotransformer)
   }, [playSimulationAudio, showStepAlert])
-
-  const handleConnectionRemovalBlocked = useCallback(() => {
-    setStatus('Turn off MCB before removing the connection.')
-    showStepAlert(EXPERIMENT_ALERTS.turnOffMcbBeforeRemovingConnection)
-  }, [showStepAlert])
 
   const handleLoadLevelChange = useCallback((nextLoadLevel) => {
     if (nextLoadLevel !== nextEnabledLoadLevel) {
@@ -705,7 +693,6 @@ const App = () => {
                     nextEnabledLoadLevel={nextEnabledLoadLevel}
                     onAutoConnectReady={handleAutoConnectReady}
                     onCheckConnections={handleCheckConnections}
-                    onConnectionRemovalBlocked={handleConnectionRemovalBlocked}
                     onGuideConnectionComplete={handleAiGuideConnectionComplete}
                     onLoadLevelChange={handleLoadLevelChange}
                     onValidateConnectionsReady={handleValidateConnectionsReady}
