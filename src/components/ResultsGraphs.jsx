@@ -14,6 +14,12 @@ const PLOT = {
   top: 36,
   width: 520,
 }
+const POINT_TOOLTIP = {
+  gap: 12,
+  height: 28,
+  margin: 6,
+  width: 132,
+}
 const TICK_COUNT = 5
 
 const toNumericValue = (value) => {
@@ -83,13 +89,31 @@ const formatAxisTick = (value) => {
   return value.toFixed(1).replace(/\.0$/, '')
 }
 
-const formatTooltipValue = (value) => value.toFixed(2).replace(/0$/, '')
+const formatCoordinateValue = (value) => (
+  value.toFixed(2).replace(/\.?0+$/, '')
+)
 
 const getChartPoint = (point, xMax, yMax) => ({
   ...point,
   x: PLOT.left + (point.outputPower / xMax) * PLOT.width,
   y: PLOT.top + PLOT.height - (point.value / yMax) * PLOT.height,
 })
+
+const getPointTooltipPosition = (point) => {
+  const x = Math.min(
+    Math.max(point.x - POINT_TOOLTIP.width / 2, POINT_TOOLTIP.margin),
+    CHART_VIEWBOX.width - POINT_TOOLTIP.width - POINT_TOOLTIP.margin,
+  )
+  const yAbove = point.y - POINT_TOOLTIP.height - POINT_TOOLTIP.gap
+  const y = yAbove >= POINT_TOOLTIP.margin
+    ? yAbove
+    : Math.min(
+      point.y + POINT_TOOLTIP.gap,
+      CHART_VIEWBOX.height - POINT_TOOLTIP.height - POINT_TOOLTIP.margin,
+    )
+
+  return { x, y }
+}
 
 const getSmoothPath = (points) => {
   if (points.length === 0) {
@@ -149,7 +173,6 @@ const ResultsLineChart = ({
         role="img"
         viewBox={`0 0 ${CHART_VIEWBOX.width} ${CHART_VIEWBOX.height}`}
       >
-        <title>{title}</title>
         <defs>
           <clipPath id={clipId}>
             <rect height={PLOT.height} width={PLOT.width} x={PLOT.left} y={PLOT.top} />
@@ -202,20 +225,43 @@ const ResultsLineChart = ({
           {linePath ? <path className="results-graph__line" d={linePath} /> : null}
         </g>
 
-        {chartPoints.map((point, index) => (
-          <circle
-            className="results-graph__point"
-            cx={point.x}
-            cy={point.y}
-            key={`${title}-${point.outputPower}-${point.value}-${index}`}
-            r="4.8"
-            tabIndex="0"
-          >
-            <title>{`${title}
-Output Power: ${formatTooltipValue(point.outputPower)} W
-${yAxisLabel}: ${formatTooltipValue(point.value)}`}</title>
-          </circle>
-        ))}
+        {chartPoints.map((point, index) => {
+          const tooltip = getPointTooltipPosition(point)
+          const outputPowerText = formatCoordinateValue(point.outputPower)
+          const valueText = formatCoordinateValue(point.value)
+          const coordinateText = `(${outputPowerText}, ${valueText})`
+          const coordinateLabel = `Point coordinates ${coordinateText}`
+
+          return (
+            <g
+              aria-label={coordinateLabel}
+              className="results-graph__point-marker"
+              key={`${title}-${point.outputPower}-${point.value}-${index}`}
+              tabIndex="0"
+            >
+              <circle className="results-graph__point-hit" cx={point.x} cy={point.y} r="10" />
+              <circle className="results-graph__point" cx={point.x} cy={point.y} r="4.8" />
+              <g className="results-graph__point-tooltip">
+                <rect
+                  className="results-graph__point-tooltip-bg"
+                  height={POINT_TOOLTIP.height}
+                  rx="5"
+                  width={POINT_TOOLTIP.width}
+                  x={tooltip.x}
+                  y={tooltip.y}
+                />
+                <text
+                  className="results-graph__point-tooltip-text"
+                  textAnchor="middle"
+                  x={tooltip.x + POINT_TOOLTIP.width / 2}
+                  y={tooltip.y + 18}
+                >
+                  <tspan>{coordinateText}</tspan>
+                </text>
+              </g>
+            </g>
+          )
+        })}
       </svg>
     </article>
   )

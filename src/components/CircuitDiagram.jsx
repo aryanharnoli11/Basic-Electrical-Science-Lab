@@ -56,12 +56,10 @@ const CircuitDiagram = ({ className = '', r1, r2, r3 }) => (
             data-polarity={polarity}
             data-terminal-id={id}
             aria-label={`Circuit terminal ${label}`}
-            title={`Circuit terminal ${label} (${id})`}
           />
           <span
             className={`terminal-number-label terminal-number-label--circuit terminal-number-label--endpoint-${label}`}
             data-terminal-id={id}
-            title={`Circuit terminal ${label} (${id})`}
           >
             {label}
           </span>

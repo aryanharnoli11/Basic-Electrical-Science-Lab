@@ -206,6 +206,8 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 1.55;
+  text-align: justify;
+  text-justify: inter-word;
   white-space: pre-line;
 }
 

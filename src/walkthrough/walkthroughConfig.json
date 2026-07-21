@@ -145,7 +145,7 @@
         "en": "Single-Phase Transformer"
       },
       "description": {
-        "en": "The single-phase transformer is the main equipment under test. It is tested under different loading conditions to determine its efficiency and voltage regulation.\n\n**Ratings:**\n**Primary Voltage:** 230 V, \n**Secondary Voltage:** 110 V\n**kVA:**  1"
+        "en": "The single-phase transformer is the main equipment under test. It is tested under different loading conditions to determine its efficiency and voltage regulation.\n\n**Ratings:**\n**Primary Voltage:** 230 V \n**Secondary Voltage:** 110 V\n**kVA:**  1"
       },
       "audio": "/walkthrough-audios/SINGLE-PHASE%20TRANSFORMER.wav",
       "placement": "left"

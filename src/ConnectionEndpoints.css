@@ -262,7 +262,8 @@
   letter-spacing: 0;
   line-height: 1;
   user-select: none;
-  pointer-events: none;
+  cursor: pointer;
+  pointer-events: auto;
   box-shadow:
     0 0 0 3px rgba(255, 255, 255, 0.94),
     0 3px 8px rgba(15, 23, 42, 0.26),
@@ -278,7 +279,7 @@
 }
 
 .connection-lab .terminal-number-label {
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .terminal-number-label::before {

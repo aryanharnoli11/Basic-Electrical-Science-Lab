@@ -1128,19 +1128,55 @@
   vector-effect: non-scaling-stroke;
 }
 
+.results-graph__point-marker {
+  cursor: default;
+  outline: none;
+}
+
+.results-graph__point-hit {
+  fill: transparent;
+  stroke: transparent;
+  pointer-events: all;
+}
+
 .results-graph__point {
   fill: #fffaf0;
   stroke: var(--results-graph-color);
   stroke-width: 2;
-  cursor: help;
+  pointer-events: none;
   vector-effect: non-scaling-stroke;
 }
 
-.results-graph__point:hover,
-.results-graph__point:focus {
+.results-graph__point-marker:hover .results-graph__point,
+.results-graph__point-marker:focus .results-graph__point {
   fill: var(--results-graph-soft-color);
   outline: none;
   stroke-width: 3;
+}
+
+.results-graph__point-tooltip {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.results-graph__point-marker:hover .results-graph__point-tooltip,
+.results-graph__point-marker:focus .results-graph__point-tooltip {
+  opacity: 1;
+}
+
+.results-graph__point-tooltip-bg {
+  fill: rgba(17, 24, 39, 0.94);
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.results-graph__point-tooltip-text {
+  fill: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .simulation-footer {

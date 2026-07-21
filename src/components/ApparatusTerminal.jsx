@@ -6,7 +6,6 @@ const polarityText = {
 const ApparatusTerminal = ({ number, owner, polarity, variant }) => {
   const terminalId = `${number}-endpoint`
   const terminalPolarity = polarityText[polarity] ?? polarity
-  const title = `${owner} ${terminalPolarity} (${terminalId})`
 
   return (
     <>
@@ -23,7 +22,6 @@ const ApparatusTerminal = ({ number, owner, polarity, variant }) => {
         data-polarity={polarity}
         data-terminal-id={terminalId}
         aria-label={`${owner} ${terminalPolarity} terminal ${number}`}
-        title={title}
       />
       <span
         id={`label-${number}`}
@@ -38,7 +36,6 @@ const ApparatusTerminal = ({ number, owner, polarity, variant }) => {
         data-terminal-id={terminalId}
         role="button"
         tabIndex={0}
-        title={title}
       >
         {number}
       </span>

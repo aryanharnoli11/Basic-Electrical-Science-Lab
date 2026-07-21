@@ -200,7 +200,7 @@ export const syncWireAnchors = (
     }
 
     anchorElement.dataset.polarity = visualElement.dataset.polarity ?? ''
-    anchorElement.title = visualElement.title
+    anchorElement.removeAttribute('title')
 
     const visualRect = visualElement.getBoundingClientRect()
     const centerX = (

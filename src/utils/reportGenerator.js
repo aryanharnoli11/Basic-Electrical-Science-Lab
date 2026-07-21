@@ -182,9 +182,7 @@ const createReportGraphSvg = ({
   }).join('')
 
   const pointMarkup = chartPoints.map((point) => (
-    `<circle class="report-graph__point" cx="${point.x}" cy="${point.y}" r="4.5">
-      <title>Output Power: ${formatNumber(point.outputPower, 1)} W; ${escapeHtml(yAxisLabel)}: ${formatResultNumber(point.value)}</title>
-    </circle>`
+    `<circle class="report-graph__point" cx="${point.x}" cy="${point.y}" r="4.5" />`
   )).join('')
 
   return `
