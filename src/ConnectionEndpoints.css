@@ -925,8 +925,10 @@
 }
 
 .connection-lab--locked .connection-terminal,
+.connection-lab--locked .jtk-endpoint,
 .connection-lab--locked .terminal-label,
-.connection-lab--locked .terminal-number-label {
+.connection-lab--locked .terminal-number-label,
+.connection-lab--locked .wire-anchor {
   pointer-events: none;
   cursor: not-allowed;
 }

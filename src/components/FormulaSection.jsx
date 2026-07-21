@@ -5,7 +5,7 @@ const FormulaSection = () => (
     <div className="formula-section" aria-label="Formula section">
       <div className="formula-section__list">
         <div className="formula-section__item">
-          <span className="formula-section__name">Voltage Regulation(%)</span>
+          <span className="formula-section__name">Voltage Regulation (%)</span>
           <span className="formula-section__equals">=</span>
           <span className="formula-fraction">
             <span className="formula-fraction__top">

@@ -11,6 +11,7 @@ import {
   deleteConnectionsForTerminal,
   hasConnectionBetween,
   isWrongConnection,
+  lockJsPlumbCircuit,
   resolveJsPlumb,
   syncWireAnchors,
   updateTerminalConnectionStates,
@@ -24,6 +25,7 @@ const ConnectionLab = ({
   activeGuideConnection,
   autoConnectRequest,
   checkRequest,
+  connectionsLocked = false,
   highlightedTerminalIds = [],
   nextEnabledLoadLevel,
   onCheckConnections,
@@ -52,6 +54,7 @@ const ConnectionLab = ({
   const onValidateConnectionsReadyRef = useRef(onValidateConnectionsReady)
   const onWiringChangeRef = useRef(onWiringChange)
   const onWrongConnectionMadeRef = useRef(onWrongConnectionMade)
+  const connectionsLockedRef = useRef(connectionsLocked)
   const powerOnRef = useRef(powerOn)
   const wireCurvinessConfigSignatureRef = useRef(WIRE_CURVINESS_CONFIG_SIGNATURE)
 
@@ -99,6 +102,22 @@ const ConnectionLab = ({
   useEffect(() => {
     onWrongConnectionMadeRef.current = onWrongConnectionMade
   }, [onWrongConnectionMade])
+
+  useEffect(() => {
+    connectionsLockedRef.current = connectionsLocked
+
+    const labElement = labRef.current
+
+    if (!labElement) {
+      return
+    }
+
+    labElement.classList.toggle('connection-lab--locked', connectionsLocked)
+
+    if (connectionsLocked && instanceRef.current) {
+      lockJsPlumbCircuit(instanceRef.current, labElement)
+    }
+  }, [connectionsLocked])
 
   useEffect(() => {
     activeGuideConnectionRef.current = activeGuideConnection
@@ -185,18 +204,24 @@ const ConnectionLab = ({
       }
 
       const autoConnectCircuit = () => {
+        connectionsLockedRef.current = true
         syncWireAnchors(labRef.current, activeInstance)
         autoConnectDefaultCircuit(activeInstance)
         activeInstance.repaintEverything?.()
         updateTerminalConnectionStates(activeInstance)
+        lockJsPlumbCircuit(activeInstance, labRef.current)
         notifyWiringChange()
       }
 
       activeInstance.bind('beforeDrop', ({ sourceId, targetId }) => {
+        if (connectionsLockedRef.current) {
+          return false
+        }
+
         return sourceId !== targetId
       })
       activeInstance.bind('beforeDetach', () => {
-        if (!powerOnRef.current) {
+        if (!powerOnRef.current && !connectionsLockedRef.current) {
           return true
         }
 
@@ -284,10 +309,12 @@ const ConnectionLab = ({
     }
 
     window.requestAnimationFrame(() => {
+      connectionsLockedRef.current = true
       syncWireAnchors(labRef.current, instance)
       autoConnectDefaultCircuit(instance)
       instance.repaintEverything?.()
       updateTerminalConnectionStates(instance)
+      lockJsPlumbCircuit(instance, labRef.current)
       notifyWiringChange()
     })
   }, [autoConnectRequest, notifyWiringChange])
@@ -354,7 +381,7 @@ const ConnectionLab = ({
         return
       }
 
-      if (powerOnRef.current) {
+      if (powerOnRef.current || connectionsLockedRef.current) {
         onConnectionRemovalBlockedRef.current?.()
         return
       }
@@ -424,7 +451,12 @@ const ConnectionLab = ({
   }, [notifyWiringChange])
 
   return (
-    <div className="connection-lab" id="connection-lab" ref={labRef} aria-label="Experiment apparatus area">
+    <div
+      className={`connection-lab ${connectionsLocked ? 'connection-lab--locked' : ''}`}
+      id="connection-lab"
+      ref={labRef}
+      aria-label="Experiment apparatus area"
+    >
       <EquipmentPanel
         activeLoadLevel={activeLoadLevel}
         nextEnabledLoadLevel={nextEnabledLoadLevel}

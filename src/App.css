@@ -306,6 +306,16 @@
   white-space: normal;
 }
 
+#instruction-button span {
+  font-size: 9.5px;
+  white-space: nowrap;
+}
+
+#instruction-button {
+  padding-right: 3px;
+  padding-left: 3px;
+}
+
 .action-button--green {
   background: linear-gradient(180deg, #7dcc4c, #23821e);
 }
@@ -644,9 +654,12 @@
   width: 49px;
 }
 
-.observation-table__group {
-  font-size: 12px;
+.observation-table th.observation-table__group {
+  padding: 0 1px;
+  font-size: 10.7px;
   letter-spacing: 0;
+  line-height: 1.05;
+  white-space: normal;
 }
 
 .observation-table__serial {
@@ -688,8 +701,8 @@
   display: grid;
   min-height: 32px;
   align-items: center;
-  grid-template-columns: 142px 14px minmax(112px, 1fr) 46px;
-  gap: 6px;
+  grid-template-columns: 142px 14px minmax(112px, max-content) 46px;
+  gap: 20px;
   font-size: 12px;
   font-weight: 800;
   line-height: 3.1;

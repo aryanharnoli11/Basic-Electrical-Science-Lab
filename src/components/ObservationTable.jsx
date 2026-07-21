@@ -31,7 +31,7 @@ const ObservationTable = ({ observations }) => (
           <tr>
             <th className="observation-table__serial" rowSpan="2">S.No</th>
             <th className="observation-table__group" colSpan="3">Primary Side Readings</th>
-            <th className="observation-table__group" colSpan="3">Secondary Side Reading</th>
+            <th className="observation-table__group" colSpan="3">Secondary Side Readings</th>
             <th className="observation-table__group" colSpan="2">Results</th>
           </tr>
           <tr>

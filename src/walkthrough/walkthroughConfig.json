@@ -10,7 +10,7 @@
       "id": 1,
       "target": "#experiment-title-board",
       "title": {
-        "en": "AIM"
+        "en": "Aim"
       },
       "description": {
         "en": "The aim of the experiment is to perform a load test on a single-phase transformer and determine its efficiency and voltage regulation."

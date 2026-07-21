@@ -27,9 +27,9 @@ export const EXPERIMENT_ALERTS = {
     type: 'success',
   },
   makeConnectionsBeforeMcb: {
-    description: 'MCB has been turned ON. Next, click on the autotransformer knob to set the desired voltage.',
+    description: 'Make and check the connections before turning ON the MCB.',
     target: '#connection-lab',
-    title: 'MCB Turned ON',
+    title: 'Incomplete Connections',
     type: 'warning',
   },
   cannotStartPower: {
@@ -42,7 +42,7 @@ export const EXPERIMENT_ALERTS = {
     description: 'Please complete the connections first and turn ON the MCB.',
     duration: 6200,
     target: '#voltage-control',
-    title: 'Autotransformer Locked',
+    title: 'Autotransformer OFF',
     type: 'warning',
   },
   autotransformerReadingsReady: {

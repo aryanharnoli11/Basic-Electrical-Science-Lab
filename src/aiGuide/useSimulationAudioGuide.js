@@ -62,9 +62,11 @@ export const useSimulationAudioGuide = ({
   const [highlightedTerminalIds, setHighlightedTerminalIds] = useState([])
   const [phase, setPhase] = useState(GUIDE_PHASE_IDLE)
   const currentPlaybackRef = useRef(null)
+  const activeConnectionStepRef = useRef(null)
   const completedConnectionKeysRef = useRef(new Set())
   const pendingConnectionRef = useRef(null)
   const phaseRef = useRef(phase)
+  const replayRequestIdRef = useRef(0)
   const runIdRef = useRef(0)
   const walkthroughOpenedForGuideRef = useRef(false)
 
@@ -97,6 +99,8 @@ export const useSimulationAudioGuide = ({
   const stop = useCallback(() => {
     runIdRef.current += 1
     phaseRef.current = GUIDE_PHASE_IDLE
+    activeConnectionStepRef.current = null
+    replayRequestIdRef.current += 1
     stopCurrentPlayback()
     resolvePendingConnection(false)
     completedConnectionKeysRef.current = new Set()
@@ -249,9 +253,53 @@ export const useSimulationAudioGuide = ({
     })
   }, [])
 
+  const repeatActiveConnection = useCallback(async () => {
+    const replayId = replayRequestIdRef.current + 1
+    const runId = runIdRef.current
+    const connectionStep = activeConnectionStepRef.current
+    const pendingConnection = pendingConnectionRef.current
+
+    if (
+      phaseRef.current !== GUIDE_PHASE_TERMINALS
+      || !connectionStep
+      || !pendingConnection
+      || pendingConnection.key !== connectionStep.key
+      || pendingConnection.runId !== runId
+    ) {
+      return false
+    }
+
+    replayRequestIdRef.current = replayId
+    await wait(GUIDE_STEP_GAP_MS)
+
+    if (
+      replayRequestIdRef.current !== replayId
+      || runIdRef.current !== runId
+      || phaseRef.current !== GUIDE_PHASE_TERMINALS
+      || pendingConnectionRef.current?.key !== connectionStep.key
+    ) {
+      return false
+    }
+
+    onStatus?.(`${connectionStep.text} Make the highlighted connection to continue.`)
+
+    try {
+      await playNarration(connectionStep)
+    } catch (error) {
+      if (runIdRef.current === runId) {
+        onError?.(error)
+      }
+
+      return false
+    }
+
+    return replayRequestIdRef.current === replayId && runIdRef.current === runId
+  }, [onError, onStatus, playNarration])
+
   const runTerminalGuide = useCallback(async (runId) => {
     phaseRef.current = GUIDE_PHASE_TERMINALS
     setPhase(GUIDE_PHASE_TERMINALS)
+    activeConnectionStepRef.current = null
     setActiveConnection(null)
     setHighlightedTerminalIds([])
     onStatus?.('The interface walkthrough is now complete.')
@@ -269,6 +317,7 @@ export const useSimulationAudioGuide = ({
       for (let index = 0; index < connectionSteps.length; index += 1) {
         const connectionStep = connectionSteps[index]
 
+        activeConnectionStepRef.current = connectionStep
         setActiveConnection(connectionStep.terminalIds)
         setHighlightedTerminalIds(connectionStep.terminalIds)
         onStatus?.(`${connectionStep.text} Make the highlighted connection to continue.`)
@@ -285,6 +334,8 @@ export const useSimulationAudioGuide = ({
           return
         }
 
+        activeConnectionStepRef.current = null
+
         if (index < connectionSteps.length - 1) {
           await playNarration({
             audio: SIMULATION_AUDIO.nextConnection,
@@ -299,6 +350,7 @@ export const useSimulationAudioGuide = ({
       }
 
       setActiveConnection(null)
+      activeConnectionStepRef.current = null
       setHighlightedTerminalIds([])
       onStatus?.('All guided terminal connections are complete.')
 
@@ -327,6 +379,7 @@ export const useSimulationAudioGuide = ({
       }
 
       phaseRef.current = GUIDE_PHASE_IDLE
+      activeConnectionStepRef.current = null
       setActiveConnection(null)
       setHighlightedTerminalIds([])
       setPhase(GUIDE_PHASE_IDLE)
@@ -416,6 +469,8 @@ export const useSimulationAudioGuide = ({
 
   useEffect(() => () => {
     runIdRef.current += 1
+    activeConnectionStepRef.current = null
+    replayRequestIdRef.current += 1
     stopCurrentPlayback()
     resolvePendingConnection(false)
   }, [resolvePendingConnection, stopCurrentPlayback])
@@ -425,6 +480,7 @@ export const useSimulationAudioGuide = ({
     highlightedTerminalIds,
     isPlaying: phase !== GUIDE_PHASE_IDLE,
     phase,
+    repeatActiveConnection,
     start,
     stop,
     onConnectionComplete: handleConnectionComplete,

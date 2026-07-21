@@ -12,7 +12,7 @@ import WalkthroughStartButton from './walkthrough/components/WalkthroughStartBut
 import { EXPERIMENT_ALERTS } from './alerts/experimentStepAlerts.js'
 import { useLabAlerts } from './alerts/useLabAlerts.js'
 import { useSimulationAudioGuide } from './aiGuide/useSimulationAudioGuide.js'
-import { SIMULATION_AUDIO } from './audio/simulationAudio.js'
+import { CONNECTION_AUDIO_BY_LABEL, SIMULATION_AUDIO } from './audio/simulationAudio.js'
 import { useQueuedAudioPlayer } from './audio/useQueuedAudioPlayer.js'
 // import StatusBar from './components/StatusBar.jsx'
  
@@ -261,6 +261,7 @@ const App = () => {
   const [autoConnectRequest, setAutoConnectRequest] = useState(0)
   const [checkRequest, setCheckRequest] = useState(0)
   const [resetRequest, setResetRequest] = useState(0)
+  const [connectionsLocked, setConnectionsLocked] = useState(false)
   const [connectionsVerified, setConnectionsVerified] = useState(false)
   const [sessionStart, setSessionStart] = useState(() => Date.now())
   const [wiringProgress, setWiringProgress] = useState(EMPTY_WIRING_PROGRESS)
@@ -361,6 +362,7 @@ const App = () => {
     highlightedTerminalIds: aiGuideHighlightedTerminalIds,
     isPlaying: aiGuidePlaying,
     onConnectionComplete: handleAiGuideConnectionComplete,
+    repeatActiveConnection: repeatAiGuideActiveConnection,
     start: startAiGuide,
     stop: stopAiGuide,
   } = useSimulationAudioGuide({
@@ -461,6 +463,7 @@ const App = () => {
     setReportGenerated(false)
     setAutoConnectRequest(0)
     setCheckRequest(0)
+    setConnectionsLocked(false)
     setConnectionsVerified(false)
     setWiringProgress(EMPTY_WIRING_PROGRESS)
     setResetRequest((current) => current + 1)
@@ -632,14 +635,31 @@ const App = () => {
     autoConnectCircuitRef.current = autoConnectCircuit
   }, [])
 
-  const handleWrongConnectionMade = useCallback(() => {
-    playSimulationAudio(SIMULATION_AUDIO.wrongConnection)
-  }, [playSimulationAudio])
+  const handleConnectionRemovalBlocked = useCallback(() => {
+    setStatus('Connections are locked after autoconnect. Reset the simulation to change the wiring.')
+  }, [])
+
+  const handleWrongConnectionMade = useCallback(async () => {
+    const currentManualConnectionAudio = activeInstruction.connectionPair
+      ? CONNECTION_AUDIO_BY_LABEL[activeInstruction.connectionPair]
+      : null
+    const playedWrongConnectionAudio = await playSimulationAudio(SIMULATION_AUDIO.wrongConnection)
+
+    if (!playedWrongConnectionAudio) {
+      return
+    }
+
+    const replayedGuideConnection = await repeatAiGuideActiveConnection()
+
+    if (!replayedGuideConnection && currentManualConnectionAudio) {
+      playSimulationAudio(currentManualConnectionAudio)
+    }
+  }, [activeInstruction.connectionPair, playSimulationAudio, repeatAiGuideActiveConnection])
 
   const handleTogglePower = () => {
     if (!powerOn && !connectionsVerified) {
       playSimulationAudio(SIMULATION_AUDIO.beforeConnectionMcbAlert)
-      setStatus('MCB has been turned ON. Next, click on the autotransformer knob to set the desired voltage.')
+      setStatus('Make and check the connections before turning ON the MCB.')
       showStepAlert(EXPERIMENT_ALERTS.makeConnectionsBeforeMcb)
       return
     }
@@ -672,6 +692,7 @@ const App = () => {
       setAutoConnectRequest((current) => current + 1)
     }
 
+    setConnectionsLocked(true)
     setConnectionsVerified(true)
 
     playSimulationAudio(SIMULATION_AUDIO.autoConnect)
@@ -823,10 +844,12 @@ const App = () => {
                     activeGuideConnection={aiGuideActiveConnection}
                     autoConnectRequest={autoConnectRequest}
                     checkRequest={checkRequest}
+                    connectionsLocked={connectionsLocked}
                     highlightedTerminalIds={aiGuideHighlightedTerminalIds}
                     nextEnabledLoadLevel={nextEnabledLoadLevel}
                     onAutoConnectReady={handleAutoConnectReady}
                     onCheckConnections={handleCheckConnections}
+                    onConnectionRemovalBlocked={handleConnectionRemovalBlocked}
                     onGuideConnectionComplete={handleAiGuideConnectionComplete}
                     onLoadLevelChange={handleLoadLevelChange}
                     onValidateConnectionsReady={handleValidateConnectionsReady}
