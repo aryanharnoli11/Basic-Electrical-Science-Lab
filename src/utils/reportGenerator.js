@@ -296,7 +296,7 @@ const createReportHtml = ({
   const sessionEnd = reportDate.getTime()
   const reportDateText = reportDate.toLocaleDateString(undefined, {
     day: '2-digit',
-    month: 'short',
+    month: 'long',
     year: 'numeric',
   })
   const startTimeText = new Date(sessionStart).toLocaleTimeString()
@@ -586,11 +586,12 @@ tr:nth-child(even) {
 }
 .report-graph {
   display: flex;
-  min-height: 310px;
+  min-height: 0;
   align-items: flex-start;
   justify-content: center;
   padding: 8px 0 0;
   overflow: visible;
+  line-height: 0;
   border-radius: 12px;
   background: linear-gradient(180deg, #f8fbfe 0%, #eef5fb 100%);
 }
@@ -690,21 +691,45 @@ tr:nth-child(even) {
   box-shadow: 0 6px 14px rgba(31, 45, 61, 0.12);
   transform: translateY(-2px);
 }
+.pdf-exporting {
+  width: 210mm !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+}
+.pdf-exporting .report-document {
+  width: 210mm !important;
+}
 .pdf-exporting .report-page {
-  margin-bottom: 0 !important;
-  border-color: transparent !important;
+  width: 210mm !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 3mm 5mm !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
+  break-before: auto !important;
+  page-break-before: auto !important;
+  break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+.pdf-exporting .report-page--overview {
+  padding-bottom: 1mm !important;
+}
+.pdf-exporting .report-page--results,
+.pdf-exporting .report-page--graphs {
+  padding-top: 0 !important;
+}
+.pdf-exporting .report-page--graphs {
+  break-before: auto !important;
+  page-break-before: auto !important;
 }
 .pdf-exporting .section,
 .pdf-exporting .results-card,
 .pdf-exporting .table-shell,
 .pdf-exporting .report-graph {
-  overflow: visible !important;
-}
-.pdf-exporting .report-page--overview,
-.pdf-exporting .report-page--results {
-  break-after: page !important;
-  page-break-after: always !important;
+  overflow: hidden !important;
 }
 @media (max-width: 768px) {
   body {
@@ -745,32 +770,155 @@ tr:nth-child(even) {
 @media print {
   @page {
     size: A4;
-    margin: 12mm;
+    margin: 0;
   }
   .print-btn,
   .download-btn,
   .report-actions {
     display: none;
   }
+  html,
   body {
+    width: 210mm;
     margin: 0;
     padding: 0;
     background: #ffffff;
+    font-size: 8.2px;
+    line-height: 1.08;
+  }
+  .report-document {
+    width: 210mm;
   }
   .report-page {
-    width: 100%;
+    width: 210mm;
+    min-height: 0;
     margin: 0;
-    padding: 16px 18px;
+    padding: 3mm 5mm;
+    overflow: visible;
     border: none;
     border-radius: 0;
     box-shadow: none;
+    break-before: auto;
+    page-break-before: auto;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+  .report-page--overview {
+    padding-bottom: 1mm;
+  }
+  .report-page--results {
+    break-before: auto;
+    page-break-before: auto;
+    padding-top: 0;
+  }
+  .report-page--graphs {
+    padding-top: 0;
+    break-before: auto;
+    page-break-before: auto;
   }
   .header-row {
-    grid-template-columns: 150px minmax(0, 1fr) 86px;
-    gap: 16px;
+    grid-template-columns: 42mm minmax(0, 1fr) 24mm;
+    gap: 5mm;
+    margin-bottom: 2mm;
+  }
+  .report-title-block {
+    padding-bottom: 5px;
+  }
+  .report-logo--virtual-labs {
+    max-width: 38mm;
+    max-height: 12mm;
+  }
+  .report-logo--iit {
+    max-width: 15mm;
+    max-height: 15mm;
+  }
+  h1 {
+    font-size: 13px;
+  }
+  h2 {
+    margin-bottom: 3px;
+    padding-bottom: 2px;
+    font-size: 10.5px;
+  }
+  h3 {
+    margin-bottom: 2px;
+    font-size: 8.8px;
+  }
+  p {
+    margin-bottom: 2px;
+  }
+  ul,
+  ol {
+    margin-top: 2px;
+  }
+  li {
+    margin-bottom: 1px;
   }
   .report-experiment-title {
-    font-size: 22px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    line-height: 1.12;
+  }
+  .section {
+    margin-bottom: 1.5mm;
+    padding: 1.6mm;
+    border-radius: 2mm;
+  }
+  .report-overview-top {
+    margin-bottom: 3px;
+  }
+  .badge,
+  .report-stamp {
+    padding: 2px 5px;
+    font-size: 7.8px;
+  }
+  .info-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    margin-top: 3px;
+  }
+  .info-card {
+    gap: 1px;
+    padding: 3px 5px;
+    font-size: 7.8px;
+  }
+  .two-column-list {
+    column-count: 2;
+    column-gap: 7mm;
+    margin-top: 3px;
+  }
+  .results-stack {
+    gap: 1.5mm;
+  }
+  .results-card {
+    gap: 2px;
+    padding: 1.6mm;
+    border-radius: 2mm;
+  }
+  th,
+  td {
+    padding: 1.3px 2px;
+    font-size: 6.8px;
+    line-height: 1.04;
+  }
+  .table-shell {
+    overflow: hidden;
+    border-radius: 2mm;
+  }
+  .graphs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2mm;
+    margin-bottom: 1.5mm;
+  }
+  .report-graph {
+    min-height: 0;
+    padding-top: 0.5mm;
+    border-radius: 2mm;
+  }
+  .report-graph__svg,
+  .report-graph__image {
+    max-height: 31mm;
+    object-fit: contain;
   }
   .section,
   .header-row,
@@ -781,9 +929,6 @@ tr:nth-child(even) {
   tr {
     break-inside: avoid;
     page-break-inside: avoid;
-  }
-  .graphs-grid {
-    grid-template-columns: 1fr;
   }
 }
   `
@@ -805,14 +950,13 @@ tr:nth-child(even) {
         <img src="${escapeHtml(virtualLabsLogoSrc)}" class="report-logo report-logo--virtual-labs" alt="Virtual Labs logo">
         <div class="report-title-block">
           <h1>Virtual Labs Simulation Report</h1>
-          <p class="report-subtitle">Basic Electrical Science Lab</p>
         </div>
         <img src="${escapeHtml(iitLogoSrc)}" class="report-logo report-logo--iit" alt="Indian Institute of Technology Roorkee logo">
       </div>
 
       <div class="section report-overview">
         <div class="report-overview-top">
-          <p class="badge">Basic Electrical Science Lab</p>
+          <p class="badge">AI-Enhanced Basic Electrical Science Lab</p>
           <p class="report-stamp">Generated on ${escapeHtml(reportDateText)}</p>
         </div>
         <p class="report-experiment-label">Experiment Title</p>
@@ -827,12 +971,13 @@ tr:nth-child(even) {
       <div class="section">
         <h2>Experiment Summary</h2>
         <h3>Aim</h3>
-        <p style="text-align: justify;">To determine the efficiency and voltage regulation of a single phase transformer by performing a load test at different lamp-load conditions.</p>
+        <p style="text-align: justify;">The aim of the experiment is to perform a load test on a single-phase transformer and determine its efficiency and voltage regulation.</p>
+        <br>
+        <h3>Simulation Summary</h3>
+        <p style="text-align: justify;">The guided walkthrough familiarized the user with the simulation interface. The circuit was connected, and the connections were verified successfully. The MCB was switched ON, and the desired voltage was set using the autotransformer. The readings were measured using the voltmeters, ammeters, and wattmeter, and the efficiency v/s output power and voltage regulation v/s output power graphs were plotted using the measured readings.</p>
+        <br>
 
-        <h3>Theory</h3>
-        <p style="text-align: justify;">In a transformer load test, the primary side input power and the secondary side output power are measured for increasing load. The secondary output power is obtained from W = VA for the lamp load. Efficiency is the ratio of output power to input power, expressed as a percentage. Voltage regulation indicates the change in secondary terminal voltage from no-load to load condition.</p>
-
-        <h3>Apparatus and Parameters</h3>
+        <h3>Apparatus Used</h3>
         <ul class="two-column-list">
           <li>Single phase transformer</li>
           <li>Autotransformer set to ${formatNumber(AUTOTRANSFORMER_OUTPUT_VOLTAGE, 1)} V</li>
@@ -843,14 +988,7 @@ tr:nth-child(even) {
           <li>No-load secondary voltage: ${formatNumber(NO_LOAD_SECONDARY_VOLTAGE, 1)} V</li>
           <li>Connecting leads</li>
         </ul>
-
-        <h3>Calculation Formulae</h3>
-        <ul>
-          <li>Input power, W<sub>in</sub> = wattmeter reading x 2</li>
-          <li>Output power, W<sub>out</sub> = V<sub>2</sub> x I<sub>2</sub></li>
-          <li>Efficiency, eta = (W<sub>out</sub> / W<sub>in</sub>) x 100%</li>
-          <li>Voltage regulation = ((V<sub>no-load</sub> - V<sub>load</sub>) / V<sub>load</sub>) x 100%</li>
-        </ul>
+        <br>
       </div>
     </div>
 
@@ -913,7 +1051,7 @@ tr:nth-child(even) {
 
         <div class="results-card">
           <h3>Conclusion</h3>
-          <p style="text-align: justify;">The transformer load-test observations show how efficiency and voltage regulation vary with output power. At the highest recorded load of ${formatNumber(fullLoadRow?.secondaryPower, 1)} W, the simulated transformer efficiency is ${formatResultNumber(fullLoadRow?.efficiency)}% and the voltage regulation is ${formatResultNumber(fullLoadRow?.voltageRegulation)}%.</p>
+          <p style="text-align: justify;">The load test observations show the variation of transformer efficiency and voltage regulation with output power. At the maximum recorded output power of ${formatNumber(fullLoadRow?.secondaryPower, 1)} W, the transformer efficiency is ${formatResultNumber(fullLoadRow?.efficiency)}%, while the voltage regulation is ${formatResultNumber(fullLoadRow?.voltageRegulation)}%.</p>
         </div>
       </div>
     </div>
@@ -1008,8 +1146,8 @@ tr:nth-child(even) {
           jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
           pagebreak: {
             mode: ['css', 'legacy'],
-            before: ['.report-page--results', '.report-page--graphs'],
-            avoid: ['.report-page', '.header-row', '.report-overview', '.info-grid', '.report-graph-card', 'thead', 'tr']
+            before: [],
+            avoid: ['.header-row', '.report-overview', '.info-grid', '.report-graph-card', 'thead', 'tr']
           }
         };
         return window.html2pdf().set(opts).from(element).save();
