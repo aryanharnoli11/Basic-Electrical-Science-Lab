@@ -10,6 +10,7 @@ const GUIDE_PHASE_CLICK = 'click'
 const GUIDE_PHASE_WALKTHROUGH = 'walkthrough'
 const GUIDE_PHASE_TERMINALS = 'terminals'
 const GUIDE_STEP_GAP_MS = 250
+const NEXT_CONNECTION_PROMPT_LIMIT = 3
 
 const canUseSpeechSynthesis = () => (
   typeof window !== 'undefined'
@@ -336,7 +337,7 @@ export const useSimulationAudioGuide = ({
 
         activeConnectionStepRef.current = null
 
-        if (index < connectionSteps.length - 1) {
+        if (index < NEXT_CONNECTION_PROMPT_LIMIT && index < connectionSteps.length - 1) {
           await playNarration({
             audio: SIMULATION_AUDIO.nextConnection,
             text: "Let's move on to the next connection.",
@@ -362,11 +363,6 @@ export const useSimulationAudioGuide = ({
       if (runIdRef.current !== runId) {
         return
       }
-
-      await playNarration({
-        audio: SIMULATION_AUDIO.forCorrectConnectionsCheckClick,
-        text: 'For correct connections, click the check button.',
-      })
 
       if (runIdRef.current === runId) {
         phaseRef.current = GUIDE_PHASE_IDLE

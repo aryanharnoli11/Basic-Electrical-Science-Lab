@@ -308,13 +308,19 @@ const ActionButtons = ({
             <ol className="action-instructions-panel__steps">
               {instructionSteps.map((step) => {
                 const isActiveStep = step.id === activeInstructionStepId
+                const hasActiveSubstep = Boolean(
+                  step.groups?.some((group) => (
+                    isActiveStep
+                    && group.pairs.includes(activeConnectionPair)
+                  )),
+                )
 
                 return (
                   <li
                     aria-current={isActiveStep ? 'step' : undefined}
-                    className={`action-instructions-panel__step ${isActiveStep ? 'action-instructions-panel__step--active' : ''}`}
+                    className={`action-instructions-panel__step ${isActiveStep && !hasActiveSubstep ? 'action-instructions-panel__step--active' : ''}`}
                     key={step.id}
-                    ref={isActiveStep && !activeConnectionPair ? activeInstructionRef : undefined}
+                    ref={isActiveStep && !hasActiveSubstep ? activeInstructionRef : undefined}
                   >
                     <strong>{step.title}</strong> {step.content}
                     {step.groups ? (

@@ -17,6 +17,7 @@
   inset: 0;
   z-index: 1000;
   pointer-events: auto;
+  touch-action: none;
   background: transparent;
 }
 

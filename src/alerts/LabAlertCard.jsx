@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { stopExclusiveAudio } from '../audio/exclusiveAudio.js'
+
 const EXIT_DURATION = 180
 
 const dispatchLabAlertEvent = (eventName, detail) => {
@@ -82,12 +84,19 @@ const LabAlertCard = ({ alert, onDismiss }) => {
   }, [])
 
   const handleConfirm = () => {
+    stopExclusiveAudio()
     onConfirm?.(alert)
     dismiss('confirm', false)
   }
 
   const handleOk = () => {
+    stopExclusiveAudio()
     dismiss('ok')
+  }
+
+  const handleClose = () => {
+    stopExclusiveAudio()
+    dismiss('close')
   }
 
   const handleNarration = () => {
@@ -136,7 +145,7 @@ const LabAlertCard = ({ alert, onDismiss }) => {
           <button
             aria-label="Close alert"
             className="lab-alert-card__icon-button"
-            onClick={() => dismiss('close')}
+            onClick={handleClose}
             type="button"
           >
             ×

@@ -10,6 +10,8 @@ import MeterNeedle from './MeterNeedle.jsx'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 const WATTMETER_MAX = 600
+const WATTMETER_HIGH_RANGE_NEEDLE_OFFSET = -2
+const WATTMETER_HIGH_RANGE_OFFSET_START = 490
 const LAMP_LOAD_BULB_Y_OFFSET = -5
 
 const LAMP_LOAD_BULBS = [
@@ -79,6 +81,11 @@ const Wattmeter = ({
 }) => {
   const numericValue = Number.isFinite(value) ? value : 0
   const meterDisplay = useMeterDisplay(numericValue, WATTMETER_MAX)
+  const calibratedNeedleRotation = meterDisplay.rotation + (
+    numericValue >= WATTMETER_HIGH_RANGE_OFFSET_START
+      ? WATTMETER_HIGH_RANGE_NEEDLE_OFFSET
+      : 0
+  )
   const loadLevel = clamp(Math.trunc(Number(activeLoadLevel) || 0), 0, LAMP_LOAD_SWITCHES.length)
   const isRowActive = (row) => row <= loadLevel
   const isSwitchEnabled = (row) => autotransformerSet && row === nextEnabledLoadLevel
@@ -141,10 +148,10 @@ const Wattmeter = ({
         <ApparatusTerminal number={24} owner="Lamp load" polarity="minus" variant="lamp-load" />
       </div>
 
-      <MeterNeedle className="meter-needle--wattmeter" rotation={meterDisplay.rotation} />
+      <MeterNeedle className="meter-needle--wattmeter" rotation={calibratedNeedleRotation} />
 
       <ApparatusTerminal number={7} owner="AC wattmeter" polarity="plus" variant="wattmeter" />
-      <ApparatusTerminal number={8} owner="AC wattmeter" polarity="minus" variant="wattmeter" />
+      <ApparatusTerminal number={8} owner="AC wattmeter" polarity="plus" variant="wattmeter" />
       <ApparatusTerminal number={9} owner="AC wattmeter" polarity="plus" variant="wattmeter" />
       <ApparatusTerminal number={10} owner="AC wattmeter" polarity="minus" variant="wattmeter" />
     </article>

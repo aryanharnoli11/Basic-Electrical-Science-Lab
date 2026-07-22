@@ -7,7 +7,7 @@ export const LAMP_LOAD_READING_BY_LEVEL = {
   1: { a1Current: 1.37, a2Current: 1.5, lowerVoltage: 116, wattmeterPower: 115 },
   2: { a1Current: 2.22, a2Current: 3.7, lowerVoltage: 114.5, wattmeterPower: 245 },
   3: { a1Current: 3.37, a2Current: 6.2, lowerVoltage: 112, wattmeterPower: 385 },
-  4: { a1Current: 3.37, a2Current: 8.2, lowerVoltage: 112, wattmeterPower: 495 },
+  4: { a1Current: 4.32, a2Current: 8.2, lowerVoltage: 110, wattmeterPower: 495 },
 }
 
 const OBSERVATION_RESULT_BY_LEVEL = {
@@ -15,7 +15,7 @@ const OBSERVATION_RESULT_BY_LEVEL = {
   1: { voltageRegulation: 1.72, efficiency: 75.65 },
   2: { voltageRegulation: 3.05, efficiency: 86.46 },
   3: { voltageRegulation: 5.53, efficiency: 90.18 },
-  4: { voltageRegulation: 5.53, efficiency: 92.76 },
+  4: { voltageRegulation: 7.27, efficiency: 91.11 },
 }
 
 const clampLoadLevel = (loadLevel) => (

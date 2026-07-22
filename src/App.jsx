@@ -165,23 +165,46 @@ const getActiveInstruction = ({
   }
 }
 
-const formatConnectionList = (connections) => (
-  connections.map((connection) => connection.label).join(', ')
+const CONNECTIONS_PER_ALERT_LINE = 6
+
+const formatConnectionList = (connections) => {
+  const labels = connections.map((connection) => connection.label)
+
+  if (labels.length <= 1) {
+    return labels.join(', ')
+  }
+
+  const groupedLabels = []
+
+  for (let index = 0; index < labels.length; index += CONNECTIONS_PER_ALERT_LINE) {
+    groupedLabels.push(
+      labels
+        .slice(index, index + CONNECTIONS_PER_ALERT_LINE)
+        .map((label) => `(${label})`)
+        .join(', '),
+    )
+  }
+
+  return groupedLabels.join('\n')
+}
+
+const getConnectionDescriptionLine = (label, connections) => (
+  `${label}:${connections.length > 1 ? '\n' : ' '}${formatConnectionList(connections)}.`
 )
 
 const getWrongConnectionDescription = ({ missingConnections = [], wrongConnections = [] }) => {
   const wrongLabel = wrongConnections.length === 1 ? 'Wrong connection' : 'Wrong connections'
-  const alertParts = [`${wrongLabel}: ${formatConnectionList(wrongConnections)}.`]
+  const alertParts = [getConnectionDescriptionLine(wrongLabel, wrongConnections)]
 
   if (missingConnections.length > 0) {
-    alertParts.push(`Missing connections: ${formatConnectionList(missingConnections)}.`)
+    alertParts.push(getConnectionDescriptionLine('Missing connections', missingConnections))
   }
 
   return alertParts.join('\n\n')
 }
 
 const getMissingConnectionDescription = ({ missingConnections = [] }) => (
-  `Missing connections: ${formatConnectionList(missingConnections)}.`
+  getConnectionDescriptionLine('Missing connections', missingConnections)
 )
 
 const getConnectionResultAudio = ({ missingConnections = [], wrongConnections = [] }) => {
@@ -267,6 +290,7 @@ const App = () => {
   const [wiringProgress, setWiringProgress] = useState(EMPTY_WIRING_PROGRESS)
   const autotransformerReadyAlertShownRef = useRef(false)
   const autoConnectCircuitRef = useRef(null)
+  const correctCheckPromptPendingRef = useRef(false)
   const validateConnectionsRef = useRef(null)
   const voltageLimitWarningShownRef = useRef(false)
 
@@ -325,6 +349,10 @@ const App = () => {
   const handleWiringChange = useCallback((nextProgress) => {
     const normalizedProgress = nextProgress ?? EMPTY_WIRING_PROGRESS
 
+    if (!normalizedProgress.isCorrect) {
+      correctCheckPromptPendingRef.current = false
+    }
+
     setWiringProgress((currentProgress) => (
       getWiringProgressSignature(currentProgress) === getWiringProgressSignature(normalizedProgress)
         ? currentProgress
@@ -342,18 +370,22 @@ const App = () => {
   }, [connectionsVerified, powerOn])
 
   const handleAiGuideStart = useCallback(() => {
+    correctCheckPromptPendingRef.current = false
     setStatus('AI Guide narration started.')
   }, [])
 
   const handleAiGuideFinish = useCallback(() => {
+    correctCheckPromptPendingRef.current = true
     setStatus('AI Guide connection guidance completed.')
   }, [])
 
   const handleAiGuideError = useCallback(() => {
+    correctCheckPromptPendingRef.current = false
     setStatus('AI Guide narration could not start. Add audio files or use a browser with speech synthesis.')
   }, [])
 
   const handleAiGuideStop = useCallback(() => {
+    correctCheckPromptPendingRef.current = false
     setStatus('AI Guide narration stopped.')
   }, [])
 
@@ -469,6 +501,7 @@ const App = () => {
     setResetRequest((current) => current + 1)
     setSessionStart(Date.now())
     autotransformerReadyAlertShownRef.current = false
+    correctCheckPromptPendingRef.current = false
     voltageLimitWarningShownRef.current = false
     setStatus('The simulation has been reset. You can start again.')
     showStepAlert(EXPERIMENT_ALERTS.simulationReset)
@@ -552,16 +585,23 @@ const App = () => {
   const scaledWidth = Math.ceil(BASE_WIDTH * scale)
   const scaledHeight = Math.ceil(CONTENT_HEIGHT * scale)
   const handleCheckConnections = useCallback((result) => {
-    const checkResultAudio = getCheckResultAudio(result)
+    const shouldPlayCorrectCheckPrompt = result.isCorrect && correctCheckPromptPendingRef.current
+    const checkResultAudio = shouldPlayCorrectCheckPrompt
+      ? SIMULATION_AUDIO.forCorrectConnectionsCheckClick
+      : getCheckResultAudio(result)
+
+    if (result.isCorrect) {
+      correctCheckPromptPendingRef.current = false
+    }
 
     playSimulationAudio(checkResultAudio)
 
     if (result.isCorrect) {
       setConnectionsVerified(true)
 
-      setStatus('Connections are correct, click on the MCB to turn it ON.')
+      setStatus('Connections Verified successfully. Now turn ON the MCB by clicking the MCB lever.')
       showStepAlert(EXPERIMENT_ALERTS.connectionsVerified, {
-        description: 'Connections are correct, click on the MCB to turn it ON.',
+        description: 'Connections Verified successfully. Now turn ON the MCB by clicking the MCB lever.',
         target: '#power-toggle-button',
         title: 'Connections Verified',
       })

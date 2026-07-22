@@ -439,13 +439,13 @@
 }
 
 .action-instructions-panel__step--active {
-  border-color: rgba(21, 123, 92, 0.58);
-  color: #162f25;
+  border-color: rgba(151, 88, 37, 0.58);
+  color: #3a2314;
   background:
-    linear-gradient(180deg, rgba(224, 255, 241, 0.96), rgba(190, 242, 220, 0.9));
+    linear-gradient(180deg, rgba(255, 244, 217, 0.98), rgba(237, 207, 163, 0.92));
   box-shadow:
-    inset 4px 0 0 #1c9a73,
-    0 4px 10px rgba(25, 100, 75, 0.16);
+    inset 4px 0 0 #b97808,
+    0 4px 10px rgba(94, 51, 20, 0.18);
 }
 
 .action-instructions-panel__steps strong {
@@ -454,7 +454,7 @@
 }
 
 .action-instructions-panel__step--active > strong {
-  color: #126147;
+  color: #7b431d;
 }
 
 .action-instructions-panel__substeps {
@@ -472,10 +472,10 @@
 }
 
 .action-instructions-panel__substep--active {
-  border-color: rgba(13, 93, 154, 0.44);
-  color: #173652;
-  background: rgba(219, 239, 255, 0.96);
-  box-shadow: inset 3px 0 0 #2878bd;
+  border-color: rgba(151, 88, 37, 0.44);
+  color: #3a2314;
+  background: rgba(255, 239, 207, 0.96);
+  box-shadow: inset 3px 0 0 #b97808;
 }
 
 .action-instructions-panel__substeps code {
@@ -1197,23 +1197,26 @@
   z-index: 1;
   display: flex;
   width: calc(100% - 1px);
-  height: 35px;
+  min-height: 40px;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  border: 1px solid rgba(0, 0, 0, 0.78);
+  padding: 0 18px;
+  border: 1px solid rgba(0, 0, 0, 0.88);
   border-radius: 0 0 5px 5px;
-  color: #ffffff;
+  color: #f8fafc;
   background:
-    linear-gradient(180deg, #33383b 0%, #1d2326 45%, #101418 100%);
+    linear-gradient(180deg, #2b3338 0%, #151c21 54%, #080d11 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 9px 14px rgba(0, 0, 0, 0.42);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1;
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.54),
+    0 9px 14px rgba(0, 0, 0, 0.46);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.2;
   letter-spacing: 0;
   text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.86);
 }
 
 .graph-panel {
@@ -2090,13 +2093,13 @@ input:focus-visible {
 }
 
 .meter-needle--under-voltmeter {
-  --meter-needle-top: 82px;
+  --meter-needle-top: 80px;
   --meter-needle-left: 79px;
   --meter-needle-size: 68px;
 }
 
 .meter-needle--under-ammeter {
-  --meter-needle-top: 77px;
+  --meter-needle-top: 75px;
   --meter-needle-left: 78px;
   --meter-needle-size: 68px;
 }
