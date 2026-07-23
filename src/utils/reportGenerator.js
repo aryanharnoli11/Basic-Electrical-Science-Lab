@@ -696,6 +696,9 @@ tr:nth-child(even) {
   margin: 0 !important;
   padding: 0 !important;
   background: #ffffff !important;
+  color: #1f2d3d !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
 }
 .pdf-exporting .report-document {
   width: 210mm !important;
@@ -704,26 +707,67 @@ tr:nth-child(even) {
   width: 210mm !important;
   min-height: 0 !important;
   margin: 0 !important;
-  padding: 3mm 5mm !important;
+  padding: 7mm 9mm !important;
   overflow: visible !important;
   border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  break-before: auto !important;
-  page-break-before: auto !important;
   break-inside: auto !important;
   page-break-inside: auto !important;
 }
 .pdf-exporting .report-page--overview {
-  padding-bottom: 1mm !important;
+  padding-bottom: 4mm !important;
 }
-.pdf-exporting .report-page--results,
-.pdf-exporting .report-page--graphs {
-  padding-top: 0 !important;
-}
-.pdf-exporting .report-page--graphs {
+.pdf-exporting .report-page--results {
   break-before: auto !important;
   page-break-before: auto !important;
+}
+.pdf-exporting .report-page--graphs {
+  break-before: page !important;
+  page-break-before: always !important;
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+.pdf-exporting .report-page--overview .section > br {
+  display: none !important;
+}
+.pdf-exporting .section {
+  margin-bottom: 3.5mm !important;
+  padding: 3.5mm 4mm !important;
+}
+.pdf-exporting .report-page--results .section,
+.pdf-exporting .report-page--graphs .section {
+  margin-bottom: 0 !important;
+}
+.pdf-exporting .info-grid {
+  gap: 3mm !important;
+  margin-top: 4mm !important;
+}
+.pdf-exporting .results-stack {
+  gap: 3.5mm !important;
+}
+.pdf-exporting .results-card {
+  gap: 2.5mm !important;
+  padding: 3mm !important;
+}
+.pdf-exporting th,
+.pdf-exporting td {
+  padding: 4px 5px !important;
+  font-size: 9.5px !important;
+  line-height: 1.25 !important;
+}
+.pdf-exporting .graphs-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 3.5mm !important;
+  margin-bottom: 4mm !important;
+}
+.pdf-exporting .report-graph {
+  padding: 2mm !important;
+}
+.pdf-exporting .report-graph__svg,
+.pdf-exporting .report-graph__image {
+  max-height: 62mm !important;
+  object-fit: contain !important;
 }
 .pdf-exporting .section,
 .pdf-exporting .results-card,
@@ -770,7 +814,7 @@ tr:nth-child(even) {
 @media print {
   @page {
     size: A4;
-    margin: 0;
+    margin: 8mm;
   }
   .print-btn,
   .download-btn,
@@ -779,21 +823,22 @@ tr:nth-child(even) {
   }
   html,
   body {
-    width: 210mm;
+    width: auto;
     margin: 0;
     padding: 0;
     background: #ffffff;
-    font-size: 8.2px;
-    line-height: 1.08;
+    color: #1f2d3d;
+    font-size: 11px;
+    line-height: 1.35;
   }
   .report-document {
-    width: 210mm;
+    width: 100%;
   }
   .report-page {
-    width: 210mm;
+    width: 100%;
     min-height: 0;
     margin: 0;
-    padding: 3mm 5mm;
+    padding: 0;
     overflow: visible;
     border: none;
     border-radius: 0;
@@ -804,123 +849,133 @@ tr:nth-child(even) {
     page-break-inside: auto;
   }
   .report-page--overview {
-    padding-bottom: 1mm;
+    padding-bottom: 0;
   }
   .report-page--results {
     break-before: auto;
     page-break-before: auto;
-    padding-top: 0;
   }
   .report-page--graphs {
-    padding-top: 0;
-    break-before: auto;
-    page-break-before: auto;
+    break-before: page;
+    page-break-before: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .report-page--overview .section > br {
+    display: none;
   }
   .header-row {
-    grid-template-columns: 42mm minmax(0, 1fr) 24mm;
-    gap: 5mm;
-    margin-bottom: 2mm;
+    grid-template-columns: 44mm minmax(0, 1fr) 26mm;
+    gap: 6mm;
+    margin-bottom: 5mm;
   }
   .report-title-block {
-    padding-bottom: 5px;
+    padding-bottom: 7px;
   }
   .report-logo--virtual-labs {
-    max-width: 38mm;
-    max-height: 12mm;
+    max-width: 42mm;
+    max-height: 18mm;
   }
   .report-logo--iit {
-    max-width: 15mm;
-    max-height: 15mm;
+    max-width: 21mm;
+    max-height: 21mm;
   }
   h1 {
-    font-size: 13px;
+    font-size: 18px;
+    line-height: 1.2;
   }
   h2 {
-    margin-bottom: 3px;
-    padding-bottom: 2px;
-    font-size: 10.5px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    font-size: 15px;
+    line-height: 1.25;
   }
   h3 {
-    margin-bottom: 2px;
-    font-size: 8.8px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    line-height: 1.25;
   }
   p {
-    margin-bottom: 2px;
+    margin-bottom: 6px;
   }
   ul,
   ol {
-    margin-top: 2px;
+    margin-top: 5px;
+    padding-left: 18px;
   }
   li {
-    margin-bottom: 1px;
+    margin-bottom: 3px;
   }
   .report-experiment-title {
-    margin-bottom: 5px;
-    font-size: 12px;
-    line-height: 1.12;
+    margin-bottom: 8px;
+    font-size: 16px;
+    line-height: 1.25;
   }
   .section {
-    margin-bottom: 1.5mm;
-    padding: 1.6mm;
-    border-radius: 2mm;
+    margin-bottom: 3.5mm;
+    padding: 3.5mm 4mm;
+    border-radius: 3mm;
+  }
+  .report-page--results .section,
+  .report-page--graphs .section {
+    margin-bottom: 0;
   }
   .report-overview-top {
-    margin-bottom: 3px;
+    margin-bottom: 5px;
   }
   .badge,
   .report-stamp {
-    padding: 2px 5px;
-    font-size: 7.8px;
+    padding: 4px 8px;
+    font-size: 10px;
   }
   .info-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
-    margin-top: 3px;
+    gap: 3mm;
+    margin-top: 4mm;
   }
   .info-card {
-    gap: 1px;
-    padding: 3px 5px;
-    font-size: 7.8px;
+    gap: 3px;
+    padding: 7px 9px;
+    font-size: 10px;
   }
   .two-column-list {
     column-count: 2;
-    column-gap: 7mm;
-    margin-top: 3px;
+    column-gap: 10mm;
+    margin-top: 5px;
   }
   .results-stack {
-    gap: 1.5mm;
+    gap: 3.5mm;
   }
   .results-card {
-    gap: 2px;
-    padding: 1.6mm;
-    border-radius: 2mm;
+    gap: 2.5mm;
+    padding: 3mm;
+    border-radius: 3mm;
   }
   th,
   td {
-    padding: 1.3px 2px;
-    font-size: 6.8px;
-    line-height: 1.04;
+    padding: 4px 5px;
+    font-size: 9.5px;
+    line-height: 1.25;
   }
   .table-shell {
-    overflow: hidden;
-    border-radius: 2mm;
+    overflow: visible;
+    border-radius: 3mm;
   }
   .graphs-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2mm;
-    margin-bottom: 1.5mm;
+    gap: 3.5mm;
+    margin-bottom: 4mm;
   }
   .report-graph {
     min-height: 0;
-    padding-top: 0.5mm;
-    border-radius: 2mm;
+    padding: 2mm;
+    border-radius: 3mm;
   }
   .report-graph__svg,
   .report-graph__image {
-    max-height: 31mm;
+    max-height: 62mm;
     object-fit: contain;
   }
-  .section,
   .header-row,
   .info-grid,
   .report-graph-card,
