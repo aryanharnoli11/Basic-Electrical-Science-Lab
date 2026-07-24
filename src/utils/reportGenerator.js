@@ -351,7 +351,6 @@ body {
 .report-page:last-of-type {
   margin-bottom: 0;
 }
-.report-page--results,
 .report-page--graphs {
   break-before: page;
   page-break-before: always;
@@ -520,6 +519,30 @@ table {
   border-collapse: collapse;
   background-color: white;
   table-layout: auto;
+}
+.report-observation-table {
+  table-layout: fixed;
+}
+.report-observation-table__col-serial {
+  width: 48px;
+}
+.report-observation-table__col-reading {
+  width: 11%;
+}
+.report-observation-table__col-result {
+  width: 13.5%;
+}
+.report-observation-table__serial-heading {
+  min-width: 48px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.report-observation-table__serial-heading > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: max-content;
+  width: 100%;
 }
 th,
 td {
@@ -692,7 +715,7 @@ tr:nth-child(even) {
   transform: translateY(-2px);
 }
 .pdf-exporting {
-  width: 210mm !important;
+  width: 194mm !important;
   margin: 0 !important;
   padding: 0 !important;
   background: #ffffff !important;
@@ -700,27 +723,30 @@ tr:nth-child(even) {
   font-size: 11px !important;
   line-height: 1.35 !important;
 }
+.pdf-exporting .print-btn,
+.pdf-exporting .download-btn,
+.pdf-exporting .report-actions {
+  display: none !important;
+}
 .pdf-exporting .report-document {
-  width: 210mm !important;
+  width: 194mm !important;
 }
 .pdf-exporting .report-page {
-  width: 210mm !important;
+  width: 100% !important;
   min-height: 0 !important;
   margin: 0 !important;
-  padding: 7mm 9mm !important;
+  padding: 0 !important;
   overflow: visible !important;
   border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
+  break-before: auto !important;
+  page-break-before: auto !important;
   break-inside: auto !important;
   page-break-inside: auto !important;
 }
 .pdf-exporting .report-page--overview {
-  padding-bottom: 4mm !important;
-}
-.pdf-exporting .report-page--results {
-  break-before: auto !important;
-  page-break-before: auto !important;
+  padding-bottom: 0 !important;
 }
 .pdf-exporting .report-page--graphs {
   break-before: page !important;
@@ -731,17 +757,84 @@ tr:nth-child(even) {
 .pdf-exporting .report-page--overview .section > br {
   display: none !important;
 }
+.pdf-exporting .header-row {
+  grid-template-columns: 44mm minmax(0, 1fr) 26mm !important;
+  gap: 6mm !important;
+  margin-bottom: 5mm !important;
+}
+.pdf-exporting .report-title-block {
+  padding-bottom: 7px !important;
+}
+.pdf-exporting .report-logo--virtual-labs {
+  max-width: 42mm !important;
+  max-height: 18mm !important;
+}
+.pdf-exporting .report-logo--iit {
+  max-width: 21mm !important;
+  max-height: 21mm !important;
+}
+.pdf-exporting h1 {
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+}
+.pdf-exporting h2 {
+  margin-bottom: 8px !important;
+  padding-bottom: 6px !important;
+  font-size: 15px !important;
+  line-height: 1.25 !important;
+}
+.pdf-exporting h3 {
+  margin-bottom: 5px !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+}
+.pdf-exporting p {
+  margin-bottom: 6px !important;
+}
+.pdf-exporting ul,
+.pdf-exporting ol {
+  margin-top: 5px !important;
+  padding-left: 18px !important;
+}
+.pdf-exporting li {
+  margin-bottom: 3px !important;
+}
+.pdf-exporting .report-experiment-title {
+  margin-bottom: 8px !important;
+  font-size: 16px !important;
+  line-height: 1.25 !important;
+}
 .pdf-exporting .section {
   margin-bottom: 3.5mm !important;
   padding: 3.5mm 4mm !important;
+  border-radius: 3mm !important;
 }
-.pdf-exporting .report-page--results .section,
+.pdf-exporting .report-page--overview .results-section,
 .pdf-exporting .report-page--graphs .section {
   margin-bottom: 0 !important;
 }
+.pdf-exporting .report-overview-top {
+  margin-bottom: 5px !important;
+}
+.pdf-exporting .badge,
+.pdf-exporting .report-stamp {
+  padding: 4px 8px !important;
+  font-size: 10px !important;
+}
 .pdf-exporting .info-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   gap: 3mm !important;
   margin-top: 4mm !important;
+}
+.pdf-exporting .info-card {
+  gap: 3px !important;
+  padding: 7px 9px !important;
+  font-size: 10px !important;
+}
+.pdf-exporting .two-column-list {
+  column-count: 2 !important;
+  column-gap: 10mm !important;
+  margin-top: 5px !important;
 }
 .pdf-exporting .results-stack {
   gap: 3.5mm !important;
@@ -749,6 +842,7 @@ tr:nth-child(even) {
 .pdf-exporting .results-card {
   gap: 2.5mm !important;
   padding: 3mm !important;
+  border-radius: 3mm !important;
 }
 .pdf-exporting th,
 .pdf-exporting td {
@@ -756,24 +850,66 @@ tr:nth-child(even) {
   font-size: 9.5px !important;
   line-height: 1.25 !important;
 }
+.pdf-exporting .report-observation-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+.pdf-exporting .report-observation-table__col-serial {
+  width: 13mm !important;
+}
+.pdf-exporting .report-observation-table__serial-heading {
+  min-width: 13mm !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+}
+.pdf-exporting .report-observation-table__serial-heading > span {
+  min-width: calc(13mm - 4px) !important;
+}
+.pdf-exporting .report-observation-table th,
+.pdf-exporting .report-observation-table td {
+  padding: 3px 2px !important;
+  font-size: 8.4px !important;
+  line-height: 1.15 !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+.pdf-exporting .report-observation-table th {
+  white-space: normal !important;
+}
+.pdf-exporting .report-observation-table th[rowspan],
+.pdf-exporting .report-observation-table td {
+  white-space: nowrap !important;
+}
+.pdf-exporting .table-shell {
+  overflow: visible !important;
+  border-radius: 3mm !important;
+}
 .pdf-exporting .graphs-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 3.5mm !important;
   margin-bottom: 4mm !important;
 }
 .pdf-exporting .report-graph {
+  min-height: 0 !important;
   padding: 2mm !important;
+  border-radius: 3mm !important;
 }
 .pdf-exporting .report-graph__svg,
 .pdf-exporting .report-graph__image {
   max-height: 62mm !important;
   object-fit: contain !important;
 }
-.pdf-exporting .section,
-.pdf-exporting .results-card,
-.pdf-exporting .table-shell,
-.pdf-exporting .report-graph {
-  overflow: hidden !important;
+.pdf-exporting .header-row,
+.pdf-exporting .info-grid,
+.pdf-exporting .report-graph-card,
+.pdf-exporting .report-graph,
+.pdf-exporting thead,
+.pdf-exporting tr {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
 }
 @media (max-width: 768px) {
   body {
@@ -851,10 +987,6 @@ tr:nth-child(even) {
   .report-page--overview {
     padding-bottom: 0;
   }
-  .report-page--results {
-    break-before: auto;
-    page-break-before: auto;
-  }
   .report-page--graphs {
     break-before: page;
     page-break-before: always;
@@ -916,7 +1048,7 @@ tr:nth-child(even) {
     padding: 3.5mm 4mm;
     border-radius: 3mm;
   }
-  .report-page--results .section,
+  .report-page--overview .results-section,
   .report-page--graphs .section {
     margin-bottom: 0;
   }
@@ -956,6 +1088,39 @@ tr:nth-child(even) {
     padding: 4px 5px;
     font-size: 9.5px;
     line-height: 1.25;
+  }
+  .report-observation-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+  .report-observation-table__col-serial {
+    width: 13mm;
+  }
+  .report-observation-table__serial-heading {
+    min-width: 13mm;
+    padding-left: 2px;
+    padding-right: 2px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .report-observation-table__serial-heading > span {
+    min-width: calc(13mm - 4px);
+  }
+  .report-observation-table th,
+  .report-observation-table td {
+    padding: 3px 2px;
+    font-size: 8.4px;
+    line-height: 1.15;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+  .report-observation-table th {
+    white-space: normal;
+  }
+  .report-observation-table th[rowspan],
+  .report-observation-table td {
+    white-space: nowrap;
   }
   .table-shell {
     overflow: visible;
@@ -1034,30 +1199,34 @@ tr:nth-child(even) {
 
         <h3>Apparatus Used</h3>
         <ul class="two-column-list">
-          <li>Single phase transformer</li>
-          <li>Autotransformer set to ${formatNumber(AUTOTRANSFORMER_OUTPUT_VOLTAGE, 1)} V</li>
-          <li>AC voltmeters for primary and secondary voltage</li>
-          <li>AC ammeters for primary and secondary current</li>
-          <li>Wattmeter on primary side</li>
-          <li>Lamp load bank</li>
-          <li>No-load secondary voltage: ${formatNumber(NO_LOAD_SECONDARY_VOLTAGE, 1)} V</li>
+          <li>MCB: 16A, DP, 240 V AC</li>
+          <li>Autotransformer: 0 - 240 V AC, 4.05 kVA, 15 A</li>
+          <li>Single phase transformer: 230 V/115 V, 1 kVA</li>
+          <li>AC voltmeters for primary and secondary voltage: 0 - 240 V </li>
+          <li>AC ammeters for primary and secondary current:  0 - 10 A </li>
+          <li>Wattmeter on primary side: 0 - 600 W, 5A, M.F. - 2</li>
+          <li>Lamp load: 200 W per lamp</li>
           <li>Connecting leads</li>
         </ul>
         <br>
       </div>
-    </div>
 
-    <div class="report-page report-page--results">
       <div class="section results-section">
         <h2>Observations and Results</h2>
         <div class="results-stack">
           <div class="results-card results-card--table">
             <h3>Observation Table</h3>
             <div class="table-shell">
-              <table>
+              <table class="report-observation-table">
+                <colgroup>
+                  <col class="report-observation-table__col-serial">
+                  <col span="3" class="report-observation-table__col-reading">
+                  <col span="3" class="report-observation-table__col-reading">
+                  <col span="2" class="report-observation-table__col-result">
+                </colgroup>
                 <thead>
                   <tr>
-                    <th rowspan="2">S.No.</th>
+                    <th class="report-observation-table__serial-heading" rowspan="2"><span>S.No.</span></th>
                     <th colspan="3">Primary Side Readings</th>
                     <th colspan="3">Secondary Side Readings</th>
                     <th colspan="2">Results</th>
@@ -1103,7 +1272,7 @@ tr:nth-child(even) {
             <div class="report-graph">${regulationGraphSvg}</div>
           </div>
         </div>
-
+        <br>
         <div class="results-card">
           <h3>Conclusion</h3>
           <p style="text-align: justify;">The load test observations show the variation of transformer efficiency and voltage regulation with output power. At the maximum recorded output power of ${formatNumber(fullLoadRow?.secondaryPower, 1)} W, the transformer efficiency is ${formatResultNumber(fullLoadRow?.efficiency)}%, while the voltage regulation is ${formatResultNumber(fullLoadRow?.voltageRegulation)}%.</p>
@@ -1118,15 +1287,106 @@ tr:nth-child(even) {
   </div>
 
   <script>
-    function ensureHtml2Pdf() {
+    function hasPdfTools() {
+      return Boolean(window.html2canvas && window.jspdf && window.jspdf.jsPDF);
+    }
+
+    function loadPdfScript(src, isReady) {
       return new Promise(function(resolve, reject) {
-        if (window.html2pdf) return resolve();
+        if (isReady()) return resolve();
+        var existingScript = Array.from(document.scripts).find(function(script) {
+          return script.src === src;
+        });
+
+        if (existingScript) {
+          existingScript.addEventListener('load', function() {
+            isReady() ? resolve() : reject();
+          }, { once: true });
+          existingScript.addEventListener('error', reject, { once: true });
+          return;
+        }
+
         var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        script.onload = resolve;
+        script.crossOrigin = 'anonymous';
+        script.src = src;
+        script.onload = function() {
+          isReady() ? resolve() : reject();
+        };
         script.onerror = reject;
         document.head.appendChild(script);
       });
+    }
+
+    function ensurePdfTools() {
+      return loadPdfScript(
+        'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+        function() { return Boolean(window.html2canvas); },
+      ).then(function() {
+        return loadPdfScript(
+          'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+          function() { return Boolean(window.jspdf && window.jspdf.jsPDF); },
+        );
+      }).then(function() {
+        if (!hasPdfTools()) {
+          throw new Error('PDF export tools did not load.');
+        }
+      });
+    }
+
+    function waitForPdfLayout() {
+      var fontReady = document.fonts && document.fonts.ready
+        ? document.fonts.ready.catch(function() {})
+        : Promise.resolve();
+      var imageReady = Array.from(document.images).map(function(image) {
+        if (image.complete) {
+          return image.decode ? image.decode().catch(function() {}) : Promise.resolve();
+        }
+
+        return new Promise(function(resolve) {
+          image.addEventListener('load', resolve, { once: true });
+          image.addEventListener('error', resolve, { once: true });
+        });
+      });
+
+      return Promise.all([fontReady].concat(imageReady)).then(function() {
+        return new Promise(function(resolve) {
+          requestAnimationFrame(function() {
+            requestAnimationFrame(resolve);
+          });
+        });
+      });
+    }
+
+    function getReportPageCaptureSize(reportPage) {
+      var fallbackWidth = Math.ceil(194 * 96 / 25.4);
+      var pageRect = reportPage.getBoundingClientRect();
+      var contentBounds = Array.from(reportPage.querySelectorAll('*')).reduce(function(bounds, element) {
+        var elementRect = element.getBoundingClientRect();
+
+        return {
+          bottom: Math.max(bounds.bottom, elementRect.bottom - pageRect.top),
+          right: Math.max(bounds.right, elementRect.right - pageRect.left),
+        };
+      }, {
+        bottom: pageRect.height,
+        right: pageRect.width,
+      });
+      var captureWidth = Math.max(
+        fallbackWidth,
+        contentBounds.right,
+        reportPage.scrollWidth,
+        reportPage.offsetWidth,
+      );
+      var captureHeight = Math.max(
+        contentBounds.bottom,
+        reportPage.scrollHeight,
+        reportPage.offsetHeight,
+      );
+
+      return {
+        height: Math.ceil(captureHeight),
+        width: Math.ceil(captureWidth),
+      };
     }
 
     function prepareReportGraphImages() {
@@ -1183,30 +1443,73 @@ tr:nth-child(even) {
     }
 
     function downloadReport() {
-      prepareReportGraphImages().then(ensureHtml2Pdf).then(function() {
-        var element = document.getElementById('report-document') || document.body;
-        var opts = {
-          margin: [0.18, 0.18, 0.18, 0.18],
-          filename: 'transformer-load-test-report.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            scrollX: 0,
-            scrollY: 0,
-            onclone: function(clonedDoc) {
-              clonedDoc.body.classList.add('pdf-exporting');
-            }
-          },
-          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-          pagebreak: {
-            mode: ['css', 'legacy'],
-            before: [],
-            avoid: ['.header-row', '.report-overview', '.info-grid', '.report-graph-card', 'thead', 'tr']
-          }
-        };
-        return window.html2pdf().set(opts).from(element).save();
+      prepareReportGraphImages().then(ensurePdfTools).then(function() {
+        var reportPages = Array.from(document.querySelectorAll('#report-document > .report-page'));
+        var PdfConstructor = window.jspdf.jsPDF;
+        var pdf = new PdfConstructor({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        var pageMargin = 8;
+        var pageWidth = 210;
+        var pageHeight = 297;
+        var contentWidth = pageWidth - (pageMargin * 2);
+        var contentHeight = pageHeight - (pageMargin * 2);
+
+        if (!reportPages.length) {
+          throw new Error('No report pages available to download.');
+        }
+
+        document.body.classList.add('pdf-exporting');
+
+        return waitForPdfLayout().then(function() {
+          return reportPages.reduce(function(pageChain, reportPage, pageIndex) {
+            return pageChain.then(function() {
+              if (pageIndex > 0) {
+                pdf.addPage();
+              }
+
+              var captureSize = getReportPageCaptureSize(reportPage);
+
+              return window.html2canvas(reportPage, {
+                backgroundColor: '#ffffff',
+                height: captureSize.height,
+                scale: 2,
+                scrollX: 0,
+                scrollY: 0,
+                useCORS: true,
+                width: captureSize.width,
+                windowWidth: captureSize.width,
+              }).then(function(canvas) {
+                var imageData = canvas.toDataURL('image/jpeg', 0.98);
+                var renderWidth = contentWidth;
+                var renderHeight = (canvas.height * renderWidth) / canvas.width;
+
+                if (renderHeight > contentHeight) {
+                  var fitRatio = contentHeight / renderHeight;
+                  renderWidth *= fitRatio;
+                  renderHeight = contentHeight;
+                }
+
+                pdf.addImage(
+                  imageData,
+                  'JPEG',
+                  pageMargin + ((contentWidth - renderWidth) / 2),
+                  pageMargin,
+                  renderWidth,
+                  renderHeight,
+                  undefined,
+                  'FAST',
+                );
+              });
+            });
+          }, Promise.resolve());
+        }).then(function() {
+          pdf.save('transformer-load-test-report.pdf');
+          document.body.classList.remove('pdf-exporting');
+        }, function(error) {
+          document.body.classList.remove('pdf-exporting');
+          throw error;
+        });
       }).catch(function() {
+        document.body.classList.remove('pdf-exporting');
         alert('Unable to download the report automatically. Please use your browser\\'s Save as PDF option.');
       });
     }

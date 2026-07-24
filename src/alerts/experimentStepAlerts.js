@@ -39,7 +39,7 @@ export const EXPERIMENT_ALERTS = {
     type: 'warning',
   },
   completeConnectionsBeforeAutotransformer: {
-    description: 'Please complete the connections first and turn ON the MCB.',
+    description: 'Ensure that the MCB is switched ON before switching ON the autotransformer.',
     duration: 6200,
     target: '#voltage-control',
     title: 'Autotransformer OFF',
